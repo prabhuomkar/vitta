@@ -1,0 +1,140 @@
+---
+id: delete-payee
+title: "Delete an existing payee"
+description: "Delete an existing payee"
+sidebar_label: "Delete an existing payee"
+hide_title: true
+hide_table_of_contents: true
+api: eJyFU01v2zAM/SsGTxug2k7RXXxasGZAgKIIlnWXIAfGZmKhtqRKdNLA8H8fqLhdshTbSTY/Hh8fyR4YdwGKFSzwSBRgrcChx5aYvNh7MNgSFKArUKANFOCQa1BQUSi9dqytGOf3id0mEQQUeHrptKcKCvYdKQhlTS1C0QMfnaAF9trsQMHW+hYZCug6XcEwrBVYRx4Fdl5BARU1xPQGHKjsvOZjZLbBoMtpxzUUq7VkegrOmkBBKt3md/Jc0lx2ZUkhwKDgLp9c+58MdlyTYV0iU3WK+wDn0XLy3XYmRnzJ8+uIuWHyBptk5r31MAx/K3YfG0vQJPSqA2uzS9zYZUtc2z/NgzppXkC2n2QxKGS9roYoiN+/TarzDRRQM7tQZNleM+NNRa1Nt80x1RZEojcBlzKRk1BnMr7PR0BgnJv8x5jYhDZbGwM1N+L5JWWS6WJ+tRLTxTxZOir1VsTU1iRb65MYDwpKaxhLFihqUQtz53FTd7Z9Rv/VtWlLIm6jSzKBJG7cxKnDsqbkNs1BnfVcZNnhcEgxelPrd9mYGrKH+bfZ43J2c5vmac1tI7ii2onnJM3TXEzOBm7RnJX6x4wuen3XjemVM9egNgIYyfXj8Fawn8RJxjtTUOhKrq22gcXZ9xsM9OSbYRDzS0detnytYI9e40bEXvVQ6SDfFRRbbAJd8RBZychBffoxHuHn5PI4P6Q6GtEcQSo2nfyBgmc6no5/WA9ni3k/e5j9nIECvNyb056o8RXCHwLHZk9L9xTkTFoahvdq3WiCQf0/f4EhHKyvzvLdaBLOw/AbSSik2A==
+sidebar_class_name: "delete api-method"
+info_path: docs/swagger/vitta-api
+custom_edit_url: null
+---
+
+import ApiTabs from "@theme/ApiTabs";
+import DiscriminatorTabs from "@theme/DiscriminatorTabs";
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import SecuritySchemes from "@theme/ApiExplorer/SecuritySchemes";
+import MimeTabs from "@theme/MimeTabs";
+import ParamsItem from "@theme/ParamsItem";
+import ResponseSamples from "@theme/ResponseSamples";
+import SchemaItem from "@theme/SchemaItem";
+import SchemaTabs from "@theme/SchemaTabs";
+import Heading from "@theme/Heading";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Delete an existing payee"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"delete"}
+  path={"/v1/payees/{id}"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Delete an existing payee
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<details
+  style={{"marginBottom":"1rem"}}
+  className={"openapi-markdown__details"}
+  data-collapsed={false}
+  open={true}
+>
+  <summary
+    style={{}}
+  >
+    <h3
+      className={"openapi-markdown__details-summary-header-params"}
+    >
+      Path Parameters
+    </h3>
+  </summary><div>
+    <ul>
+      <ParamsItem
+        className={"paramsItem"}
+        param={{"name":"id","in":"path","description":"ID of Payee","required":true,"schema":{"type":"string","format":"uuid"},"enumDescriptions":[]}}
+      >
+        
+      </ParamsItem>
+    </ul>
+  </div>
+</details><div>
+  <div>
+    <ApiTabs
+      label={undefined}
+      id={undefined}
+    >
+      <TabItem
+        label={"204"}
+        value={"204"}
+      >
+        <div>
+          
+          
+          Success
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"401"}
+        value={"401"}
+      >
+        <div>
+          
+          
+          Unauthenticated
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"404"}
+        value={"404"}
+      >
+        <div>
+          
+          
+          Not Found
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"500"}
+        value={"500"}
+      >
+        <div>
+          
+          
+          Internal Error
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem>
+    </ApiTabs>
+  </div>
+</div>
+      

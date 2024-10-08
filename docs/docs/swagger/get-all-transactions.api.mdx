@@ -1,0 +1,248 @@
+---
+id: get-all-transactions
+title: "Get all existing transactions"
+description: "Get all existing transactions"
+sidebar_label: "Get all existing transactions"
+hide_title: true
+hide_table_of_contents: true
+api: eJy1VU1v4zYQ/SvCnGVJ1tpNrdMaRbo1UHQDJOmhhg8jamxxI5EsObIjGPrvC9LaVE6D3cMiJ0nUzJuPN3xzBsaDg2ILDxaVQ8FSKwe7GLQhi/5rU0EBB+J101zZxOBIdFZyD8X2DCU6KdYd11Bsd8MuBkvOaOXIQXGGPMv8oyInrDQeAAq474Qg55GEVkyKvQka00gRIqdfnLc7gxM1tejfuDcEBaC12EMMkql1k3NdfiHBEIOxPn+Wl+iymtg4tlIdIIa9ti0yFNB1soIY6Blb03iTbL7Kfyl/XcxWH0Q5u1mWq1m5WCxnuMSbxWJ/g8vVHnyFWH1WTQ8F246GGFAI3SnevEe4IQaDPdF7gQtkOmjbvxe+wpbeQv4P6Q/dOYru0HIf/a51Fbw0k/u+2314iVq0T5U+qeji4iuyVEmeOKuuLclOq9k3Gv24tF3D0jT0eQ9FluQT+Hme5MshhorKn8fKksXqkhgyVWv+bqcrZJqxbOmq2jzLF7N5NstuHrJ5keVF9uGft0axM9U7xxhiYMnBYaIL8Paxg2HwHots/n8deFTYcU2K/b2nwPvyLb3YKCarsIlurdUWhkDL1OATcYRNE9GzdCzVIeJrwWqJaz3KmRcJ9GoF6XGe8mtls0eyLghbZxsooGY2rkjTo2TGWUWtTvZNn0gNXuu+KeG9F6rLwE708IUAD+LRgxUUF5tQh1R7HQzH1v3tw0Truw28rnF9t4nuDQm5H1Uy2msbBftRSFEE0qlF6TM3Fsu60+0T2o+mTVry/W2kIOXChbxcTFgbFDVFeZJBPKm5SNPT6ZRg+Jtoe0hHV5f+ufnt9q/721meZEnNbeNxfdcuec6TLMmCamnHLapJqB/RdFXwS/OYnjk1DcowYyHD80jhFo5ziIFfrbBaO/Y/z+cSHT3aZhj88b8dWb+zdjEc0Uosfce3uyGGmrAiG1h/ot43RQgyflSO2HRh8bzeTp79l7H6dPsAMeA16ReS4/Hpsb8tMdVPkEOSl4l5dH7MWxoGiMdEuvEIhvjH/nfo3EnbauJvxiMYdsMwfAWJFKB4
+sidebar_class_name: "get api-method"
+info_path: docs/swagger/vitta-api
+custom_edit_url: null
+---
+
+import ApiTabs from "@theme/ApiTabs";
+import DiscriminatorTabs from "@theme/DiscriminatorTabs";
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import SecuritySchemes from "@theme/ApiExplorer/SecuritySchemes";
+import MimeTabs from "@theme/MimeTabs";
+import ParamsItem from "@theme/ParamsItem";
+import ResponseSamples from "@theme/ResponseSamples";
+import SchemaItem from "@theme/SchemaItem";
+import SchemaTabs from "@theme/SchemaTabs";
+import Heading from "@theme/Heading";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Get all existing transactions"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/v1/transactions"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Get all existing transactions
+
+<div>
+  <div>
+    <ApiTabs
+      label={undefined}
+      id={undefined}
+    >
+      <TabItem
+        label={"200"}
+        value={"200"}
+      >
+        <div>
+          
+          
+          Success
+          
+          
+        </div><div>
+          <MimeTabs
+            className={"openapi-tabs__mime"}
+            schemaType={"response"}
+          >
+            <TabItem
+              label={"application/json"}
+              value={"application/json"}
+            >
+              <SchemaTabs
+                className={"openapi-tabs__schema"}
+              >
+                <TabItem
+                  label={"Schema"}
+                  value={"Schema"}
+                >
+                  <details
+                    style={{}}
+                    className={"openapi-markdown__details response"}
+                    data-collapsed={false}
+                    open={true}
+                  >
+                    <summary
+                      style={{}}
+                      className={"openapi-markdown__details-summary-response"}
+                    >
+                      <strong>
+                        Schema
+                      </strong>
+                    </summary><div
+                      style={{"textAlign":"left","marginLeft":"1rem"}}
+                    >
+                      
+                    </div><ul
+                      style={{"marginLeft":"1rem"}}
+                    >
+                      <li>
+                        <div
+                          style={{"fontSize":"var(--ifm-code-font-size)","opacity":"0.6","marginLeft":"-.5rem","paddingBottom":".5rem"}}
+                        >
+                          Array [
+                        </div>
+                      </li><SchemaItem
+                        collapsible={false}
+                        name={"id"}
+                        required={false}
+                        schemaName={"uuid"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"string","format":"uuid","example":"01926b84-93cb-75b9-b445-a5a744f7a59f","readOnly":true}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={false}
+                        name={"accountId"}
+                        required={false}
+                        schemaName={"uuid"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"string","format":"uuid","example":"01926b84-93cb-75b9-b445-a5a744f7a59f"}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={false}
+                        name={"payeeId"}
+                        required={false}
+                        schemaName={"uuid"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"string","format":"uuid","example":"01926b84-93cb-75b9-b445-a5a744f7a59f"}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={false}
+                        name={"categoryId"}
+                        required={false}
+                        schemaName={"uuid"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"string","format":"uuid","example":"01926b84-93cb-75b9-b445-a5a744f7a59f"}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={false}
+                        name={"name"}
+                        required={false}
+                        schemaName={"string"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"string","example":"House Party Food"}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={false}
+                        name={"notes"}
+                        required={false}
+                        schemaName={"string"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"string","example":"Sample markdown notes"}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={false}
+                        name={"credit"}
+                        required={false}
+                        schemaName={"float"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"number","format":"float","multipleOf":0.2,"example":12.25}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={false}
+                        name={"debit"}
+                        required={false}
+                        schemaName={"float"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"number","format":"float","multipleOf":0.2,"example":10.49}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={false}
+                        name={"createdAt"}
+                        required={false}
+                        schemaName={"date-time"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"string","format":"date-time","example":"2024-10-07T01:02:03Z","readOnly":true}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={false}
+                        name={"updatedAt"}
+                        required={false}
+                        schemaName={"date-time"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"string","format":"date-time","example":"2024-10-07T01:02:03Z","readOnly":true}}
+                      >
+                        
+                      </SchemaItem><li>
+                        <div
+                          style={{"fontSize":"var(--ifm-code-font-size)","opacity":"0.6","marginLeft":"-.5rem"}}
+                        >
+                          ]
+                        </div>
+                      </li>
+                    </ul>
+                  </details>
+                </TabItem><TabItem
+                  label={"Example (from schema)"}
+                  value={"Example (from schema)"}
+                >
+                  <ResponseSamples
+                    responseExample={"[\n  {\n    \"id\": \"01926b84-93cb-75b9-b445-a5a744f7a59f\",\n    \"accountId\": \"01926b84-93cb-75b9-b445-a5a744f7a59f\",\n    \"payeeId\": \"01926b84-93cb-75b9-b445-a5a744f7a59f\",\n    \"categoryId\": \"01926b84-93cb-75b9-b445-a5a744f7a59f\",\n    \"name\": \"House Party Food\",\n    \"notes\": \"Sample markdown notes\",\n    \"credit\": 12.25,\n    \"debit\": 10.49,\n    \"createdAt\": \"2024-10-07T01:02:03Z\",\n    \"updatedAt\": \"2024-10-07T01:02:03Z\"\n  }\n]"}
+                    language={"json"}
+                  >
+                    
+                  </ResponseSamples>
+                </TabItem>
+              </SchemaTabs>
+            </TabItem>
+          </MimeTabs>
+        </div>
+      </TabItem><TabItem
+        label={"401"}
+        value={"401"}
+      >
+        <div>
+          
+          
+          Unauthenticated
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"500"}
+        value={"500"}
+      >
+        <div>
+          
+          
+          Internal Error
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem>
+    </ApiTabs>
+  </div>
+</div>
+      

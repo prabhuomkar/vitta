@@ -1,0 +1,140 @@
+---
+id: delete-group
+title: "Delete an existing group"
+description: "Delete an existing group"
+sidebar_label: "Delete an existing group"
+hide_title: true
+hide_table_of_contents: true
+api: eJyFU01v2zAM/SsGTxug2k7RXXxatmZDgKIolnWXIAfFpmOhtqRKVNLA0H8faLtdshTbSTY/Hh8fyR5I7jwUa/gSqh2Sh40AK53skNCxowctO4QCVAUClIYCrKQGBFToS6csKcPG5W1i6uS7M8GCAIfPQTmsoCAXUIAvG+wkFD3Q0TKaJ6f0DgTUxnWSoIAQVAUxbgQYi04y7LKCAipskfAV2GMZnKLjwGwrvSrngRoo1hvOdOit0R49V7rOb/g5p7kKZYneQxRwk88u/Y9aBmpQkyolYTXGvYNzbyj5ZoIeIj7l+WXEUhM6Ldtk4ZxxEOPfit0OjSVSJ/iiPCm9S3ZTlx1SY/40D2LUvIBsP8uGIJ/1qoqDIG7/OqngWiigIbK+yLK9IpJXFXYmrdtjqgywRK8Crngio1AnMr7Nh0Fgmhv/DzFDE0rXZghU1LLnF5dJ5g/Li5WYPyyTlcVS1SymMjqpjUuGeBBQGk2yJIbCTipmbp3cNsF0T9J9tl3aIYvbqhK1R46bNnFuZdlgcp3mIE56LrLscDikcvCmxu2yKdVnd8uvi/vV4uo6zdOGupZxWbWR5yzN05xN1njqpD4p9Y8ZnfX6phvhC2W2lUoz4ECun4a3hv0MBIzjAwGFqvjaGuOJnX2/lR4fXRsjm58DOt7yjYC9dEpuWex1D5Xy/F1BUcvW4wUPlhU1H9SHH9MRfkzOj/NdqpNR6iNwxTbwHwh4wuN4/HETTxbzdnG3+LkAAfJ8b8Y9EdPLhN8FHpodl+7R85l0GONbtTCZIIr/5z9I7w/GVSf5djIx5xh/AyM2pe4=
+sidebar_class_name: "delete api-method"
+info_path: docs/swagger/vitta-api
+custom_edit_url: null
+---
+
+import ApiTabs from "@theme/ApiTabs";
+import DiscriminatorTabs from "@theme/DiscriminatorTabs";
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import SecuritySchemes from "@theme/ApiExplorer/SecuritySchemes";
+import MimeTabs from "@theme/MimeTabs";
+import ParamsItem from "@theme/ParamsItem";
+import ResponseSamples from "@theme/ResponseSamples";
+import SchemaItem from "@theme/SchemaItem";
+import SchemaTabs from "@theme/SchemaTabs";
+import Heading from "@theme/Heading";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Delete an existing group"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"delete"}
+  path={"/v1/groups/{id}"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Delete an existing group
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<details
+  style={{"marginBottom":"1rem"}}
+  className={"openapi-markdown__details"}
+  data-collapsed={false}
+  open={true}
+>
+  <summary
+    style={{}}
+  >
+    <h3
+      className={"openapi-markdown__details-summary-header-params"}
+    >
+      Path Parameters
+    </h3>
+  </summary><div>
+    <ul>
+      <ParamsItem
+        className={"paramsItem"}
+        param={{"name":"id","in":"path","description":"ID of Group","required":true,"schema":{"type":"string","format":"uuid"},"enumDescriptions":[]}}
+      >
+        
+      </ParamsItem>
+    </ul>
+  </div>
+</details><div>
+  <div>
+    <ApiTabs
+      label={undefined}
+      id={undefined}
+    >
+      <TabItem
+        label={"204"}
+        value={"204"}
+      >
+        <div>
+          
+          
+          Success
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"401"}
+        value={"401"}
+      >
+        <div>
+          
+          
+          Unauthenticated
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"404"}
+        value={"404"}
+      >
+        <div>
+          
+          
+          Not Found
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"500"}
+        value={"500"}
+      >
+        <div>
+          
+          
+          Internal Error
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem>
+    </ApiTabs>
+  </div>
+</div>
+      

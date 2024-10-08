@@ -1,0 +1,140 @@
+---
+id: delete-category
+title: "Delete an existing category"
+description: "Delete an existing category"
+sidebar_label: "Delete an existing category"
+hide_title: true
+hide_table_of_contents: true
+api: eJyFVMFu2zAM/RWDpw1QbafoLj4tazMgQFEUy7pLkANjM7FQW3IlKllg6N8HOm6aLsV2kkU9PT0+ku6BceuhWMK3UG2JPawUdOiwJSYnBz0YbAkK0BUo0AYK6JBrUFCRL53uWFsJzu8Su0lukWlr3QEUOHoJ2lEFBbtACnxZU4tQ9MCHTgg9O222oGBjXYsMBYSgK4hxpcB25FCY5xUUUFFDTGfcnsrgNB8GfWv0upwGrqFYruSyI99Z48nLY9f5jSzvxS5CWZL3EBXc5JPL8yeDgWsyrEtkqo64D3geLCffbTAD4kueXyLmhskZbJKZc9ZBjH/7djfklqBJ6Lf2rM02Kd8SbYlr+2YBqKP5BWS7STbiNPms11UcfHG717IF10ABNXPniyzbaWa8qqi16aY5pNqCOPXq40Jqc/TrzM1TpYQExgrKfsAMuWizsQNQcyMnv+SZZPo4v+iP6eM8WXRU6o14qq1JNtYlAx4UlNYwlixU1KIW5Z3DdR1s+4zua9emLYnHjS7JeBLc2JbTDsuakus0B3WWc5Fl+/0+xeE0tW6bjVd9dj+/nT0sZlfXaZ7W3DbCK64ddU7SPM0l1FnPLZqzp/5dqnfpnqxj+s1Z16A2wjno68caLmE3kdRPVQQFha5kAmvrWQB9v0ZPT66JUcIvgZz0/ErBDp3GtXi+7KHSXr4rKDbYeLrQIu6SkQn79GOcys/JxcB+qHgMohHEDpsgO1DwTIfjPyGu4lmb3s3uZz9noADfd9CxY9S4iuYPiYd8j+335GVuWorx9FoYQxDV/+8/ovd766qz+90YEs0x/gH2z67v
+sidebar_class_name: "delete api-method"
+info_path: docs/swagger/vitta-api
+custom_edit_url: null
+---
+
+import ApiTabs from "@theme/ApiTabs";
+import DiscriminatorTabs from "@theme/DiscriminatorTabs";
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import SecuritySchemes from "@theme/ApiExplorer/SecuritySchemes";
+import MimeTabs from "@theme/MimeTabs";
+import ParamsItem from "@theme/ParamsItem";
+import ResponseSamples from "@theme/ResponseSamples";
+import SchemaItem from "@theme/SchemaItem";
+import SchemaTabs from "@theme/SchemaTabs";
+import Heading from "@theme/Heading";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Delete an existing category"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"delete"}
+  path={"/v1/categories/{id}"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Delete an existing category
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<details
+  style={{"marginBottom":"1rem"}}
+  className={"openapi-markdown__details"}
+  data-collapsed={false}
+  open={true}
+>
+  <summary
+    style={{}}
+  >
+    <h3
+      className={"openapi-markdown__details-summary-header-params"}
+    >
+      Path Parameters
+    </h3>
+  </summary><div>
+    <ul>
+      <ParamsItem
+        className={"paramsItem"}
+        param={{"name":"id","in":"path","description":"ID of Category","required":true,"schema":{"type":"string","format":"uuid"},"enumDescriptions":[]}}
+      >
+        
+      </ParamsItem>
+    </ul>
+  </div>
+</details><div>
+  <div>
+    <ApiTabs
+      label={undefined}
+      id={undefined}
+    >
+      <TabItem
+        label={"204"}
+        value={"204"}
+      >
+        <div>
+          
+          
+          Success
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"401"}
+        value={"401"}
+      >
+        <div>
+          
+          
+          Unauthenticated
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"404"}
+        value={"404"}
+      >
+        <div>
+          
+          
+          Not Found
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"500"}
+        value={"500"}
+      >
+        <div>
+          
+          
+          Internal Error
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem>
+    </ApiTabs>
+  </div>
+</div>
+      

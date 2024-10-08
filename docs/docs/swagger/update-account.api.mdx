@@ -1,0 +1,217 @@
+---
+id: update-account
+title: "Update an existing account"
+description: "Update an existing account"
+sidebar_label: "Update an existing account"
+hide_title: true
+hide_table_of_contents: true
+api: eJy1VVFv4jgQ/ivRPN1KhgSWXq95Okqpiu7URaU96bbiYRI7xNvEztoOFKH899M4gcKCdp/uiTCemW88833jHThcWYhfYZymulbOwpJBhQZL4YShkx0oLAXEIDkwkApiqNDlwIALmxpZOanJOLsLdBZ0aYCBEd9raQSH2JlaMLBpLkqEeAduW1E+64xUK2CQaVOigxjqWnJomiUDXQmDlHjGyV5xdOIjtRVpbaTb+uoStDId1y6H+HVJsQQsrLvVfEtoqVZOKEefWFWFTH3e8JulqnfnZenkm0gJpTJUhZPC0qnkvy6dgXjHsirIJRrcDH9P/hj1bj6nSe/6KrnpJaPRVQ+v8Ho0yq7x6ibzXUL+RRXbtksN65p9jvSReTaZTWbBLao3aBjoLLut+Uq4o6BE60KgOo7qsrcOF7KruiQWTMaLh3DyMJ38FcwegcFkAgzu78KnO2Awnd8Dg8f5AhgsFv/CsmGQGoFO8LH7aXdofD0nS3FykWE0HPUGUS+6fo4GcTSMo89fL7WkHf//iUGdkc4H7FnWkPGUw95gK61sS4lhNKKfUxks6jQV1tJoRlF0fn6LPOgY2voMzn1eFNYuF8oRWQVv/S5gPWoX3OtaeY+rS2gz5YRRWARTY7QButMPUL63AapAvEvrpFoFeNBZKVyueSv4lBTvhR9DuB6EnZcNd5I3XpNmvV8YtSkghty5ysZhuJbOYY+LUvezYtuXGkilew0vSH9tP4+UfJgzJYFueXhqk4+/Bwn46UPq0/3ID/vqSCcnMmnXUZf/lPANLbhMe/yOD/9Q9cF4PjtbeOP5LFhUIpVZt1OCTJvA+wPzawdTT1lRoqSGVAaTvNblG5o/q7JfCsIrZCqUPa57XGGai2DYj4AdtTIOw81m00d/2tdmFXahNvx7Npk+Lqa9YT/q564sKC8No61z0I/6EZkqbV2J6gjqp9M/ue1hIE68u7AqUCpK6cvbdbx4hfUAGOyZAQxiyek9ybV1dLzbJWjFiymahszfa2Fohy8ZrNFITKjhrzvg0tI3hzjDwoqzSg4bHX576gT6Kfjx+blYbmdEtQXCLGr6BwzexLZ94BraablALowvpT2YtIC9Zwr/CDx7TojXB83Mx8+TB2CQdO9QqTkFGdzQ/sFNi6z9rTz9vW0HBapVjSvybZMS2fFUFa0KWPdLhV68me93K6kXS3ugFE1zuG7dmaBhv46fo7UbbfhRfNWZqGlN8x+MYb3m
+sidebar_class_name: "patch api-method"
+info_path: docs/swagger/vitta-api
+custom_edit_url: null
+---
+
+import ApiTabs from "@theme/ApiTabs";
+import DiscriminatorTabs from "@theme/DiscriminatorTabs";
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import SecuritySchemes from "@theme/ApiExplorer/SecuritySchemes";
+import MimeTabs from "@theme/MimeTabs";
+import ParamsItem from "@theme/ParamsItem";
+import ResponseSamples from "@theme/ResponseSamples";
+import SchemaItem from "@theme/SchemaItem";
+import SchemaTabs from "@theme/SchemaTabs";
+import Heading from "@theme/Heading";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Update an existing account"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"patch"}
+  path={"/v1/accounts/{id}"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Update an existing account
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<details
+  style={{"marginBottom":"1rem"}}
+  className={"openapi-markdown__details"}
+  data-collapsed={false}
+  open={true}
+>
+  <summary
+    style={{}}
+  >
+    <h3
+      className={"openapi-markdown__details-summary-header-params"}
+    >
+      Path Parameters
+    </h3>
+  </summary><div>
+    <ul>
+      <ParamsItem
+        className={"paramsItem"}
+        param={{"name":"id","in":"path","description":"ID of Account","required":true,"schema":{"type":"string","format":"uuid"},"enumDescriptions":[]}}
+      >
+        
+      </ParamsItem>
+    </ul>
+  </div>
+</details><MimeTabs
+  className={"openapi-tabs__mime"}
+>
+  <TabItem
+    label={"application/json"}
+    value={"application/json-schema"}
+  >
+    <details
+      style={{}}
+      className={"openapi-markdown__details mime"}
+      data-collapsed={false}
+      open={true}
+    >
+      <summary
+        style={{}}
+        className={"openapi-markdown__details-summary-mime"}
+      >
+        <h3
+          className={"openapi-markdown__details-summary-header-body"}
+        >
+          Body
+        </h3><strong
+          className={"openapi-schema__required"}
+        >
+          required
+        </strong>
+      </summary><div
+        style={{"textAlign":"left","marginLeft":"1rem"}}
+      >
+        
+      </div><ul
+        style={{"marginLeft":"1rem"}}
+      >
+        <SchemaItem
+          collapsible={false}
+          name={"name"}
+          required={false}
+          schemaName={"string"}
+          qualifierMessage={undefined}
+          schema={{"type":"string","example":"ICICI Bank"}}
+        >
+          
+        </SchemaItem><SchemaItem
+          collapsible={false}
+          name={"offBudget"}
+          required={false}
+          schemaName={"boolean"}
+          qualifierMessage={undefined}
+          schema={{"type":"boolean","example":true}}
+        >
+          
+        </SchemaItem><SchemaItem
+          collapsible={false}
+          name={"type"}
+          required={false}
+          schemaName={"string"}
+          qualifierMessage={"**Possible values:** [`CASH/CHECK IN`, `CC`, `FD/RD`, `EPF`, `NPS`, `SSY`]"}
+          schema={{"type":"string","enum":["CASH/CHECK IN","CC","FD/RD","EPF","NPS","SSY"]}}
+        >
+          
+        </SchemaItem>
+      </ul>
+    </details>
+  </TabItem>
+</MimeTabs><div>
+  <div>
+    <ApiTabs
+      label={undefined}
+      id={undefined}
+    >
+      <TabItem
+        label={"204"}
+        value={"204"}
+      >
+        <div>
+          
+          
+          Success
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"400"}
+        value={"400"}
+      >
+        <div>
+          
+          
+          Bad request
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"401"}
+        value={"401"}
+      >
+        <div>
+          
+          
+          Unauthenticated
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"404"}
+        value={"404"}
+      >
+        <div>
+          
+          
+          Not Found
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"500"}
+        value={"500"}
+      >
+        <div>
+          
+          
+          Internal Error
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem>
+    </ApiTabs>
+  </div>
+</div>
+      

@@ -1,0 +1,218 @@
+---
+id: get-budget
+title: "Get Budget"
+description: "Get Budget"
+sidebar_label: "Get Budget"
+hide_title: true
+hide_table_of_contents: true
+api: eJy9VE2P0zAQ/SvVnNMkLS1Lc2JB1aoSghXLcql6mDiTxpDYxh/drar8dzRuKC1UQkiIU6Lx+M3zvHlzAI9bB8Ua3oRqS97BJgFtyKKXWq0qKGBL/ngGCTgSwUq/h2J9gBKdFLfBN1CsN/0mAUvOaOXIQXGAaT7hT0VOWGkYDQp4CEKQc5CA0MqT8pyCxrRSxILZF8d5B3CioQ75z+8NQQG6/EKCKRjL9Lw8VhHoaavtnpmecp23Um0hgVrbDj0UEIKsIAF6xs60nJJPFtOX5avZePFClOObebkYl7PZfIxzvJnN6hucL2rgF2H1QbV7KLwN1Ceneu+xo2sVf1a4s1qQZZpXYLZWB/O/OMdifyb8kbXl6Gj5bCjKeAWs04oFPwFJ5WlL9py4VP7F9Bx6kl8B2hPav8SZ5tPZFaQyTiedd1OFrrwEq1uNPD5daL00LX2oocjT6QXLdLa4Au/MMKf/HLtPwEsfm3902EdyofXQ93w0u2agR4XBN6Q8G4Yq6BOY5/nveSvlySpsR0trtQXGu0y4Iz862boj3+jB62wxZIkh202yctgKbH27I+ui84NtoYDGe+OKLNtJ73FcUafTut2nUgMvgx+r4oGdfDTr2cI4dZNBGD1mQXHMiXylqnVMHFr0mcuMbu9X8Otbbu9XowdDQtbDGhnV2o5i/rBpUEQFqUPJzI3Fsgm6+4r2tenSjriPrRQ89Zynolng1qBoaDRNc0jO3lxk2dPTU4rxNNV2mw1XXfZu9Xb5/mE5nqZ52viuZVzu2pHnJM3TnENGO9+hOit1IcfF606d8vTsM9OiVAwR6RwGqdawm8API8QV3mjnOX44lOjo0bZ9z+FvgSwv700CO7QSS+7setMn0BBWZKO6X2nPjxeCDLPZYRu4/m9rmlU+Tc7d8hMkgJfiHsVMhi9jDweo9mfIkeRxMh4dj21HfQ/JQCQMIeiTP9+/R+eetK3O7pshBP2m7/vvnldRdw==
+sidebar_class_name: "get api-method"
+info_path: docs/swagger/vitta-api
+custom_edit_url: null
+---
+
+import ApiTabs from "@theme/ApiTabs";
+import DiscriminatorTabs from "@theme/DiscriminatorTabs";
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import SecuritySchemes from "@theme/ApiExplorer/SecuritySchemes";
+import MimeTabs from "@theme/MimeTabs";
+import ParamsItem from "@theme/ParamsItem";
+import ResponseSamples from "@theme/ResponseSamples";
+import SchemaItem from "@theme/SchemaItem";
+import SchemaTabs from "@theme/SchemaTabs";
+import Heading from "@theme/Heading";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Get Budget"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/v1/budgets"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Get Budget
+
+<div>
+  <div>
+    <ApiTabs
+      label={undefined}
+      id={undefined}
+    >
+      <TabItem
+        label={"201"}
+        value={"201"}
+      >
+        <div>
+          
+          
+          Success
+          
+          
+        </div><div>
+          <MimeTabs
+            className={"openapi-tabs__mime"}
+            schemaType={"response"}
+          >
+            <TabItem
+              label={"application/json"}
+              value={"application/json"}
+            >
+              <SchemaTabs
+                className={"openapi-tabs__schema"}
+              >
+                <TabItem
+                  label={"Schema"}
+                  value={"Schema"}
+                >
+                  <details
+                    style={{}}
+                    className={"openapi-markdown__details response"}
+                    data-collapsed={false}
+                    open={true}
+                  >
+                    <summary
+                      style={{}}
+                      className={"openapi-markdown__details-summary-response"}
+                    >
+                      <strong>
+                        Schema
+                      </strong>
+                    </summary><div
+                      style={{"textAlign":"left","marginLeft":"1rem"}}
+                    >
+                      
+                    </div><ul
+                      style={{"marginLeft":"1rem"}}
+                    >
+                      <SchemaItem
+                        collapsible={false}
+                        name={"categoryId"}
+                        required={false}
+                        schemaName={"uuid"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"string","format":"uuid","example":"01926b84-93cb-75b9-b445-a5a744f7a59f","readOnly":true}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={false}
+                        name={"categoryName"}
+                        required={false}
+                        schemaName={"string"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"string","example":"Groceries","readOnly":true}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={false}
+                        name={"groupId"}
+                        required={false}
+                        schemaName={"uuid"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"string","format":"uuid","example":"01926b84-93cb-75b9-b445-a5a744f7a59f","readOnly":true}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={false}
+                        name={"groupName"}
+                        required={false}
+                        schemaName={"string"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"string","example":"Recurring Expenses","readOnly":true}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={false}
+                        name={"month"}
+                        required={false}
+                        schemaName={"int32"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"integer","format":"int32","example":10,"readOnly":true}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={false}
+                        name={"year"}
+                        required={false}
+                        schemaName={"int32"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"integer","format":"int32","example":2024,"readOnly":true}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={false}
+                        name={"budgeted"}
+                        required={false}
+                        schemaName={"float"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"number","format":"float","multipleOf":0.2,"example":10.49,"readOnly":true}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={false}
+                        name={"spent"}
+                        required={false}
+                        schemaName={"float"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"number","format":"float","multipleOf":0.2,"example":10.49,"readOnly":true}}
+                      >
+                        
+                      </SchemaItem>
+                    </ul>
+                  </details>
+                </TabItem><TabItem
+                  label={"Example (from schema)"}
+                  value={"Example (from schema)"}
+                >
+                  <ResponseSamples
+                    responseExample={"{\n  \"categoryId\": \"01926b84-93cb-75b9-b445-a5a744f7a59f\",\n  \"categoryName\": \"Groceries\",\n  \"groupId\": \"01926b84-93cb-75b9-b445-a5a744f7a59f\",\n  \"groupName\": \"Recurring Expenses\",\n  \"month\": 10,\n  \"year\": 2024,\n  \"budgeted\": 10.49,\n  \"spent\": 10.49\n}"}
+                    language={"json"}
+                  >
+                    
+                  </ResponseSamples>
+                </TabItem>
+              </SchemaTabs>
+            </TabItem>
+          </MimeTabs>
+        </div>
+      </TabItem><TabItem
+        label={"401"}
+        value={"401"}
+      >
+        <div>
+          
+          
+          Unauthenticated
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"500"}
+        value={"500"}
+      >
+        <div>
+          
+          
+          Internal Error
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem>
+    </ApiTabs>
+  </div>
+</div>
+      

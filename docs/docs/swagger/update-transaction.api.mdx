@@ -1,0 +1,253 @@
+---
+id: update-transaction
+title: "Update an existing transaction"
+description: "Update an existing transaction"
+sidebar_label: "Update an existing transaction"
+hide_title: true
+hide_table_of_contents: true
+api: eJy1Vt9v2zYQ/leEe9oAWZJde1n0NDdLUQNDGzTJHhbk4SSebLYSqZJUHEPQ/14cpTjy7C4BhjyJIu+++/2RLThcW0jv4Magspg7qZWF+xBqNFiRI8OnLSisCFKQAkKQClKo0W0gBEE2N7JmNUhh9Wegi2AEBSEY+t5IQwJSZxoKweYbqhDSFtyuZkzrjFRrCKHQpkIHKTSNFNB19yHomgwy0Erwfi3Q0SG8pbwx0u28lxlamS8bt4H07p712ThZ916LHVvMtXKkHC+xrkuZe+z4q2Xv22PXdPaVcgch1IY9cZIsn0rxsvsh0CNWdckiyfR89lv2+3xy/i7PJmeL7HySzeeLCS7wbD4vznBxXvhMofisyl2fqS4EzHPdKLd6C3Mdl3hH9FbgOTpaa7N7K/y+IY+Rn5E+6sZScIXG7YIPWguvpV1fwp+rXftFUKH5JvRWBb0KR2RISDdSVk2VkRlHU5QauV2qpnSyLulzAWkSzUbw01k0W3Q8N9n/x0qi+XnvGDoSS/efmebRmThZ0UG0s2Q2n0yTSXJ2k0zTZJYm7/451Yr96L2ljS4EJ51XGE94xweHHOI3bK2V7Ws5S+b8OaSi6ybPyfrCzZPk+Pw9imBgh15meixzq7BxG1KOiYJEL3fC1iftgg+6UV5iccraSjkyCsvg0hhtoOv+zZy3Pr8BqoAepXVSrQN3wHMVuY0WPfHmzLyegFOIH6bxSNLGrRSd50Xz8ETejSkhhY1ztU3j+EE6hxNBlY6KchdJDcyUTzx6zRzY53XEpvuaMwgMJM7/XsbHwyT65ZluL5/K345p7LVUuKem1yqM6ea1OsOddsQTe5r4CRc8U4Gf5v0wP82jVIX2KRva+W9OeLC8Wh3dl8urVXBdUy6L4SoKCm0CL89WtHKY+4mjCiXXsDaYbRpdfUPzR11FFXHHlTInZX2qh5CWNeYbCmZRAuGo+mkcb7fbCP1ppM06HlRt/Nfq4vLT9eVkFiXRxlUl43L/9H5OoyRK/JWhratQjUy92LgHEe/7yNGji+sSpWJY72I7tPQdPEwhhHFTQwipFPws2WjrWKRtM7R0a8qu4+3vDRl+AtyH8IBGYsaJv2tBSMtrAWmBpaUjb/YPAvjly8AxvwanXjEn3R42Ue2A7ZYN/0EI32jXv5W6+y6EDaEg493pDy56o5MbVn9WPHqR8Fjux/5qeXPxEULIhqdMpQUrGdwyleK2t6zrPl9p2++1UKJaN7hm2R6UZxUPh7of4nD4sqMnI/M57xnh1jKdVdR1+3CbYQu68GX9K7R2q40Y6dfDFiet634A8R53qA==
+sidebar_class_name: "patch api-method"
+info_path: docs/swagger/vitta-api
+custom_edit_url: null
+---
+
+import ApiTabs from "@theme/ApiTabs";
+import DiscriminatorTabs from "@theme/DiscriminatorTabs";
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import SecuritySchemes from "@theme/ApiExplorer/SecuritySchemes";
+import MimeTabs from "@theme/MimeTabs";
+import ParamsItem from "@theme/ParamsItem";
+import ResponseSamples from "@theme/ResponseSamples";
+import SchemaItem from "@theme/SchemaItem";
+import SchemaTabs from "@theme/SchemaTabs";
+import Heading from "@theme/Heading";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Update an existing transaction"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"patch"}
+  path={"/v1/transactions/{id}"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Update an existing transaction
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<details
+  style={{"marginBottom":"1rem"}}
+  className={"openapi-markdown__details"}
+  data-collapsed={false}
+  open={true}
+>
+  <summary
+    style={{}}
+  >
+    <h3
+      className={"openapi-markdown__details-summary-header-params"}
+    >
+      Path Parameters
+    </h3>
+  </summary><div>
+    <ul>
+      <ParamsItem
+        className={"paramsItem"}
+        param={{"name":"id","in":"path","description":"ID of Transaction","required":true,"schema":{"type":"string","format":"uuid"},"enumDescriptions":[]}}
+      >
+        
+      </ParamsItem>
+    </ul>
+  </div>
+</details><MimeTabs
+  className={"openapi-tabs__mime"}
+>
+  <TabItem
+    label={"application/json"}
+    value={"application/json-schema"}
+  >
+    <details
+      style={{}}
+      className={"openapi-markdown__details mime"}
+      data-collapsed={false}
+      open={true}
+    >
+      <summary
+        style={{}}
+        className={"openapi-markdown__details-summary-mime"}
+      >
+        <h3
+          className={"openapi-markdown__details-summary-header-body"}
+        >
+          Body
+        </h3><strong
+          className={"openapi-schema__required"}
+        >
+          required
+        </strong>
+      </summary><div
+        style={{"textAlign":"left","marginLeft":"1rem"}}
+      >
+        
+      </div><ul
+        style={{"marginLeft":"1rem"}}
+      >
+        <SchemaItem
+          collapsible={false}
+          name={"accountId"}
+          required={false}
+          schemaName={"uuid"}
+          qualifierMessage={undefined}
+          schema={{"type":"string","format":"uuid","example":"01926b84-93cb-75b9-b445-a5a744f7a59f"}}
+        >
+          
+        </SchemaItem><SchemaItem
+          collapsible={false}
+          name={"payeeId"}
+          required={false}
+          schemaName={"uuid"}
+          qualifierMessage={undefined}
+          schema={{"type":"string","format":"uuid","example":"01926b84-93cb-75b9-b445-a5a744f7a59f"}}
+        >
+          
+        </SchemaItem><SchemaItem
+          collapsible={false}
+          name={"categoryId"}
+          required={false}
+          schemaName={"uuid"}
+          qualifierMessage={undefined}
+          schema={{"type":"string","format":"uuid","example":"01926b84-93cb-75b9-b445-a5a744f7a59f"}}
+        >
+          
+        </SchemaItem><SchemaItem
+          collapsible={false}
+          name={"name"}
+          required={false}
+          schemaName={"string"}
+          qualifierMessage={undefined}
+          schema={{"type":"string","example":"House Party Food"}}
+        >
+          
+        </SchemaItem><SchemaItem
+          collapsible={false}
+          name={"notes"}
+          required={false}
+          schemaName={"string"}
+          qualifierMessage={undefined}
+          schema={{"type":"string","example":"Sample markdown notes"}}
+        >
+          
+        </SchemaItem><SchemaItem
+          collapsible={false}
+          name={"credit"}
+          required={false}
+          schemaName={"float"}
+          qualifierMessage={undefined}
+          schema={{"type":"number","format":"float","multipleOf":0.2,"example":12.25}}
+        >
+          
+        </SchemaItem><SchemaItem
+          collapsible={false}
+          name={"debit"}
+          required={false}
+          schemaName={"float"}
+          qualifierMessage={undefined}
+          schema={{"type":"number","format":"float","multipleOf":0.2,"example":10.49}}
+        >
+          
+        </SchemaItem>
+      </ul>
+    </details>
+  </TabItem>
+</MimeTabs><div>
+  <div>
+    <ApiTabs
+      label={undefined}
+      id={undefined}
+    >
+      <TabItem
+        label={"204"}
+        value={"204"}
+      >
+        <div>
+          
+          
+          Success
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"400"}
+        value={"400"}
+      >
+        <div>
+          
+          
+          Bad request
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"401"}
+        value={"401"}
+      >
+        <div>
+          
+          
+          Unauthenticated
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"404"}
+        value={"404"}
+      >
+        <div>
+          
+          
+          Not Found
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"500"}
+        value={"500"}
+      >
+        <div>
+          
+          
+          Internal Error
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem>
+    </ApiTabs>
+  </div>
+</div>
+      

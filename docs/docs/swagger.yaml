@@ -1,0 +1,825 @@
+openapi: 3.0.3
+info:
+  title: Vitta API
+  description: |-
+    API Specification for Vitta
+  contact:
+    email: prabhuomkar@pm.me
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Vitta
+  url: http://vitta.omkar.xyz
+servers:
+  - url: https://vitta-demo.fly.io
+tags:
+  - name: Budgets
+    description: Everything about your Groups, Categories for Budgeting
+  - name: Accounts
+    description: Everything about your Accounts
+  - name: Payees
+    description: Everything about your Payees
+  - name: Transactions
+    description: Everything about your Transactions
+paths:
+  /v1/groups:
+    post:
+      tags:
+        - Budgets
+      summary: Create a new group
+      operationId: createGroup
+      security:
+        - basicAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+        required: true
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthenticated
+        '500':
+          description: Internal Error
+  /v1/groups/{id}:
+    patch:
+      tags:
+        - Budgets
+      parameters:
+        - name: id
+          in: path
+          description: ID of Group
+          required: true
+          schema:
+            type: string
+            format: uuid
+      summary: Update an existing group
+      operationId: updateGroup
+      security:
+        - basicAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+        required: true
+      responses:
+        '204':
+          description: Success
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthenticated
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Error
+    delete:
+      tags:
+        - Budgets
+      parameters:
+        - name: id
+          in: path
+          description: ID of Group
+          required: true
+          schema:
+            type: string
+            format: uuid
+      summary: Delete an existing group
+      operationId: deleteGroup
+      security:
+        - basicAuth: []
+      responses:
+        '204':
+          description: Success
+        '401':
+          description: Unauthenticated
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Error
+  /v1/categories:
+    post:
+      tags:
+        - Budgets
+      summary: Create a new category
+      operationId: createCategory
+      security:
+        - basicAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+        required: true
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthenticated
+        '500':
+          description: Internal Error
+  /v1/categories/{id}:
+    patch:
+      tags:
+        - Budgets
+      parameters:
+        - name: id
+          in: path
+          description: ID of Category
+          required: true
+          schema:
+            type: string
+            format: uuid
+      summary: Update an existing category
+      operationId: updateCategory
+      security:
+        - basicAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+        required: true
+      responses:
+        '204':
+          description: Success
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthenticated
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Error
+    delete:
+      tags:
+        - Budgets
+      parameters:
+        - name: id
+          in: path
+          description: ID of Category
+          required: true
+          schema:
+            type: string
+            format: uuid
+      summary: Delete an existing category
+      operationId: deleteCategory
+      security:
+        - basicAuth: []
+      responses:
+        '204':
+          description: Success
+        '401':
+          description: Unauthenticated
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Error
+  /v1/budgets:
+    get:
+      tags:
+        - Budgets
+      summary: Get Budget
+      operationId: getBudget
+      security:
+        - basicAuth: []
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetResult'
+        '401':
+          description: Unauthenticated
+        '500':
+          description: Internal Error
+    patch:
+      tags:
+        - Budgets
+      summary: Set Budget
+      operationId: setBudget
+      security:
+        - basicAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Budget'
+        required: true
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthenticated
+        '500':
+          description: Internal Error
+  /v1/accounts:
+    post:
+      tags:
+        - Accounts
+      summary: Create a new account
+      operationId: createAccount
+      security:
+        - basicAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+        required: true
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthenticated
+        '500':
+          description: Internal Error
+    get:
+      tags:
+        - Accounts
+      summary: Get all existing accounts
+      operationId: getAllAccounts
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Accounts'
+        '401':
+          description: Unauthenticated
+        '500':
+          description: Internal Error
+  /v1/accounts/{id}:
+    patch:
+      tags:
+        - Accounts
+      parameters:
+        - name: id
+          in: path
+          description: ID of Account
+          required: true
+          schema:
+            type: string
+            format: uuid
+      summary: Update an existing account
+      operationId: updateAccount
+      security:
+        - basicAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+        required: true
+      responses:
+        '204':
+          description: Success
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthenticated
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Error
+    delete:
+      tags:
+        - Accounts
+      parameters:
+        - name: id
+          in: path
+          description: ID of Account
+          required: true
+          schema:
+            type: string
+            format: uuid
+      summary: Delete an existing account
+      operationId: deleteAccount
+      security:
+        - basicAuth: []
+      responses:
+        '204':
+          description: Success
+        '401':
+          description: Unauthenticated
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Error
+  /v1/payees:
+    post:
+      tags:
+        - Payees
+      summary: Create a new payee
+      operationId: createPayee
+      security:
+        - basicAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Payee'
+        required: true
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payee'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthenticated
+        '500':
+          description: Internal Error
+    get:
+      tags:
+        - Payees
+      summary: Get all existing payees
+      operationId: getAllPayees
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payees'
+        '401':
+          description: Unauthenticated
+        '500':
+          description: Internal Error
+  /v1/payees/{id}:
+    patch:
+      tags:
+        - Payees
+      parameters:
+        - name: id
+          in: path
+          description: ID of Payee
+          required: true
+          schema:
+            type: string
+            format: uuid
+      summary: Update an existing payee
+      operationId: updatePayee
+      security:
+        - basicAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Payee'
+        required: true
+      responses:
+        '204':
+          description: Success
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthenticated
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Error
+    delete:
+      tags:
+        - Payees
+      parameters:
+        - name: id
+          in: path
+          description: ID of Payee
+          required: true
+          schema:
+            type: string
+            format: uuid
+      summary: Delete an existing payee
+      operationId: deletePayee
+      security:
+        - basicAuth: []
+      responses:
+        '204':
+          description: Success
+        '401':
+          description: Unauthenticated
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Error
+  /v1/transactions:
+    post:
+      tags:
+        - Transactions
+      summary: Create a new transaction
+      operationId: createTransaction
+      security:
+        - basicAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transaction'
+        required: true
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthenticated
+        '500':
+          description: Internal Error
+    put:
+      tags:
+        - Transactions
+      summary: Import transactions
+      operationId: importTransactions
+      security:
+        - basicAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: string
+              format: binary
+        required: true
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionsResult'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthenticated
+        '500':
+          description: Internal Error
+    get:
+      tags:
+        - Transactions
+      summary: Get all existing transactions
+      operationId: getAllTransactions
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transactions'
+        '401':
+          description: Unauthenticated
+        '500':
+          description: Internal Error
+  /v1/transactions/{id}:
+    patch:
+      tags:
+        - Transactions
+      parameters:
+        - name: id
+          in: path
+          description: ID of Transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+      summary: Update an existing transaction
+      operationId: updateTransaction
+      security:
+        - basicAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transaction'
+        required: true
+      responses:
+        '204':
+          description: Success
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthenticated
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Error
+    delete:
+      tags:
+        - Transactions
+      parameters:
+        - name: id
+          in: path
+          description: ID of Transaction
+          required: true
+          schema:
+            type: string
+            format: uuid
+      summary: Delete an existing transaction
+      operationId: deleteTransaction
+      security:
+        - basicAuth: []
+      responses:
+        '204':
+          description: Success
+        '401':
+          description: Unauthenticated
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Error
+components:
+  schemas:
+    Group:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 01926b84-93cb-75b9-b445-a5a744f7a59f
+          readOnly: true
+        name:
+          type: string
+          example: Recurring Expenses
+        notes:
+          type: string
+          example: Some markdown notes
+        createdAt:
+          type: string
+          format: date-time
+          example: 2024-10-07T01:02:03Z
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2024-10-07T01:02:03Z
+          readOnly: true
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 01926b84-93cb-75b9-b445-a5a744f7a59f
+          readOnly: true
+        groupId:
+          type: string
+          format: uuid
+          example: 01926b84-93cb-75b9-b445-a5a744f7a59f
+        name:
+          type: string
+          example: Groceries
+        notes:
+          type: string
+          example: Some markdown notes
+        createdAt:
+          type: string
+          format: date-time
+          example: 2024-10-07T01:02:03Z
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2024-10-07T01:02:03Z
+          readOnly: true
+    Account:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 01926b84-93cb-75b9-b445-a5a744f7a59f
+          readOnly: true
+        name:
+          type: string
+          example: ICICI Bank
+        offBudget:
+          type: boolean
+          example: true
+        type:
+          type: string
+          enum: ["CASH/CHECK IN", "CC", "FD/RD", "EPF", "NPS", "SSY"]
+        createdAt:
+          type: string
+          format: date-time
+          example: 2024-10-07T01:02:03Z
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2024-10-07T01:02:03Z
+          readOnly: true
+    Accounts:
+      type: array
+      items:
+        $ref: '#/components/schemas/Account'
+    Payee:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 01926b84-93cb-75b9-b445-a5a744f7a59f
+          readOnly: true
+        name:
+          type: string
+          example: Swiggy
+        createdAt:
+          type: string
+          format: date-time
+          example: 2024-10-07T01:02:03Z
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2024-10-07T01:02:03Z
+          readOnly: true
+    Payees:
+      type: array
+      items:
+        $ref: '#/components/schemas/Payee'
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 01926b84-93cb-75b9-b445-a5a744f7a59f
+          readOnly: true
+        accountId:
+          type: string
+          format: uuid
+          example: 01926b84-93cb-75b9-b445-a5a744f7a59f
+        payeeId:
+          type: string
+          format: uuid
+          example: 01926b84-93cb-75b9-b445-a5a744f7a59f
+        categoryId:
+          type: string
+          format: uuid
+          example: 01926b84-93cb-75b9-b445-a5a744f7a59f
+        name:
+          type: string
+          example: House Party Food
+        notes:
+          type: string
+          example: Sample markdown notes
+        credit:
+          type: number
+          format: float
+          multipleOf: 0.2
+          example: 12.25
+        debit:
+          type: number
+          format: float
+          multipleOf: 0.2
+          example: 10.49
+        createdAt:
+          type: string
+          format: date-time
+          example: 2024-10-07T01:02:03Z
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2024-10-07T01:02:03Z
+          readOnly: true
+    Transactions:
+      type: array
+      items:
+        $ref: '#/components/schemas/Transaction'
+    TransactionsResult:
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int64
+          example: 10
+        imported:
+          type: integer
+          format: int64
+          example: 6
+    Budget:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 01926b84-93cb-75b9-b445-a5a744f7a59f
+          readOnly: true
+        month:
+          type: integer
+          format: int32
+          example: 10
+        year:
+          type: integer
+          format: int32
+          example: 2024
+        categoryId:
+          type: string
+          format: uuid
+          example: 01926b84-93cb-75b9-b445-a5a744f7a59f
+        budgeted:
+          type: number
+          format: float
+          multipleOf: 0.2
+          example: 10.49
+        createdAt:
+          type: string
+          format: date-time
+          example: 2024-10-07T01:02:03Z
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2024-10-07T01:02:03Z
+          readOnly: true
+    BudgetResult:
+      type: object
+      properties:
+        categoryId:
+          type: string
+          format: uuid
+          example: 01926b84-93cb-75b9-b445-a5a744f7a59f
+          readOnly: true
+        categoryName:
+          type: string
+          example: Groceries
+          readOnly: true
+        groupId:
+          type: string
+          format: uuid
+          example: 01926b84-93cb-75b9-b445-a5a744f7a59f
+          readOnly: true
+        groupName:
+          type: string
+          example: Recurring Expenses
+          readOnly: true
+        month:
+          type: integer
+          format: int32
+          example: 10
+          readOnly: true
+        year:
+          type: integer
+          format: int32
+          example: 2024
+          readOnly: true
+        budgeted:
+          type: number
+          format: float
+          multipleOf: 0.2
+          example: 10.49
+          readOnly: true
+        spent:
+          type: number
+          format: float
+          multipleOf: 0.2
+          example: 10.49
+          readOnly: true
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic

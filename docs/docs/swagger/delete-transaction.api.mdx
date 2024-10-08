@@ -1,0 +1,140 @@
+---
+id: delete-transaction
+title: "Delete an existing transaction"
+description: "Delete an existing transaction"
+sidebar_label: "Delete an existing transaction"
+hide_title: true
+hide_table_of_contents: true
+api: eJyFVMFu2zAM/RWDpw1QbafoLjotWDMgQFEUS7tLkANj07FQW3IlOmlg+N8HOl7nLAF6kkWRj4+PpDtg3AXQa3j2aANmbJwNsFHQoMeamLy8dmCxJtBgclBgLGhokEtQkFPIvGkkDDQs7yNXRBMoUODprTWectDsW1IQspJqBN0BHxvBDOyN3YGCwvkaGTS0rcmh7zcKXEMeBWiZg4acKmI6hw+Utd7wcWC5xWCyecsl6PVG4j2FxtlAQfLdpndynFNetVlGIUCv4C6dXb6/WGy5JMsmQ6b85HcF59Fx9NO1dvD4lqaXHkvL5C1W0cJ756Hv/1fvfigvQhvRuwls7C7is1pr4tL9EwLUqQsakv0smbiGpDN5P4jj93872PoKNJTMTdBJsjfMeJNT7eKiOsbGgcj1V8yV9Ogk2kTSj44JCIydlPvgMxRkbOEGR8OVvPyWNNH8aXkxKvOnZbRqKDOFCGucjQrno8EfFGTOMmYsUFSjEeaNx23ZuvoV/femjmsSoSuTkQ0kfuOEzhvMSopu4xTUpGadJIfDIcbhNXZ+l4yhIXlY/lg8rhY3t3Eal1xXgiuqnXjO4jROxdS4wDXaSapP+3VW8Yd6TO+cNBUaK7ADxW5s5Br2M1AwbSUo0CaXjSxdYHHpui0GevFV34v5rSUv079RsEdvcCvCrzvITZDvHHSBVaALNiIxWVm3L7/GFf0aXVvgq7RHI9ojSN6qlRsoeKXj6TfRb/rJwN4vHhbPC1CA55N0mhw1nkL7KvBQ8mkMX4IsUU19/5GtHU3Qq8/jnzCEg/P5JL4ZTcK57/8AkDy5aA==
+sidebar_class_name: "delete api-method"
+info_path: docs/swagger/vitta-api
+custom_edit_url: null
+---
+
+import ApiTabs from "@theme/ApiTabs";
+import DiscriminatorTabs from "@theme/DiscriminatorTabs";
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import SecuritySchemes from "@theme/ApiExplorer/SecuritySchemes";
+import MimeTabs from "@theme/MimeTabs";
+import ParamsItem from "@theme/ParamsItem";
+import ResponseSamples from "@theme/ResponseSamples";
+import SchemaItem from "@theme/SchemaItem";
+import SchemaTabs from "@theme/SchemaTabs";
+import Heading from "@theme/Heading";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Delete an existing transaction"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"delete"}
+  path={"/v1/transactions/{id}"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Delete an existing transaction
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<details
+  style={{"marginBottom":"1rem"}}
+  className={"openapi-markdown__details"}
+  data-collapsed={false}
+  open={true}
+>
+  <summary
+    style={{}}
+  >
+    <h3
+      className={"openapi-markdown__details-summary-header-params"}
+    >
+      Path Parameters
+    </h3>
+  </summary><div>
+    <ul>
+      <ParamsItem
+        className={"paramsItem"}
+        param={{"name":"id","in":"path","description":"ID of Transaction","required":true,"schema":{"type":"string","format":"uuid"},"enumDescriptions":[]}}
+      >
+        
+      </ParamsItem>
+    </ul>
+  </div>
+</details><div>
+  <div>
+    <ApiTabs
+      label={undefined}
+      id={undefined}
+    >
+      <TabItem
+        label={"204"}
+        value={"204"}
+      >
+        <div>
+          
+          
+          Success
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"401"}
+        value={"401"}
+      >
+        <div>
+          
+          
+          Unauthenticated
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"404"}
+        value={"404"}
+      >
+        <div>
+          
+          
+          Not Found
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"500"}
+        value={"500"}
+      >
+        <div>
+          
+          
+          Internal Error
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem>
+    </ApiTabs>
+  </div>
+</div>
+      

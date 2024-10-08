@@ -1,0 +1,140 @@
+---
+id: delete-account
+title: "Delete an existing account"
+description: "Delete an existing account"
+sidebar_label: "Delete an existing account"
+hide_title: true
+hide_table_of_contents: true
+api: eJyFVMFu2zAM/RWDpw1QbafoLj4tWDMgQFEUy7pLkANjM7FQW3IlKmlg6N8HOm6aNsV2kkVSj4+PpHtg3HooljAtSxsMe1gp6NBhS0xOPD0YbAkK0BUo0AYK6JBrUFCRL53uWFsxzm8Tu0lGGFDg6DloRxUU7AIp8GVNLULRAx86wfPstNmCgo11LTIUEIKuIMaVAtuRQwGeV1BARQ0xvUF7KoPTfBjYrdHrchq4hmK5kreOfGeNJy+5rvMbOd5TXYSyJO8hKrjJJ5f+R4OBazKsS2SqjnGf4NxbTn7aYIaIb3l+GTE3TM5gk8ycsw5i/Kja7VBagiahF+1Zm22Cpzpb4tq+CQDqqHwB2W6SjWE+63UVB1Hc7rVjwTVQQM3c+SLLdpoZrypqbbppDqm2IDK9iriQvhzFOpPy1CUBgbF7ch9ihkK02dghUHMjnj+SJpk+zC9GY/owTxYdlXojgmprko11yRAPCkprGEsWKGpRC/PO4boOtn1C971r05ZE4EaXZDxJ3DiR0w7LmpLrNAd1VnORZfv9PsXBm1q3zcanPrub/5jdL2ZX12me1tw2giuqHXlO0jzNxdRZzy2as1T/7NO7ak/KMb1w1jWojUAO9PqxgUvYTUDBawtBQaEr2bzaehZ336/R06NrYhTzcyAn075SsEOncS2CL3uotJfvCooNNp4umIi0ZGS1vvwa1/Fr8nFRP6U7GtEcQHI2QW6g4IkOx19BXMWzAb2d3c1+z6Sk99NznBY1nkL5U+Ch3OPoPXpZmJZiPGULowmi+v/7B/R+b1119r4bTcI5xr8Lyaug
+sidebar_class_name: "delete api-method"
+info_path: docs/swagger/vitta-api
+custom_edit_url: null
+---
+
+import ApiTabs from "@theme/ApiTabs";
+import DiscriminatorTabs from "@theme/DiscriminatorTabs";
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import SecuritySchemes from "@theme/ApiExplorer/SecuritySchemes";
+import MimeTabs from "@theme/MimeTabs";
+import ParamsItem from "@theme/ParamsItem";
+import ResponseSamples from "@theme/ResponseSamples";
+import SchemaItem from "@theme/SchemaItem";
+import SchemaTabs from "@theme/SchemaTabs";
+import Heading from "@theme/Heading";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Delete an existing account"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"delete"}
+  path={"/v1/accounts/{id}"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Delete an existing account
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<details
+  style={{"marginBottom":"1rem"}}
+  className={"openapi-markdown__details"}
+  data-collapsed={false}
+  open={true}
+>
+  <summary
+    style={{}}
+  >
+    <h3
+      className={"openapi-markdown__details-summary-header-params"}
+    >
+      Path Parameters
+    </h3>
+  </summary><div>
+    <ul>
+      <ParamsItem
+        className={"paramsItem"}
+        param={{"name":"id","in":"path","description":"ID of Account","required":true,"schema":{"type":"string","format":"uuid"},"enumDescriptions":[]}}
+      >
+        
+      </ParamsItem>
+    </ul>
+  </div>
+</details><div>
+  <div>
+    <ApiTabs
+      label={undefined}
+      id={undefined}
+    >
+      <TabItem
+        label={"204"}
+        value={"204"}
+      >
+        <div>
+          
+          
+          Success
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"401"}
+        value={"401"}
+      >
+        <div>
+          
+          
+          Unauthenticated
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"404"}
+        value={"404"}
+      >
+        <div>
+          
+          
+          Not Found
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"500"}
+        value={"500"}
+      >
+        <div>
+          
+          
+          Internal Error
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem>
+    </ApiTabs>
+  </div>
+</div>
+      
