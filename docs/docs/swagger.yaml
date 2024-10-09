@@ -268,7 +268,7 @@ paths:
       tags:
         - Accounts
       summary: Get all existing accounts
-      operationId: getAllAccounts
+      operationId: getAccounts
       security:
         - basicAuth: []
       responses:
@@ -370,7 +370,7 @@ paths:
       tags:
         - Payees
       summary: Get all existing payees
-      operationId: getAllPayees
+      operationId: getPayees
       security:
         - basicAuth: []
       responses:
@@ -499,7 +499,7 @@ paths:
       tags:
         - Transactions
       summary: Get all existing transactions
-      operationId: getAllTransactions
+      operationId: getTransactions
       security:
         - basicAuth: []
       responses:
