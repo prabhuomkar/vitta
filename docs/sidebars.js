@@ -27,7 +27,8 @@ const sidebars = {
       items: [
         'getting-started/installation',
         'getting-started/configuration',
-        'getting-started/ui-guide'
+        'getting-started/ui-guide',
+        'getting-started/developer-guide'
       ],
     },
     {
