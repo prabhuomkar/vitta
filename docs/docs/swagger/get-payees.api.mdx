@@ -1,0 +1,194 @@
+---
+id: get-payees
+title: "Get all existing payees"
+description: "Get all existing payees"
+sidebar_label: "Get all existing payees"
+hide_title: true
+hide_table_of_contents: true
+api: eJy1lE1v2zgQhv+KMGfqw6692ehUowgKA4s2gJs91PBhRI0tthLJJUd2BEP/fUFaSZ003T31JGH0zjvDmUc8A+PBQ7mFexyIPOwEGEsOWRm9rqGEA/H0SYAn2TvFA5TbM1TolVz13EC53Y07AY68NdqTh/IM86IIj5q8dMoGNyhh00tJPjhJo5k0Bwla2yoZC+bffNCdwcuGOgxvPFiCEtA5HECAYur8VdxU30gyCLAutM3qUl3VVxrPTukDCNgb1yFDCX2vahBAj9jZNkiK2e38j+rPRXr7TlbpzbK6TavFYpniEm8Wi/0NLm/3EE6I9WfdDlCy62kUoLGjtyr9cN6c1OEwwChAOkKmesX/2VqNTCmrjl64zIv5Ip0VaXHzpZiVxbws3n19q5/e1r+5xiiAFceEiAW8DngYx6BaFLOfAXjQ2HNDmsPCqQ7Jy7dAWWsmp7FN7pwzDoLfS8FH4gTbNqFH5VnpQ2KfGO2IGzOBG7jAACjkx1luf2DsjuR8pLh3LZTQMFtf5vlRMWNaU2eyfTtkykAA+wn7TaDyAtgV/M+DDibBPaqgvGhi70rvTRROg/o7lElW92t4fa7V/TrZWJJqP/0Syd64JOqnvwZlXC51qELn1mHV9Kb7ju697bIuLqRVkrSPZF4IhZVF2VAyzwoQV2cu8/x0OmUYv2bGHfIp1ed/rT/cfdrcpfOsyBru2uAbpnbpc5YVWRFC1njuUF+V+vVqXhz1eWxMj5zbFpUOfrG387S2LRxncYdPV1NjPIfw+VyhpwfXjmMI/9OTC5fSTsARncIqTHm7GwU0hDW5uOnvNIRBSEk2gHHEto83y+vrJ2z8GaKPd19AAL5c9GWxYnoG76dbSg9XzrHJCyUPPuDc0TiCmBrppxCM4v/z79H7k3H1Vb6dQjDuxnH8F7RR7IE=
+sidebar_class_name: "get api-method"
+info_path: docs/swagger/vitta-api
+custom_edit_url: null
+---
+
+import ApiTabs from "@theme/ApiTabs";
+import DiscriminatorTabs from "@theme/DiscriminatorTabs";
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import SecuritySchemes from "@theme/ApiExplorer/SecuritySchemes";
+import MimeTabs from "@theme/MimeTabs";
+import ParamsItem from "@theme/ParamsItem";
+import ResponseSamples from "@theme/ResponseSamples";
+import SchemaItem from "@theme/SchemaItem";
+import SchemaTabs from "@theme/SchemaTabs";
+import Heading from "@theme/Heading";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Get all existing payees"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/v1/payees"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Get all existing payees
+
+<div>
+  <div>
+    <ApiTabs
+      label={undefined}
+      id={undefined}
+    >
+      <TabItem
+        label={"200"}
+        value={"200"}
+      >
+        <div>
+          
+          
+          Success
+          
+          
+        </div><div>
+          <MimeTabs
+            className={"openapi-tabs__mime"}
+            schemaType={"response"}
+          >
+            <TabItem
+              label={"application/json"}
+              value={"application/json"}
+            >
+              <SchemaTabs
+                className={"openapi-tabs__schema"}
+              >
+                <TabItem
+                  label={"Schema"}
+                  value={"Schema"}
+                >
+                  <details
+                    style={{}}
+                    className={"openapi-markdown__details response"}
+                    data-collapsed={false}
+                    open={true}
+                  >
+                    <summary
+                      style={{}}
+                      className={"openapi-markdown__details-summary-response"}
+                    >
+                      <strong>
+                        Schema
+                      </strong>
+                    </summary><div
+                      style={{"textAlign":"left","marginLeft":"1rem"}}
+                    >
+                      
+                    </div><ul
+                      style={{"marginLeft":"1rem"}}
+                    >
+                      <li>
+                        <div
+                          style={{"fontSize":"var(--ifm-code-font-size)","opacity":"0.6","marginLeft":"-.5rem","paddingBottom":".5rem"}}
+                        >
+                          Array [
+                        </div>
+                      </li><SchemaItem
+                        collapsible={false}
+                        name={"id"}
+                        required={false}
+                        schemaName={"uuid"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"string","format":"uuid","example":"01926b84-93cb-75b9-b445-a5a744f7a59f","readOnly":true}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={false}
+                        name={"name"}
+                        required={false}
+                        schemaName={"string"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"string","example":"Swiggy"}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={false}
+                        name={"createdAt"}
+                        required={false}
+                        schemaName={"date-time"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"string","format":"date-time","example":"2024-10-07T01:02:03Z","readOnly":true}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={false}
+                        name={"updatedAt"}
+                        required={false}
+                        schemaName={"date-time"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"string","format":"date-time","example":"2024-10-07T01:02:03Z","readOnly":true}}
+                      >
+                        
+                      </SchemaItem><li>
+                        <div
+                          style={{"fontSize":"var(--ifm-code-font-size)","opacity":"0.6","marginLeft":"-.5rem"}}
+                        >
+                          ]
+                        </div>
+                      </li>
+                    </ul>
+                  </details>
+                </TabItem><TabItem
+                  label={"Example (from schema)"}
+                  value={"Example (from schema)"}
+                >
+                  <ResponseSamples
+                    responseExample={"[\n  {\n    \"id\": \"01926b84-93cb-75b9-b445-a5a744f7a59f\",\n    \"name\": \"Swiggy\",\n    \"createdAt\": \"2024-10-07T01:02:03Z\",\n    \"updatedAt\": \"2024-10-07T01:02:03Z\"\n  }\n]"}
+                    language={"json"}
+                  >
+                    
+                  </ResponseSamples>
+                </TabItem>
+              </SchemaTabs>
+            </TabItem>
+          </MimeTabs>
+        </div>
+      </TabItem><TabItem
+        label={"401"}
+        value={"401"}
+      >
+        <div>
+          
+          
+          Unauthenticated
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"500"}
+        value={"500"}
+      >
+        <div>
+          
+          
+          Internal Error
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem>
+    </ApiTabs>
+  </div>
+</div>
+      
