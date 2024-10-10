@@ -1,29 +1,147 @@
 package handlers
 
 import (
-	"fmt"
+	"encoding/json"
 	"log/slog"
 	"net/http"
+	"time"
+
+	uuid "github.com/google/uuid"
+)
+
+// Account model.
+type Account struct {
+	ID        uuid.UUID `json:"id"`
+	Name      string    `json:"name"`
+	OffBudget *bool     `json:"offBudget"`
+	Category  string    `json:"category"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+const (
+	queryCreateAccount = `INSERT into accounts (id, name, off_budget, category, created_at, updated_at)` +
+		` VALUES ($1, $2, $3, $4, $5, $6)`
+	queryUpdateAccount = `UPDATE accounts SET name=$1, off_budget=$2, category=$3, updated_at=$4 WHERE id=$5`
+	queryDeleteAccount = `DELETE FROM accounts WHERE id=$1`
+	queryGetAccounts   = `SELECT * FROM accounts`
 )
 
 func (h *Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {
-	slog.Info("request url", "url", r.URL.Path)
-	fmt.Fprintln(w, "CreateAccount")
+	var account Account
+
+	err := json.NewDecoder(r.Body).Decode(&account)
+	if err != nil {
+		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
+
+		return
+	}
+
+	account.ID, err = uuid.NewV7()
+	if err != nil {
+		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
+
+		return
+	}
+
+	account.CreatedAt = time.Now()
+	account.UpdatedAt = account.CreatedAt
+
+	_, err = h.db.Exec(r.Context(), queryCreateAccount,
+		account.ID, account.Name, account.OffBudget, account.Category, account.CreatedAt, account.UpdatedAt)
+	if err != nil {
+		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
+
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	err = json.NewEncoder(w).Encode(account)
+	if err != nil {
+		slog.Error("error encoding account response", "error", err)
+	}
 }
 
 func (h *Handler) UpdateAccount(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	slog.Info("UpdateAccount", "id", id)
-	fmt.Fprintln(w, "UpdateAccount")
+
+	var account Account
+
+	err := json.NewDecoder(r.Body).Decode(&account)
+	if err != nil {
+		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
+
+		return
+	}
+
+	account.ID = uuid.MustParse(id)
+	account.UpdatedAt = time.Now()
+
+	_, err = h.db.Exec(r.Context(), queryUpdateAccount,
+		account.Name, account.OffBudget, account.Category, account.UpdatedAt, account.ID)
+	if err != nil {
+		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
+
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (h *Handler) DeleteAccount(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	slog.Info("DeleteAccount", "id", id)
-	fmt.Fprintln(w, "DeleteAccount")
+
+	accountID := uuid.MustParse(id)
+
+	_, err := h.db.Exec(r.Context(), queryDeleteAccount, accountID)
+	if err != nil {
+		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
+
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (h *Handler) GetAccounts(w http.ResponseWriter, r *http.Request) {
-	slog.Info("request url", "url", r.URL.Path)
-	fmt.Fprintln(w, "GetAccounts")
+	rows, err := h.db.Query(r.Context(), queryGetAccounts)
+	if err != nil {
+		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
+
+		return
+	}
+	defer rows.Close()
+
+	accounts := []Account{}
+
+	for rows.Next() {
+		var acc Account
+
+		err := rows.Scan(&acc.ID, &acc.Name, &acc.OffBudget, &acc.Category, &acc.CreatedAt, &acc.UpdatedAt)
+		if err != nil {
+			buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
+
+			return
+		}
+
+		accounts = append(accounts, acc)
+	}
+
+	if err := rows.Err(); err != nil {
+		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
+
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	err = json.NewEncoder(w).Encode(accounts)
+	if err != nil {
+		slog.Error("error encoding accounts response", "error", err)
+	}
 }

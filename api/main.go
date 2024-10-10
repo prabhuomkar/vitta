@@ -41,6 +41,8 @@ func main() {
 
 		err := server.ListenAndServe()
 		if err != nil && errors.Is(err, http.ErrServerClosed) {
+			slog.Info("stopped http server")
+		} else if err != nil {
 			slog.Error("error starting http server", "error", err)
 			os.Exit(1)
 		}

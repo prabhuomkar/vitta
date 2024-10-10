@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"encoding/json"
+	"log/slog"
 	"net/http"
 	"vitta/config"
 
@@ -14,7 +16,7 @@ type Handler struct {
 }
 
 func New(cfg *config.Config, db *pgx.Conn) *http.ServeMux {
-	handler := &Handler{
+	h := &Handler{
 		cfg: cfg,
 		db:  db,
 	}
@@ -22,30 +24,46 @@ func New(cfg *config.Config, db *pgx.Conn) *http.ServeMux {
 	mux := http.NewServeMux()
 
 	// accounts
-	mux.HandleFunc("POST /v1/accounts", handler.CreateAccount)
-	mux.HandleFunc("PATCH /v1/accounts/{id}", handler.UpdateAccount)
-	mux.HandleFunc("DELETE /v1/accounts/{id}", handler.DeleteAccount)
-	mux.HandleFunc("GET /v1/accounts", handler.GetAccounts)
+	mux.HandleFunc("POST /v1/accounts", h.CreateAccount)
+	mux.HandleFunc("PATCH /v1/accounts/{id}", h.UpdateAccount)
+	mux.HandleFunc("DELETE /v1/accounts/{id}", h.DeleteAccount)
+	mux.HandleFunc("GET /v1/accounts", h.GetAccounts)
 	// payees
-	mux.HandleFunc("POST /v1/payees", handler.CreatePayee)
-	mux.HandleFunc("PATCH /v1/payees/{id}", handler.UpdatePayee)
-	mux.HandleFunc("DELETE /v1/payees/{id}", handler.DeletePayee)
-	mux.HandleFunc("GET /v1/payees", handler.GetPayees)
+	mux.HandleFunc("POST /v1/payees", h.CreatePayee)
+	mux.HandleFunc("PATCH /v1/payees/{id}", h.UpdatePayee)
+	mux.HandleFunc("DELETE /v1/payees/{id}", h.DeletePayee)
+	mux.HandleFunc("GET /v1/payees", h.GetPayees)
 	// transactions
-	mux.HandleFunc("POST /v1/transactions", handler.CreateTransaction)
-	mux.HandleFunc("PUT /v1/transactions/{id}", handler.ImportTransactions)
-	mux.HandleFunc("PATCH /v1/transactions/{id}", handler.UpdateTransaction)
-	mux.HandleFunc("DELETE /v1/transactions/{id}", handler.DeleteTransaction)
-	mux.HandleFunc("GET /v1/transactions", handler.GetTransactions)
+	mux.HandleFunc("POST /v1/transactions", h.CreateTransaction)
+	mux.HandleFunc("PUT /v1/transactions/{id}", h.ImportTransactions)
+	mux.HandleFunc("PATCH /v1/transactions/{id}", h.UpdateTransaction)
+	mux.HandleFunc("DELETE /v1/transactions/{id}", h.DeleteTransaction)
+	mux.HandleFunc("GET /v1/transactions", h.GetTransactions)
 	// budgets
-	mux.HandleFunc("POST /v1/groups", handler.CreateGroup)
-	mux.HandleFunc("PATCH /v1/groups/{id}", handler.UpdateGroup)
-	mux.HandleFunc("DELETE /v1/groups/{id}", handler.DeleteGroup)
-	mux.HandleFunc("POST /v1/categories", handler.CreateCategory)
-	mux.HandleFunc("PATCH /v1/categories/{id}", handler.CreateCategory)
-	mux.HandleFunc("DELETE /v1/categories/{id}", handler.CreateCategory)
-	mux.HandleFunc("GET /v1/budgets", handler.GetBudget)
-	mux.HandleFunc("PATCH /v1/budgets", handler.SetBudget)
+	mux.HandleFunc("POST /v1/groups", h.CreateGroup)
+	mux.HandleFunc("PATCH /v1/groups/{id}", h.UpdateGroup)
+	mux.HandleFunc("DELETE /v1/groups/{id}", h.DeleteGroup)
+	mux.HandleFunc("POST /v1/categories", h.CreateCategory)
+	mux.HandleFunc("PATCH /v1/categories/{id}", h.UpdateCategory)
+	mux.HandleFunc("DELETE /v1/categories/{id}", h.DeleteCategory)
+	mux.HandleFunc("GET /v1/budgets", h.GetBudget)
+	mux.HandleFunc("PUT /v1/budgets", h.SetBudget)
 
 	return mux
+}
+
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
+func buildErrorResponse(w http.ResponseWriter, err string, code int) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+
+	errorResponse := ErrorResponse{Error: err}
+
+	encodeErr := json.NewEncoder(w).Encode(errorResponse)
+	if encodeErr != nil {
+		slog.Error("error encoding error response", "error", encodeErr)
+	}
 }

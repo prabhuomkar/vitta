@@ -1,0 +1,19 @@
+services:
+  api:
+    container_name: api
+    build: api
+    restart: always
+    ports:
+      - '8080:8080'
+    depends_on:
+      - database
+  database:
+    container_name: database
+    image: postgres:17.0-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: vdbuser
+      POSTGRES_PASSWORD: vdbpass
+      POSTGRES_DB: vitta
+    ports:
+      - '5432:5432'

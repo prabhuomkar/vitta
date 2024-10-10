@@ -4,3 +4,5 @@ linters:
     - depguard
     - exhaustruct
     - gci
+    - varnamelen
+    - dupl
