@@ -5,7 +5,7 @@ description: "Get Budget"
 sidebar_label: "Get Budget"
 hide_title: true
 hide_table_of_contents: true
-api: eJy9VE2P0zAQ/SvVnNMkLS1Lc2JB1aoSghXLcql6mDiTxpDYxh/drar8dzRuKC1UQkiIU6Lx+M3zvHlzAI9bB8Ua3oRqS97BJgFtyKKXWq0qKGBL/ngGCTgSwUq/h2J9gBKdFLfBN1CsN/0mAUvOaOXIQXGAaT7hT0VOWGkYDQp4CEKQc5CA0MqT8pyCxrRSxILZF8d5B3CioQ75z+8NQQG6/EKCKRjL9Lw8VhHoaavtnpmecp23Um0hgVrbDj0UEIKsIAF6xs60nJJPFtOX5avZePFClOObebkYl7PZfIxzvJnN6hucL2rgF2H1QbV7KLwN1Ceneu+xo2sVf1a4s1qQZZpXYLZWB/O/OMdifyb8kbXl6Gj5bCjKeAWs04oFPwFJ5WlL9py4VP7F9Bx6kl8B2hPav8SZ5tPZFaQyTiedd1OFrrwEq1uNPD5daL00LX2oocjT6QXLdLa4Au/MMKf/HLtPwEsfm3902EdyofXQ93w0u2agR4XBN6Q8G4Yq6BOY5/nveSvlySpsR0trtQXGu0y4Iz862boj3+jB62wxZIkh202yctgKbH27I+ui84NtoYDGe+OKLNtJ73FcUafTut2nUgMvgx+r4oGdfDTr2cI4dZNBGD1mQXHMiXylqnVMHFr0mcuMbu9X8Otbbu9XowdDQtbDGhnV2o5i/rBpUEQFqUPJzI3Fsgm6+4r2tenSjriPrRQ89Zynolng1qBoaDRNc0jO3lxk2dPTU4rxNNV2mw1XXfZu9Xb5/mE5nqZ52viuZVzu2pHnJM3TnENGO9+hOit1IcfF606d8vTsM9OiVAwR6RwGqdawm8API8QV3mjnOX44lOjo0bZ9z+FvgSwv700CO7QSS+7setMn0BBWZKO6X2nPjxeCDLPZYRu4/m9rmlU+Tc7d8hMkgJfiHsVMhi9jDweo9mfIkeRxMh4dj21HfQ/JQCQMIeiTP9+/R+eetK3O7pshBP2m7/vvnldRdw==
+api: eJy9VU2L20gQ/SumzrIkO3ZmrdPOLmYwhGTI7OzF+FBqlaxOpO5Of3jGGP33UG3FK28MIRBykqiufvXq6/UJPO4dFFv4K1R78g52CWhDFr3UalNBAXvy5zNIwJEIVvojFNsTlOikuA++gWK763cJWHJGK0cOihPM8xl/KnLCSsNoUMBTEIKcgwSEVp6UZxc0ppUiBsw+OfY7gRMNdch//mgICtDlJxJMwVim5+U5iqxGPs5bqfaQQK1thx4KCEFWkAC9Ymdadslnq/nb8o/FdPVGlNO7ZbmalovFcopLvFss6jtcrmrgTLD6oNojFN4G6hMQ6Gmv7XHzm+O9x45uRfwvwoPVgiyX4wbM3upgfhfnGOzHhD/yDLF1sn41FMflBlinFQ/WBUgqT3uyY+JS+TfzMfQsvwF0JLQ/iTPP54sbSGXcAhpXU4WuvAarW408pl1ovTQtfaihyNP5Fct0sboB78ywD78cu0/ASx+Lf97kj+RC66Hv+Whxa1GfFQbfkPK8mFRBn8Ayz7/32yhPVmE7WVurLTDetcMD+clFPjryjR40hVcZucWQHWZZOagPS4w9kHVRYYJtoYDGe+OKLDtI73FaUafTuj2mUgOLzjdJemLFOIvCSJgu1WQQRo9eUJx9Il+pah0dhxL9y2Em948b+H8u94+byZMhIetBria1tpPoPygaithB6lAyc2OxbILuPqP903RpR1zHVgqeevZTcVng3qBoaDJPc0hGORdZ9vLykmI8TbXdZ8NVl73b/L1+/7SeztM8bXzXMi5X7cxzluZpziajne9QjUJdteMqu0ulPL36zLQoFUNEOqehVVs4zODbIsSnotHOs/10KtHRs237ns1fAll+JHYJHNBKLLmy212fQENYkY3d/UxHTl4IMszmgG3g+N89B9zly+Q8rP+BBPC6uedmJsOXsYcDVMcRciR5noxnx2PbUd9DMhAJgwn65Mf3H9G5F22r0X0zmKDf9X3/FWeFcNQ=
 sidebar_class_name: "get api-method"
 info_path: docs/swagger/vitta-api
 custom_edit_url: null
@@ -97,6 +97,15 @@ Get Budget
                     >
                       <SchemaItem
                         collapsible={false}
+                        name={"id"}
+                        required={false}
+                        schemaName={"uuid"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"string","format":"uuid","example":"01926b84-93cb-75b9-b445-a5a744f7a59f","readOnly":true}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={false}
                         name={"categoryId"}
                         required={false}
                         schemaName={"uuid"}
@@ -175,7 +184,7 @@ Get Budget
                   value={"Example (from schema)"}
                 >
                   <ResponseSamples
-                    responseExample={"{\n  \"categoryId\": \"01926b84-93cb-75b9-b445-a5a744f7a59f\",\n  \"categoryName\": \"Groceries\",\n  \"groupId\": \"01926b84-93cb-75b9-b445-a5a744f7a59f\",\n  \"groupName\": \"Recurring Expenses\",\n  \"month\": 10,\n  \"year\": 2024,\n  \"budgeted\": 10.49,\n  \"spent\": 10.49\n}"}
+                    responseExample={"{\n  \"id\": \"01926b84-93cb-75b9-b445-a5a744f7a59f\",\n  \"categoryId\": \"01926b84-93cb-75b9-b445-a5a744f7a59f\",\n  \"categoryName\": \"Groceries\",\n  \"groupId\": \"01926b84-93cb-75b9-b445-a5a744f7a59f\",\n  \"groupName\": \"Recurring Expenses\",\n  \"month\": 10,\n  \"year\": 2024,\n  \"budgeted\": 10.49,\n  \"spent\": 10.49\n}"}
                     language={"json"}
                   >
                     

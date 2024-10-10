@@ -56,7 +56,7 @@ const sidebar: SidebarsConfig = {
           type: "doc",
           id: "swagger/set-budget",
           label: "Set Budget",
-          className: "api-method patch",
+          className: "api-method put",
         },
       ],
     },
@@ -72,7 +72,7 @@ const sidebar: SidebarsConfig = {
         },
         {
           type: "doc",
-          id: "swagger/get-all-accounts",
+          id: "swagger/get-accounts",
           label: "Get all existing accounts",
           className: "api-method get",
         },
@@ -102,7 +102,7 @@ const sidebar: SidebarsConfig = {
         },
         {
           type: "doc",
-          id: "swagger/get-all-payees",
+          id: "swagger/get-payees",
           label: "Get all existing payees",
           className: "api-method get",
         },
@@ -138,7 +138,7 @@ const sidebar: SidebarsConfig = {
         },
         {
           type: "doc",
-          id: "swagger/get-all-transactions",
+          id: "swagger/get-transactions",
           label: "Get all existing transactions",
           className: "api-method get",
         },
