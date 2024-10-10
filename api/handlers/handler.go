@@ -15,7 +15,7 @@ type Handler struct {
 	db  *pgx.Conn
 }
 
-func New(cfg *config.Config, db *pgx.Conn) *http.ServeMux {
+func New(cfg *config.Config, db *pgx.Conn) http.Handler {
 	h := &Handler{
 		cfg: cfg,
 		db:  db,
@@ -49,7 +49,7 @@ func New(cfg *config.Config, db *pgx.Conn) *http.ServeMux {
 	mux.HandleFunc("GET /v1/budgets", h.GetBudget)
 	mux.HandleFunc("PUT /v1/budgets", h.SetBudget)
 
-	return mux
+	return h.basicAuthMiddleware(mux)
 }
 
 type ErrorResponse struct {
@@ -66,4 +66,18 @@ func buildErrorResponse(w http.ResponseWriter, err string, code int) {
 	if encodeErr != nil {
 		slog.Error("error encoding error response", "error", encodeErr)
 	}
+}
+
+func (h *Handler) basicAuthMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		username, password, ok := r.BasicAuth()
+
+		if !ok || username != h.cfg.AdminUsername || password != h.cfg.AdminPassword {
+			buildErrorResponse(w, "Unauthorized", http.StatusUnauthorized)
+
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }
