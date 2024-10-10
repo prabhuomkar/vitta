@@ -13,3 +13,9 @@ cover:
 
 lint:
 	@golangci-lint run ./...
+
+migrate-up:
+	@migrate -path=database/migrations -database "${DATABASE_URL}" -verbose up
+
+migrate-down:
+	@migrate -path=database/migrations -database "${DATABASE_URL}" -verbose down
