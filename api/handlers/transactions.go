@@ -31,7 +31,7 @@ type (
 		Debit        float64    `json:"debit,omitempty"`
 		Name         string     `json:"name"`
 		Notes        string     `json:"notes,omitempty"`
-		ClearedAt    time.Time  `json:"clearedAt"`
+		ClearedAt    *time.Time `json:"clearedAt,omitempty"`
 		CreatedAt    time.Time  `json:"createdAt"`
 		UpdatedAt    time.Time  `json:"updatedAt"`
 	}
@@ -75,7 +75,7 @@ func (h *Handler) CreateTransaction(w http.ResponseWriter, r *http.Request) {
 	_, err = h.db.Exec(r.Context(), queryCreateTransaction,
 		transaction.ID, transaction.AccountID, transaction.CategoryID, transaction.PayeeID,
 		transaction.Credit, transaction.Debit, transaction.Name, transaction.Notes,
-		transaction.ClearedAt, transaction.CreatedAt, transaction.UpdatedAt)
+		nil, transaction.CreatedAt, transaction.UpdatedAt)
 	if err != nil {
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
