@@ -21,17 +21,19 @@ type (
 
 	// Transaction model.
 	Transaction struct {
-		ID         uuid.UUID `json:"id"`
-		AccountID  uuid.UUID `json:"accountId"`
-		CategoryID uuid.UUID `json:"categoryId"`
-		PayeeID    uuid.UUID `json:"payeeId"`
-		Credit     float64   `json:"credit"`
-		Debit      float64   `json:"debit"`
-		Name       string    `json:"name"`
-		Notes      string    `json:"notes"`
-		ClearedAt  time.Time `json:"clearedAt"`
-		CreatedAt  time.Time `json:"createdAt"`
-		UpdatedAt  time.Time `json:"updatedAt"`
+		ID           uuid.UUID  `json:"id"`
+		AccountID    uuid.UUID  `json:"accountId"`
+		CategoryID   *uuid.UUID `json:"categoryId,omitempty"`
+		CategoryName *string    `json:"categoryName,omitempty"`
+		PayeeID      *uuid.UUID `json:"payeeId,omitempty"`
+		PayeeName    *string    `json:"payeeName,omitempty"`
+		Credit       float64    `json:"credit,omitempty"`
+		Debit        float64    `json:"debit,omitempty"`
+		Name         string     `json:"name"`
+		Notes        string     `json:"notes,omitempty"`
+		ClearedAt    time.Time  `json:"clearedAt"`
+		CreatedAt    time.Time  `json:"createdAt"`
+		UpdatedAt    time.Time  `json:"updatedAt"`
 	}
 )
 
@@ -41,7 +43,8 @@ const (
 	queryUpdateTransaction = `UPDATE transactions SET account_id=$1, category_id=$2, payee_id=$3,` +
 		` credit=$4, debit=$5, name=$6, notes=$7, cleared_at=$8, updated_at=$9 WHERE id=$10`
 	queryDeleteTransaction = `DELETE FROM transactions WHERE id=$1`
-	queryGetTransactions   = `SELECT * FROM transactions`
+	queryGetTransactions   = `SELECT t.*, c.name as category_name, p.name as payee_name FROM transactions AS t` +
+		` LEFT JOIN categories AS c ON t.category_id = c.id LEFT JOIN payees AS p ON t.payee_id = p.id`
 
 	queryCreatePayee = `INSERT into payees (id, name, created_at, updated_at) VALUES ($1, $2, $3, $4)`
 	queryUpdatePayee = `UPDATE payees SET name=$1, updated_at=$2 WHERE id=$3`
@@ -147,9 +150,9 @@ func (h *Handler) GetTransactions(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var transaction Transaction
 
-		err := rows.Scan(&transaction.ID, &transaction.AccountID, &transaction.CategoryID,
-			&transaction.PayeeID, &transaction.Name, &transaction.Credit, &transaction.Debit,
-			&transaction.Notes, &transaction.ClearedAt, &transaction.CreatedAt, &transaction.UpdatedAt)
+		err := rows.Scan(&transaction.ID, &transaction.AccountID, &transaction.CategoryID, &transaction.PayeeID,
+			&transaction.Name, &transaction.Credit, &transaction.Debit, &transaction.Notes, &transaction.ClearedAt,
+			&transaction.CreatedAt, &transaction.UpdatedAt, &transaction.CategoryName, &transaction.PayeeName)
 		if err != nil {
 			buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 

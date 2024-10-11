@@ -14,7 +14,7 @@ type (
 	Group struct {
 		ID        uuid.UUID `json:"id"`
 		Name      string    `json:"name"`
-		Notes     string    `json:"notes"`
+		Notes     string    `json:"notes,omitempty"`
 		CreatedAt time.Time `json:"createdAt"`
 		UpdatedAt time.Time `json:"updatedAt"`
 	}
@@ -24,7 +24,7 @@ type (
 		ID        uuid.UUID `json:"id"`
 		GroupID   uuid.UUID `json:"groupId"`
 		Name      string    `json:"name"`
-		Notes     string    `json:"notes"`
+		Notes     string    `json:"notes,omitempty"`
 		CreatedAt time.Time `json:"createdAt"`
 		UpdatedAt time.Time `json:"updatedAt"`
 	}
