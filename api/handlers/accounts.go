@@ -20,7 +20,7 @@ type Account struct {
 }
 
 const (
-	queryCreateAccount = `INSERT into accounts (id, name, off_budget, category, created_at, updated_at)` +
+	queryCreateAccount = `INSERT INTO accounts (id, name, off_budget, category, created_at, updated_at)` +
 		` VALUES ($1, $2, $3, $4, $5, $6)`
 	queryUpdateAccount = `UPDATE accounts SET name=$1, off_budget=$2, category=$3, updated_at=$4 WHERE id=$5`
 	queryDeleteAccount = `DELETE FROM accounts WHERE id=$1`
@@ -56,7 +56,7 @@ func (h *Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 
 	err = json.NewEncoder(w).Encode(account)
 	if err != nil {
@@ -67,20 +67,26 @@ func (h *Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) UpdateAccount(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 
-	var account Account
-
-	err := json.NewDecoder(r.Body).Decode(&account)
+	accountID, err := uuid.Parse(id)
 	if err != nil {
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
 		return
 	}
 
-	account.ID = uuid.MustParse(id)
+	var account Account
+
+	err = json.NewDecoder(r.Body).Decode(&account)
+	if err != nil {
+		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
+
+		return
+	}
+
 	account.UpdatedAt = time.Now()
 
 	_, err = h.db.Exec(r.Context(), queryUpdateAccount,
-		account.Name, account.OffBudget, account.Category, account.UpdatedAt, account.ID)
+		account.Name, account.OffBudget, account.Category, account.UpdatedAt, accountID)
 	if err != nil {
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
@@ -94,9 +100,14 @@ func (h *Handler) UpdateAccount(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) DeleteAccount(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 
-	accountID := uuid.MustParse(id)
+	accountID, err := uuid.Parse(id)
+	if err != nil {
+		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
-	_, err := h.db.Exec(r.Context(), queryDeleteAccount, accountID)
+		return
+	}
+
+	_, err = h.db.Exec(r.Context(), queryDeleteAccount, accountID)
 	if err != nil {
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 

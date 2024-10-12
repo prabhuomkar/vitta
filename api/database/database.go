@@ -2,11 +2,10 @@ package database
 
 import (
 	"context"
-	"log/slog"
-	"os"
 	"time"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 // Config for the database connection.
@@ -15,15 +14,19 @@ type Config struct {
 	Timeout time.Duration
 }
 
-func New(cfg *Config) *pgx.Conn {
+type DBIface interface {
+	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
+	Exec(ctx context.Context, sql string, arguments ...any) (pgconn.CommandTag, error)
+}
+
+func New(cfg *Config) (DBIface, error) { //nolint: ireturn
 	ctx, cancel := context.WithTimeout(context.Background(), cfg.Timeout)
 	defer cancel()
 
 	conn, err := pgx.Connect(ctx, cfg.URL)
 	if err != nil {
-		slog.Error("error connecting to database", "error", err)
-		os.Exit(1) //nolint: gocritic
+		return nil, err //nolint: wrapcheck
 	}
 
-	return conn
+	return conn, nil
 }
