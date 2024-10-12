@@ -6,7 +6,8 @@ import {
   FormLabel,
   Input,
   Stack,
-  useTheme
+  useTheme,
+  Image
 } from '@chakra-ui/react';
 
 const Login = () => {
@@ -67,8 +68,17 @@ const Login = () => {
       px={4}
       bg="gray.100"
     >
-      <Box w={{ base: 'full', md: '400px' }} p={6} bg="white" borderRadius="md">
-        <Stack spacing={4}>
+      <Box
+        w={{ base: 'full', md: '400px' }}
+        p={6}
+        bg="white"
+        borderRadius="md"
+        border="1px solid"
+        borderColor="gray.200"
+      >
+        <Stack spacing={4} align="center">
+          {' '}
+          <Image src="/logo.png" alt="Logo" boxSize="64px" mb={2} />
           <FormControl id="username">
             <FormLabel>Username</FormLabel>
             <Input
@@ -80,7 +90,6 @@ const Login = () => {
               focusBorderColor={primaryColor}
             />
           </FormControl>
-
           <FormControl id="password">
             <FormLabel>Password</FormLabel>
             <Input
@@ -92,7 +101,6 @@ const Login = () => {
               focusBorderColor={primaryColor}
             />
           </FormControl>
-
           <Button
             colorScheme={primaryColor}
             bg={primaryColor}
