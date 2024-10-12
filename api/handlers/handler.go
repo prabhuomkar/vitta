@@ -34,7 +34,7 @@ func New(cfg *config.Config, db database.DBIface) http.Handler {
 	mux.HandleFunc("GET /v1/payees", h.GetPayees)
 	// transactions
 	mux.HandleFunc("POST /v1/transactions", h.CreateTransaction)
-	mux.HandleFunc("PUT /v1/transactions/{id}", h.ImportTransactions)
+	mux.HandleFunc("PUT /v1/transactions", h.ImportTransactions)
 	mux.HandleFunc("PATCH /v1/transactions/{id}", h.UpdateTransaction)
 	mux.HandleFunc("DELETE /v1/transactions/{id}", h.DeleteTransaction)
 	mux.HandleFunc("GET /v1/transactions", h.GetTransactions)
