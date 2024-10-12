@@ -14,7 +14,7 @@ type (
 	Group struct {
 		ID        uuid.UUID `json:"id"`
 		Name      string    `json:"name"`
-		Notes     string    `json:"notes"`
+		Notes     string    `json:"notes,omitempty"`
 		CreatedAt time.Time `json:"createdAt"`
 		UpdatedAt time.Time `json:"updatedAt"`
 	}
@@ -24,7 +24,7 @@ type (
 		ID        uuid.UUID `json:"id"`
 		GroupID   uuid.UUID `json:"groupId"`
 		Name      string    `json:"name"`
-		Notes     string    `json:"notes"`
+		Notes     string    `json:"notes,omitempty"`
 		CreatedAt time.Time `json:"createdAt"`
 		UpdatedAt time.Time `json:"updatedAt"`
 	}
@@ -55,15 +55,15 @@ type (
 )
 
 const (
-	queryCreateGroup = `INSERT into groups (id, name, notes, created_at, updated_at)` +
+	queryCreateGroup = `INSERT INTO groups (id, name, notes, created_at, updated_at)` +
 		` VALUES ($1, $2, $3, $4, $5)`
 	queryUpdateGroup    = `UPDATE groups SET name=$1, notes=$2, updated_at=$3 WHERE id=$4`
 	queryDeleteGroup    = `DELETE FROM groups WHERE id=$1`
-	queryCreateCategory = `INSERT into categories (id, group_id, name, notes, created_at, updated_at)` +
+	queryCreateCategory = `INSERT INTO categories (id, group_id, name, notes, created_at, updated_at)` +
 		` VALUES ($1, $2, $3, $4, $5, $6)`
 	queryUpdateCategory = `UPDATE categories SET name=$1, notes=$2, updated_at=$3 WHERE id=$4`
 	queryDeleteCategory = `DELETE FROM categories WHERE id=$1`
-	querySetBudget      = `INSERT into budgets (id, category_id, year, month, budgeted, created_at,` +
+	querySetBudget      = `INSERT INTO budgets (id, category_id, year, month, budgeted, created_at,` +
 		` updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (year, month, category_id) DO UPDATE SET budgeted=$5`
 	queryGetBudget = `SELECT budgets.id AS id, COALESCE(budgets.budgeted, 0) AS budgeted, COALESCE(t.spent, 0) AS spent,` +
 		` budgets.year AS year, budgets.month AS month, cg.id AS category_id, cg.name AS category_name,` +
@@ -103,7 +103,7 @@ func (h *Handler) CreateGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 
 	err = json.NewEncoder(w).Encode(group)
 	if err != nil {
@@ -114,20 +114,26 @@ func (h *Handler) CreateGroup(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) UpdateGroup(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 
-	var group Group
-
-	err := json.NewDecoder(r.Body).Decode(&group)
+	groupID, err := uuid.Parse(id)
 	if err != nil {
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
 		return
 	}
 
-	group.ID = uuid.MustParse(id)
+	var group Group
+
+	err = json.NewDecoder(r.Body).Decode(&group)
+	if err != nil {
+		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
+
+		return
+	}
+
 	group.UpdatedAt = time.Now()
 
 	_, err = h.db.Exec(r.Context(), queryUpdateGroup,
-		group.Name, group.Notes, group.UpdatedAt, group.ID)
+		group.Name, group.Notes, group.UpdatedAt, groupID)
 	if err != nil {
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
@@ -141,9 +147,14 @@ func (h *Handler) UpdateGroup(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 
-	groupID := uuid.MustParse(id)
+	groupID, err := uuid.Parse(id)
+	if err != nil {
+		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
-	_, err := h.db.Exec(r.Context(), queryDeleteGroup, groupID)
+		return
+	}
+
+	_, err = h.db.Exec(r.Context(), queryDeleteGroup, groupID)
 	if err != nil {
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
@@ -183,7 +194,7 @@ func (h *Handler) CreateCategory(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 
 	err = json.NewEncoder(w).Encode(category)
 	if err != nil {
@@ -194,20 +205,26 @@ func (h *Handler) CreateCategory(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) UpdateCategory(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 
-	var category Category
-
-	err := json.NewDecoder(r.Body).Decode(&category)
+	categoryID, err := uuid.Parse(id)
 	if err != nil {
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
 		return
 	}
 
-	category.ID = uuid.MustParse(id)
+	var category Category
+
+	err = json.NewDecoder(r.Body).Decode(&category)
+	if err != nil {
+		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
+
+		return
+	}
+
 	category.UpdatedAt = time.Now()
 
 	_, err = h.db.Exec(r.Context(), queryUpdateCategory,
-		category.Name, category.Notes, category.UpdatedAt, category.ID)
+		category.Name, category.Notes, category.UpdatedAt, categoryID)
 	if err != nil {
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
@@ -221,9 +238,14 @@ func (h *Handler) UpdateCategory(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) DeleteCategory(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 
-	categoryID := uuid.MustParse(id)
+	categoryID, err := uuid.Parse(id)
+	if err != nil {
+		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
-	_, err := h.db.Exec(r.Context(), queryDeleteCategory, categoryID)
+		return
+	}
+
+	_, err = h.db.Exec(r.Context(), queryDeleteCategory, categoryID)
 	if err != nil {
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 

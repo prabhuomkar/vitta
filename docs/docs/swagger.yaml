@@ -696,10 +696,18 @@ components:
           type: string
           format: uuid
           example: 01926b84-93cb-75b9-b445-a5a744f7a59f
+        payeeName:
+          type: string
+          example: Swiggy
+          readOnly: true
         categoryId:
           type: string
           format: uuid
           example: 01926b84-93cb-75b9-b445-a5a744f7a59f
+        categoryName:
+          type: string
+          example: Online Food
+          readOnly: true
         name:
           type: string
           example: House Party Food

@@ -15,17 +15,25 @@ import (
 )
 
 func main() {
-	cfg := config.New()
+	cfg, err := config.New()
+	if err != nil {
+		slog.Error("error reading config", "error", err)
+		os.Exit(1)
+	}
 
 	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		AddSource: cfg.LogLevel == slog.LevelDebug,
 		Level:     cfg.LogLevel,
 	})))
 
-	db := database.New(&database.Config{
+	db, err := database.New(&database.Config{
 		URL:     cfg.DatabaseURL,
 		Timeout: cfg.DatabaseTimeout,
 	})
+	if err != nil {
+		slog.Error("error connecting to database", "error", err)
+		os.Exit(1)
+	}
 
 	handler := handlers.New(cfg, db)
 
@@ -57,7 +65,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), cfg.ShutdownTimeout)
 	defer cancel()
 
-	err := server.Shutdown(ctx)
+	err = server.Shutdown(ctx)
 	if err != nil {
 		slog.Error("error shutting down http server", "error", err)
 	}

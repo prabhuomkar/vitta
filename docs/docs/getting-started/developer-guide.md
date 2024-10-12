@@ -39,7 +39,7 @@ Run the following command to setup database migrations:
 
 ```bash
 cd api
-make migrate-up # requires golang-migrate to be installed
+DATABASE_URL="postgres://vdbuser:vdbpass@localhost:5432/vitta?sslmode=disable" make migrate-up # requires golang-migrate to be installed
 ```
 
 ### API

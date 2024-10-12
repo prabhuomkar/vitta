@@ -5,17 +5,16 @@ import (
 	"log/slog"
 	"net/http"
 	"vitta/config"
-
-	"github.com/jackc/pgx/v5"
+	"vitta/database"
 )
 
 // Handler configuration.
 type Handler struct {
 	cfg *config.Config
-	db  *pgx.Conn
+	db  database.DBIface
 }
 
-func New(cfg *config.Config, db *pgx.Conn) http.Handler {
+func New(cfg *config.Config, db database.DBIface) http.Handler {
 	h := &Handler{
 		cfg: cfg,
 		db:  db,
@@ -52,6 +51,7 @@ func New(cfg *config.Config, db *pgx.Conn) http.Handler {
 	return h.basicAuthMiddleware(mux)
 }
 
+// ErrorResponse model.
 type ErrorResponse struct {
 	Error string `json:"error"`
 }
@@ -68,6 +68,7 @@ func buildErrorResponse(w http.ResponseWriter, err string, code int) {
 	}
 }
 
+// Middleware for checking basic auth credentials.
 func (h *Handler) basicAuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		username, password, ok := r.BasicAuth()

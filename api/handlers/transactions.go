@@ -21,29 +21,32 @@ type (
 
 	// Transaction model.
 	Transaction struct {
-		ID         uuid.UUID `json:"id"`
-		AccountID  uuid.UUID `json:"accountId"`
-		CategoryID uuid.UUID `json:"categoryId"`
-		PayeeID    uuid.UUID `json:"payeeId"`
-		Credit     float64   `json:"credit"`
-		Debit      float64   `json:"debit"`
-		Name       string    `json:"name"`
-		Notes      string    `json:"notes"`
-		ClearedAt  time.Time `json:"clearedAt"`
-		CreatedAt  time.Time `json:"createdAt"`
-		UpdatedAt  time.Time `json:"updatedAt"`
+		ID           uuid.UUID  `json:"id"`
+		AccountID    uuid.UUID  `json:"accountId"`
+		CategoryID   *uuid.UUID `json:"categoryId,omitempty"`
+		CategoryName *string    `json:"categoryName,omitempty"`
+		PayeeID      *uuid.UUID `json:"payeeId,omitempty"`
+		PayeeName    *string    `json:"payeeName,omitempty"`
+		Credit       float64    `json:"credit,omitempty"`
+		Debit        float64    `json:"debit,omitempty"`
+		Name         string     `json:"name"`
+		Notes        string     `json:"notes,omitempty"`
+		ClearedAt    *time.Time `json:"clearedAt,omitempty"`
+		CreatedAt    time.Time  `json:"createdAt"`
+		UpdatedAt    time.Time  `json:"updatedAt"`
 	}
 )
 
 const (
-	queryCreateTransaction = `INSERT into transactions (id, account_id, category_id, payee_id, credit,` +
+	queryCreateTransaction = `INSERT INTO transactions (id, account_id, category_id, payee_id, credit,` +
 		` debit, name, notes, cleared_at, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
 	queryUpdateTransaction = `UPDATE transactions SET account_id=$1, category_id=$2, payee_id=$3,` +
 		` credit=$4, debit=$5, name=$6, notes=$7, cleared_at=$8, updated_at=$9 WHERE id=$10`
 	queryDeleteTransaction = `DELETE FROM transactions WHERE id=$1`
-	queryGetTransactions   = `SELECT * FROM transactions`
+	queryGetTransactions   = `SELECT t.*, c.name as category_name, p.name as payee_name FROM transactions AS t` +
+		` LEFT JOIN categories AS c ON t.category_id = c.id LEFT JOIN payees AS p ON t.payee_id = p.id`
 
-	queryCreatePayee = `INSERT into payees (id, name, created_at, updated_at) VALUES ($1, $2, $3, $4)`
+	queryCreatePayee = `INSERT INTO payees (id, name, created_at, updated_at) VALUES ($1, $2, $3, $4)`
 	queryUpdatePayee = `UPDATE payees SET name=$1, updated_at=$2 WHERE id=$3`
 	queryDeletePayee = `DELETE FROM payees WHERE id=$1`
 	queryGetPayees   = `SELECT * FROM payees`
@@ -72,7 +75,7 @@ func (h *Handler) CreateTransaction(w http.ResponseWriter, r *http.Request) {
 	_, err = h.db.Exec(r.Context(), queryCreateTransaction,
 		transaction.ID, transaction.AccountID, transaction.CategoryID, transaction.PayeeID,
 		transaction.Credit, transaction.Debit, transaction.Name, transaction.Notes,
-		transaction.ClearedAt, transaction.CreatedAt, transaction.UpdatedAt)
+		nil, transaction.CreatedAt, transaction.UpdatedAt)
 	if err != nil {
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
@@ -80,7 +83,7 @@ func (h *Handler) CreateTransaction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 
 	err = json.NewEncoder(w).Encode(transaction)
 	if err != nil {
@@ -91,22 +94,28 @@ func (h *Handler) CreateTransaction(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) UpdateTransaction(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 
-	var transaction Transaction
-
-	err := json.NewDecoder(r.Body).Decode(&transaction)
+	transactionID, err := uuid.Parse(id)
 	if err != nil {
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
 		return
 	}
 
-	transaction.ID = uuid.MustParse(id)
+	var transaction Transaction
+
+	err = json.NewDecoder(r.Body).Decode(&transaction)
+	if err != nil {
+		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
+
+		return
+	}
+
 	transaction.UpdatedAt = time.Now()
 
 	_, err = h.db.Exec(r.Context(), queryUpdateTransaction,
 		transaction.AccountID, transaction.CategoryID, transaction.PayeeID,
 		transaction.Credit, transaction.Debit, transaction.Name, transaction.Notes,
-		transaction.ClearedAt, transaction.UpdatedAt, transaction.ID)
+		transaction.ClearedAt, transaction.UpdatedAt, transactionID)
 	if err != nil {
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
@@ -120,9 +129,14 @@ func (h *Handler) UpdateTransaction(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) DeleteTransaction(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 
-	transactionID := uuid.MustParse(id)
+	transactionID, err := uuid.Parse(id)
+	if err != nil {
+		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
-	_, err := h.db.Exec(r.Context(), queryDeleteTransaction, transactionID)
+		return
+	}
+
+	_, err = h.db.Exec(r.Context(), queryDeleteTransaction, transactionID)
 	if err != nil {
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
@@ -147,9 +161,9 @@ func (h *Handler) GetTransactions(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var transaction Transaction
 
-		err := rows.Scan(&transaction.ID, &transaction.AccountID, &transaction.CategoryID,
-			&transaction.PayeeID, &transaction.Name, &transaction.Credit, &transaction.Debit,
-			&transaction.Notes, &transaction.ClearedAt, &transaction.CreatedAt, &transaction.UpdatedAt)
+		err := rows.Scan(&transaction.ID, &transaction.AccountID, &transaction.CategoryID, &transaction.PayeeID,
+			&transaction.Name, &transaction.Credit, &transaction.Debit, &transaction.Notes, &transaction.ClearedAt,
+			&transaction.CreatedAt, &transaction.UpdatedAt, &transaction.CategoryName, &transaction.PayeeName)
 		if err != nil {
 			buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
@@ -208,7 +222,7 @@ func (h *Handler) CreatePayee(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 
 	err = json.NewEncoder(w).Encode(payee)
 	if err != nil {
@@ -219,20 +233,26 @@ func (h *Handler) CreatePayee(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) UpdatePayee(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 
-	var payee Payee
-
-	err := json.NewDecoder(r.Body).Decode(&payee)
+	payeeID, err := uuid.Parse(id)
 	if err != nil {
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
 		return
 	}
 
-	payee.ID = uuid.MustParse(id)
+	var payee Payee
+
+	err = json.NewDecoder(r.Body).Decode(&payee)
+	if err != nil {
+		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
+
+		return
+	}
+
 	payee.UpdatedAt = time.Now()
 
 	_, err = h.db.Exec(r.Context(), queryUpdatePayee,
-		payee.Name, payee.UpdatedAt, payee.ID)
+		payee.Name, payee.UpdatedAt, payeeID)
 	if err != nil {
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
@@ -246,9 +266,14 @@ func (h *Handler) UpdatePayee(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) DeletePayee(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 
-	payeeID := uuid.MustParse(id)
+	payeeID, err := uuid.Parse(id)
+	if err != nil {
+		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
-	_, err := h.db.Exec(r.Context(), queryDeletePayee, payeeID)
+		return
+	}
+
+	_, err = h.db.Exec(r.Context(), queryDeletePayee, payeeID)
 	if err != nil {
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
