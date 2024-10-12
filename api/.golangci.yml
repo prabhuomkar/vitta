@@ -6,3 +6,7 @@ linters:
     - gci
     - varnamelen
     - dupl
+    - paralleltest
+    - testpackage
+    - godox
+    - gochecknoglobals

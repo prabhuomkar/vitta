@@ -2,7 +2,6 @@ package config
 
 import (
 	"log/slog"
-	"os"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
@@ -21,14 +20,13 @@ type Config struct {
 	AdminPassword   string        `default:"vittaT3st!"                                      env:"ADMIN_PASSWORD"`
 }
 
-func New() *Config {
+func New() (*Config, error) {
 	var cfg Config
 
 	err := envconfig.Process("vitta", &cfg)
 	if err != nil {
-		slog.Error("error reading config", "error", err)
-		os.Exit(1)
+		return nil, err //nolint: wrapcheck
 	}
 
-	return &cfg
+	return &cfg, nil
 }
