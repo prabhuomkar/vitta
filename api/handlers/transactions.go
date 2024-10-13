@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"log/slog"
@@ -195,6 +196,7 @@ func (h *Handler) GetTransactions(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) ImportTransactions(w http.ResponseWriter, r *http.Request) { //nolint: funlen,cyclop
 	accountIDQuery := r.URL.Query().Get("accountId")
+	accountCategory := r.URL.Query().Get("accountCategory")
 	adapter := r.URL.Query().Get("adapter")
 
 	accountID, err := uuid.Parse(accountIDQuery)
@@ -231,7 +233,7 @@ func (h *Handler) ImportTransactions(w http.ResponseWriter, r *http.Request) { /
 		return
 	}
 
-	bankAdapter := adapters.New(adapter, nil)
+	bankAdapter := adapters.New(adapter, accountCategory, nil)
 	adapterTransactions := bankAdapter.GetTransactions(rows)
 
 	tx, err := h.db.Begin(r.Context())
@@ -279,9 +281,23 @@ func (h *Handler) ImportTransactions(w http.ResponseWriter, r *http.Request) { /
 }
 
 func (h *Handler) getDataRows(fileName string, file multipart.File) ([][]string, error) {
-	rows := [][]string{}
+	var (
+		rows [][]string
+		err  error
+	)
 
-	if strings.HasSuffix(strings.ToLower(fileName), ".xls") {
+	switch {
+	case strings.HasSuffix(strings.ToLower(fileName), ".csv"):
+		reader := csv.NewReader(file)
+
+		rows, err = reader.ReadAll()
+		if err != nil {
+			slog.Error("error reading rows", "error", err)
+
+			return nil, fmt.Errorf("error reading rows: %w", err)
+		}
+
+	case strings.HasSuffix(strings.ToLower(fileName), ".xls"):
 		xlsFile, err := xls.OpenReader(file, "utf-8")
 		if err != nil {
 			slog.Error("error opening file", "error", err)
@@ -301,7 +317,7 @@ func (h *Handler) getDataRows(fileName string, file multipart.File) ([][]string,
 
 			rows = append(rows, rowData)
 		}
-	} else {
+	default:
 		xFile, err := excelize.OpenReader(file)
 		if err != nil {
 			slog.Error("error opening file", "error", err)

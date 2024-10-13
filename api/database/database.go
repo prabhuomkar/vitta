@@ -22,7 +22,7 @@ type DBIface interface {
 	Close()
 }
 
-func New(cfg *Config) (DBIface, error) { //nolint: ireturn
+func New(cfg *Config) (DBIface, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), cfg.Timeout)
 	defer cancel()
 

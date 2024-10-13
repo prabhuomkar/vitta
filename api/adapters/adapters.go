@@ -19,15 +19,19 @@ type (
 		Credit  float64
 		Debit   float64
 	}
+
+	Adapter interface {
+		GetTransactions(rows [][]string) []AdapterTransaction
+	}
 )
 
-type Adapter interface {
-	GetTransactions(rows [][]string) []AdapterTransaction
-}
+const (
+	AdapterICICI = "icici"
+)
 
-func New(name string, _ *Config) Adapter { //nolint: ireturn
-	if name == "icici" {
-		return newICICI()
+func New(name, category string, _ *Config) Adapter {
+	if name == AdapterICICI {
+		return newICICI(category)
 	}
 
 	return nil // TODO(omkar): Add generic adapter
