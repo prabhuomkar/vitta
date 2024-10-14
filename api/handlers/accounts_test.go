@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/pashagolub/pgxmock/v4"
@@ -13,6 +15,8 @@ var (
 	testAccountName = "ICICI Bank"
 	testOffBudget   = true
 	testCategory    = "CASH/CHECK IN"
+	testAccountTime = time.Now()
+	accountRowCols  = []string{"id", "name", "off_budget", "category", "created_at", "updated_at"}
 )
 
 func TestCreateAccount(t *testing.T) {
@@ -63,9 +67,14 @@ func TestUpdateAccount(t *testing.T) {
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error due to bad request", http.MethodPatch, "/v1/accounts/invalid-uuid", true, "invalid-body",
+			"error due to bad account id", http.MethodPatch, "/v1/accounts/invalid-uuid", true, "invalid-body",
 			nil,
 			http.StatusBadRequest, "invalid UUID",
+		},
+		{
+			"error due to bad request", http.MethodPatch, "/v1/accounts/" + testAccountID.String(), true, "invalid-body",
+			nil,
+			http.StatusBadRequest, "invalid character",
 		},
 		{
 			"error updating account in database", http.MethodPatch, "/v1/accounts/" + testAccountID.String(), true,
@@ -98,12 +107,12 @@ func TestUpdateAccount(t *testing.T) {
 func TestDeleteAccount(t *testing.T) {
 	tests := []testCase{
 		{
-			"error due to auth", http.MethodDelete, "/v1/accounts/invalid-uuid", false, "invalid-body",
+			"error due to auth", http.MethodDelete, "/v1/accounts/invalid-uuid", false, "",
 			nil,
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error due to bad request", http.MethodDelete, "/v1/accounts/invalid-uuid", true, "invalid-body",
+			"error due to bad account id", http.MethodDelete, "/v1/accounts/invalid-uuid", true, "",
 			nil,
 			http.StatusBadRequest, "invalid UUID",
 		},
@@ -136,7 +145,35 @@ func TestGetAccounts(t *testing.T) {
 			nil,
 			http.StatusUnauthorized, "Unauthorized",
 		},
-		// TODO(omkar): Add more unit test cases
+		{
+			"error getting accounts from db", http.MethodGet, "/v1/accounts", true, "",
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnError(pgx.ErrNoRows)
+			},
+			http.StatusInternalServerError, "no rows",
+		},
+		{
+			"error scanning accounts rows from db", http.MethodGet, "/v1/accounts", true, "",
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(accountRowCols).AddRow("invalid", "ok", "false", "category", "bad-time", "bad-time"))
+			},
+			http.StatusInternalServerError, "Scanning value error",
+		},
+		{
+			"error reading accounts rows from db", http.MethodGet, "/v1/accounts", true, "",
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(accountRowCols).RowError(0, errors.New("some error in db")))
+			},
+			http.StatusInternalServerError, "some error in db",
+		},
+		{
+			"success", http.MethodGet, "/v1/accounts", true, "",
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(accountRowCols).AddRow(testAccountID.String(), testAccountName, &testOffBudget, testCategory,
+					testAccountTime, testAccountTime))
+			},
+			http.StatusOK, testAccountID.String(),
+		},
 	}
 	for _, tc := range tests {
 		tc.Run(t)

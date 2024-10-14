@@ -5,7 +5,7 @@ description: "Import transactions"
 sidebar_label: "Import transactions"
 hide_title: true
 hide_table_of_contents: true
-api: eJyVVMFu2zAM/RWDZ8VOiq4Hn5YWPQQYhmBpdwlyYGwmVmtLqkQnDQL/+0DF7Zw0wLCTZeqRenx80hEYtwHyJTx5NAEL1tYEWCmwjjzK36yEHHTjrOczjIJARes1HyBfHmGNQRfTlivIl6tupcDTW0uB7215gPwIhTVMhmXZtDVrh56zjfXNqERGCYeioiau+OAIcgjstdmCAoEhQw5rbdAfoOu6U33tqYScfUsxEJw1gYKUuBlP5FNSKLx2whhyWLRFQUGoD9igc7UuYqvZSxDcFSp2/UIFgwLnRRjWp1PYMtYDmDZMW/JDytrw3S0ooHdsXE2QT8ad6vUU8v+VeyeNs2ZZn03sF4W2ZhGmU3A7Hn/t/R7LpB8JRMwVfZ4NtlyRYdGDSsF9u1ZrZpi8wTp59N56kDMvALG9hM/90hBXVtzk2iglilkg200yvjSW35EP0VetryGHitmFPMt2mhlHJTU23dSHVFsQq30YcSFjO01mYMdPhaWIVI8ocZNgInttNjYCe2l/yzHJdD6Dy86m81mycFToTe+ZZGN9EvG9rbCItqIGtTB3HtdVa5tX9N9dkzYkqta6IBNIcAYjl6nDoqLkJh2DGvScZ9l+v08x7qbWb7M+NWQ/Zg+PPxePo5t0nFbc1FJXVDvxnKTjdCwhZwM3aAZHXR/OWZufkjG9c+Zq1EZqRV7HfnBL2E1AAV+8G5UNLJvH4xoDPfu66yT81pKXh2KlYIde41p0Xq46BRVhST7O+pUOkMPD6W6OnoSCwOtWqFx7NTr1kTQtCnI8gH+51mKUTwfOn59Awbp/mxpbSorUjWXV3+WJI54b6WQc1X+Feb+B5jCgECU4ufA5yIVpqOtA9YzbPhSb+Ff+HEPYW18O8l0fgm7Vdd0fiev8RA==
+api: eJyVVE1v2zgQ/SvCnHYBRrKDtged6mZzMLBYBE2yl8CHMTWOmIofJUdODUP/vRhKcW3HQHdPosj5ePPmzeyB8TlB/QQPEV1Czca7BCsFASNaYoryugeHlqAG04AC46CGgNyCgoaSjiaIG9Sw/Kvwm2Khte8dg4JI33sTqYGaY08Kkm7JItR74F2QeImjcc+gYOOjRYYa+t40MAwrBT5QRAm8bCSzDT7yCUoFiXQfDe8yxDUmoxc9t1A/rSSAZKfEX3yzk5TaOybHcrR9xyZg5EryXjXIGdR/gLc2DuMOhmE4ry5fpOBdoiQhrmdz+ZwSdN9rTUmgH6HBEDqjc6nVSxK7C1D8+oW0cBqiEMNmzMKesTsyM47pmeIxZOP40wdQQD/Qho6gns8GNfEp4P+X7ycpnA3L+UQzXyn1HQsxg4IPs9n72r9gU0wtgWxzgZ9Hhz235Fj4oEbsPl6KtXRM0WFX3MboI0jOM4NcXsGnerHErRc1hT5TKRquodrOKxw1m6q9aYaKz2UWt2+D0McOamiZQ6qramuY8aoh68tNtyuNBxHemyzvpYljn47EeeBbgsA0FPKfbXItxm18NpyI/lfSFIu75buJW9wti/tA2mwmBRUbH4tsP4kMdRYZWTSCPERct7233zB+Dra0JBx3RpNLJHbToC8C6paK63IG6qjmuqpeX19LzK+lj8/V5Jqqv5c3t//c315dl7OyZdtJXGFtxDkvZ+VMroJPbNEdpbrcqpMyD5Qx/eAqdGicxMq49lMbn2A7BwVvjQQFdd5WfLbYWp9YrPf7NSZ6jN0wyPX3nqLskZWCLUaDayH+aQ+NSXJuoN5gl+gdsMMcwx9fp33wZ3G+By+iny7R7UBydr38gYJvtBs37bAaFLSEDcUMZXy4GRNePYj7L8dLK21Qb04LrSnwkfm7nSO6PYzH3eMDKFhPi9P6Rlwkbg6rfh1l0yrAU12POlbTV5BfLDU3YByKxyTTbGkYDvX301Uu4nf+d5jSq4/NkX+YroTFYfgJUJVcEQ==
 sidebar_class_name: "put api-method"
 info_path: docs/swagger/vitta-api
 custom_edit_url: null
@@ -33,7 +33,7 @@ import TabItem from "@theme/TabItem";
 
 <MethodEndpoint
   method={"put"}
-  path={"/v1/transactions"}
+  path={"/v1/accounts/{id}/transactions"}
   context={"endpoint"}
 >
   
@@ -51,7 +51,31 @@ Import transactions
 >
 </Heading>
 
-<MimeTabs
+<details
+  style={{"marginBottom":"1rem"}}
+  className={"openapi-markdown__details"}
+  data-collapsed={false}
+  open={true}
+>
+  <summary
+    style={{}}
+  >
+    <h3
+      className={"openapi-markdown__details-summary-header-params"}
+    >
+      Path Parameters
+    </h3>
+  </summary><div>
+    <ul>
+      <ParamsItem
+        className={"paramsItem"}
+        param={{"name":"id","in":"path","description":"ID of Account","required":true,"schema":{"type":"string","format":"uuid"},"enumDescriptions":[]}}
+      >
+        
+      </ParamsItem>
+    </ul>
+  </div>
+</details><MimeTabs
   className={"openapi-tabs__mime"}
 >
   <TabItem

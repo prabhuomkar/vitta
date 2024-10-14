@@ -62,36 +62,6 @@ const sidebar: SidebarsConfig = {
     },
     {
       type: "category",
-      label: "Accounts",
-      items: [
-        {
-          type: "doc",
-          id: "swagger/create-account",
-          label: "Create a new account",
-          className: "api-method post",
-        },
-        {
-          type: "doc",
-          id: "swagger/get-accounts",
-          label: "Get all existing accounts",
-          className: "api-method get",
-        },
-        {
-          type: "doc",
-          id: "swagger/update-account",
-          label: "Update an existing account",
-          className: "api-method patch",
-        },
-        {
-          type: "doc",
-          id: "swagger/delete-account",
-          label: "Delete an existing account",
-          className: "api-method delete",
-        },
-      ],
-    },
-    {
-      type: "category",
       label: "Payees",
       items: [
         {
@@ -116,6 +86,36 @@ const sidebar: SidebarsConfig = {
           type: "doc",
           id: "swagger/delete-payee",
           label: "Delete an existing payee",
+          className: "api-method delete",
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Accounts",
+      items: [
+        {
+          type: "doc",
+          id: "swagger/create-account",
+          label: "Create a new account",
+          className: "api-method post",
+        },
+        {
+          type: "doc",
+          id: "swagger/get-accounts",
+          label: "Get all existing accounts",
+          className: "api-method get",
+        },
+        {
+          type: "doc",
+          id: "swagger/update-account",
+          label: "Update an existing account",
+          className: "api-method patch",
+        },
+        {
+          type: "doc",
+          id: "swagger/delete-account",
+          label: "Delete an existing account",
           className: "api-method delete",
         },
       ],

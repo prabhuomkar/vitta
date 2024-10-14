@@ -17,10 +17,10 @@ servers:
 tags:
   - name: Budgets
     description: Everything about your Groups, Categories for Budgeting
-  - name: Accounts
-    description: Everything about your Accounts
   - name: Payees
     description: Everything about your Payees
+  - name: Accounts
+    description: Everything about your Accounts
   - name: Transactions
     description: Everything about your Transactions
 paths:
@@ -237,108 +237,6 @@ paths:
           description: Unauthenticated
         '500':
           description: Internal Error
-  /v1/accounts:
-    post:
-      tags:
-        - Accounts
-      summary: Create a new account
-      operationId: createAccount
-      security:
-        - basicAuth: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Account'
-        required: true
-      responses:
-        '201':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Account'
-        '400':
-          description: Bad request
-        '401':
-          description: Unauthenticated
-        '500':
-          description: Internal Error
-    get:
-      tags:
-        - Accounts
-      summary: Get all existing accounts
-      operationId: getAccounts
-      security:
-        - basicAuth: []
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Accounts'
-        '401':
-          description: Unauthenticated
-        '500':
-          description: Internal Error
-  /v1/accounts/{id}:
-    patch:
-      tags:
-        - Accounts
-      parameters:
-        - name: id
-          in: path
-          description: ID of Account
-          required: true
-          schema:
-            type: string
-            format: uuid
-      summary: Update an existing account
-      operationId: updateAccount
-      security:
-        - basicAuth: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Account'
-        required: true
-      responses:
-        '204':
-          description: Success
-        '400':
-          description: Bad request
-        '401':
-          description: Unauthenticated
-        '404':
-          description: Not Found
-        '500':
-          description: Internal Error
-    delete:
-      tags:
-        - Accounts
-      parameters:
-        - name: id
-          in: path
-          description: ID of Account
-          required: true
-          schema:
-            type: string
-            format: uuid
-      summary: Delete an existing account
-      operationId: deleteAccount
-      security:
-        - basicAuth: []
-      responses:
-        '204':
-          description: Success
-        '401':
-          description: Unauthenticated
-        '404':
-          description: Not Found
-        '500':
-          description: Internal Error
   /v1/payees:
     post:
       tags:
@@ -441,10 +339,120 @@ paths:
           description: Not Found
         '500':
           description: Internal Error
-  /v1/transactions:
+  /v1/accounts:
+    post:
+      tags:
+        - Accounts
+      summary: Create a new account
+      operationId: createAccount
+      security:
+        - basicAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+        required: true
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthenticated
+        '500':
+          description: Internal Error
+    get:
+      tags:
+        - Accounts
+      summary: Get all existing accounts
+      operationId: getAccounts
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Accounts'
+        '401':
+          description: Unauthenticated
+        '500':
+          description: Internal Error
+  /v1/accounts/{id}:
+    patch:
+      tags:
+        - Accounts
+      parameters:
+        - name: id
+          in: path
+          description: ID of Account
+          required: true
+          schema:
+            type: string
+            format: uuid
+      summary: Update an existing account
+      operationId: updateAccount
+      security:
+        - basicAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+        required: true
+      responses:
+        '204':
+          description: Success
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthenticated
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Error
+    delete:
+      tags:
+        - Accounts
+      parameters:
+        - name: id
+          in: path
+          description: ID of Account
+          required: true
+          schema:
+            type: string
+            format: uuid
+      summary: Delete an existing account
+      operationId: deleteAccount
+      security:
+        - basicAuth: []
+      responses:
+        '204':
+          description: Success
+        '401':
+          description: Unauthenticated
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Error
+  /v1/accounts/{id}/transactions:
     post:
       tags:
         - Transactions
+      parameters:
+        - name: id
+          in: path
+          description: ID of Account
+          required: true
+          schema:
+            type: string
+            format: uuid
       summary: Create a new transaction
       operationId: createTransaction
       security:
@@ -471,6 +479,14 @@ paths:
     put:
       tags:
         - Transactions
+      parameters:
+        - name: id
+          in: path
+          description: ID of Account
+          required: true
+          schema:
+            type: string
+            format: uuid
       summary: Import transactions
       operationId: importTransactions
       security:
@@ -498,6 +514,14 @@ paths:
     get:
       tags:
         - Transactions
+      parameters:
+        - name: id
+          in: path
+          description: ID of Account
+          required: true
+          schema:
+            type: string
+            format: uuid
       summary: Get all existing transactions
       operationId: getTransactions
       security:
@@ -513,12 +537,19 @@ paths:
           description: Unauthenticated
         '500':
           description: Internal Error
-  /v1/transactions/{id}:
+  /v1/accounts/{id}/transactions/{tId}:
     patch:
       tags:
         - Transactions
       parameters:
         - name: id
+          in: path
+          description: ID of Account
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: tId
           in: path
           description: ID of Transaction
           required: true
@@ -551,6 +582,13 @@ paths:
         - Transactions
       parameters:
         - name: id
+          in: path
+          description: ID of Account
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: tId
           in: path
           description: ID of Transaction
           required: true
@@ -692,6 +730,7 @@ components:
           type: string
           format: uuid
           example: 01926b84-93cb-75b9-b445-a5a744f7a59f
+          readOnly: true
         payeeId:
           type: string
           format: uuid
