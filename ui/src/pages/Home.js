@@ -1,10 +1,12 @@
 import React from 'react';
-import { Box, Heading } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
+import Account from './Account';
 
 const Home = () => {
   return (
     <Box as="main" w="100%" padding="1rem">
-      <Heading>Home</Heading>
+      {/* <Heading>Home</Heading> */}
+      <Account />
     </Box>
   );
 };
