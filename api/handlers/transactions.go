@@ -45,17 +45,27 @@ type (
 const (
 	queryCreateTransaction = `INSERT INTO transactions (id, account_id, category_id, payee_id, credit,` +
 		` debit, name, notes, cleared_at, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
-	queryUpdateTransaction = `UPDATE transactions SET account_id=$1, category_id=$2, payee_id=$3,` +
-		` credit=$4, debit=$5, name=$6, notes=$7, cleared_at=$8, updated_at=$9 WHERE id=$10`
-	queryDeleteTransaction = `DELETE FROM transactions WHERE id=$1`
+	queryUpdateTransaction = `UPDATE transactions SET category_id=$2, payee_id=$3,` +
+		` credit=$4, debit=$5, name=$6, notes=$7, cleared_at=$8, updated_at=$9 WHERE account_id=$1 AND id=$10`
+	queryDeleteTransaction = `DELETE FROM transactions WHERE account_id=$1 AND id=$2`
 	queryGetTransactions   = `SELECT t.*, c.name as category_name, p.name as payee_name FROM transactions AS t` +
 		` LEFT JOIN categories AS c ON t.category_id = c.id LEFT JOIN payees AS p ON t.payee_id = p.id`
 )
 
 func (h *Handler) CreateTransaction(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+
+	accountID, err := uuid.Parse(id)
+	if err != nil {
+		slog.Error("error parsing account id", "error", err)
+		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
+
+		return
+	}
+
 	var transaction Transaction
 
-	err := json.NewDecoder(r.Body).Decode(&transaction)
+	err = json.NewDecoder(r.Body).Decode(&transaction)
 	if err != nil {
 		slog.Error("error decoding create transaction request", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
@@ -75,7 +85,7 @@ func (h *Handler) CreateTransaction(w http.ResponseWriter, r *http.Request) {
 	transaction.UpdatedAt = transaction.CreatedAt
 
 	_, err = h.db.Exec(r.Context(), queryCreateTransaction,
-		transaction.ID, transaction.AccountID, transaction.CategoryID, transaction.PayeeID,
+		transaction.ID, accountID, transaction.CategoryID, transaction.PayeeID,
 		transaction.Credit, transaction.Debit, transaction.Name, transaction.Notes,
 		nil, transaction.CreatedAt, transaction.UpdatedAt)
 	if err != nil {
@@ -96,8 +106,17 @@ func (h *Handler) CreateTransaction(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) UpdateTransaction(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
+	tId := r.PathValue("tId")
 
-	transactionID, err := uuid.Parse(id)
+	accountID, err := uuid.Parse(id)
+	if err != nil {
+		slog.Error("error parsing account id", "error", err)
+		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
+
+		return
+	}
+
+	transactionID, err := uuid.Parse(tId)
 	if err != nil {
 		slog.Error("error parsing transaction id", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
@@ -118,7 +137,7 @@ func (h *Handler) UpdateTransaction(w http.ResponseWriter, r *http.Request) {
 	transaction.UpdatedAt = time.Now()
 
 	_, err = h.db.Exec(r.Context(), queryUpdateTransaction,
-		transaction.AccountID, transaction.CategoryID, transaction.PayeeID,
+		accountID, transaction.CategoryID, transaction.PayeeID,
 		transaction.Credit, transaction.Debit, transaction.Name, transaction.Notes,
 		transaction.ClearedAt, transaction.UpdatedAt, transactionID)
 	if err != nil {
@@ -134,8 +153,17 @@ func (h *Handler) UpdateTransaction(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) DeleteTransaction(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
+	tId := r.PathValue("tId")
 
-	transactionID, err := uuid.Parse(id)
+	accountID, err := uuid.Parse(id)
+	if err != nil {
+		slog.Error("error parsing account id", "error", err)
+		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
+
+		return
+	}
+
+	transactionID, err := uuid.Parse(tId)
 	if err != nil {
 		slog.Error("error parsing transaction id", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
@@ -143,7 +171,7 @@ func (h *Handler) DeleteTransaction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = h.db.Exec(r.Context(), queryDeleteTransaction, transactionID)
+	_, err = h.db.Exec(r.Context(), queryDeleteTransaction, accountID, transactionID)
 	if err != nil {
 		slog.Error("error deleting transaction in database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
@@ -206,6 +234,7 @@ func (h *Handler) ImportTransactions(w http.ResponseWriter, r *http.Request) { /
 
 	accountID, err := uuid.Parse(accountIDQuery)
 	if err != nil {
+		slog.Error("error parsing account id", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
 		return

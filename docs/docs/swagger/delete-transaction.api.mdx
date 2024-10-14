@@ -5,7 +5,7 @@ description: "Delete an existing transaction"
 sidebar_label: "Delete an existing transaction"
 hide_title: true
 hide_table_of_contents: true
-api: eJyFVMFu2zAM/RWDpw1QbafoLjotWDMgQFEUS7tLkANj07FQW3IlOmlg+N8HOl7nLAF6kkWRj4+PpDtg3AXQa3j2aANmbJwNsFHQoMeamLy8dmCxJtBgclBgLGhokEtQkFPIvGkkDDQs7yNXRBMoUODprTWectDsW1IQspJqBN0BHxvBDOyN3YGCwvkaGTS0rcmh7zcKXEMeBWiZg4acKmI6hw+Utd7wcWC5xWCyecsl6PVG4j2FxtlAQfLdpndynFNetVlGIUCv4C6dXb6/WGy5JMsmQ6b85HcF59Fx9NO1dvD4lqaXHkvL5C1W0cJ756Hv/1fvfigvQhvRuwls7C7is1pr4tL9EwLUqQsakv0smbiGpDN5P4jj93872PoKNJTMTdBJsjfMeJNT7eKiOsbGgcj1V8yV9Ogk2kTSj44JCIydlPvgMxRkbOEGR8OVvPyWNNH8aXkxKvOnZbRqKDOFCGucjQrno8EfFGTOMmYsUFSjEeaNx23ZuvoV/femjmsSoSuTkQ0kfuOEzhvMSopu4xTUpGadJIfDIcbhNXZ+l4yhIXlY/lg8rhY3t3Eal1xXgiuqnXjO4jROxdS4wDXaSapP+3VW8Yd6TO+cNBUaK7ADxW5s5Br2M1AwbSUo0CaXjSxdYHHpui0GevFV34v5rSUv079RsEdvcCvCrzvITZDvHHSBVaALNiIxWVm3L7/GFf0aXVvgq7RHI9ojSN6qlRsoeKXj6TfRb/rJwN4vHhbPC1CA55N0mhw1nkL7KvBQ8mkMX4IsUU19/5GtHU3Qq8/jnzCEg/P5JL4ZTcK57/8AkDy5aA==
+api: eJylVFFvm0AM/ivIT5t0BVJ1LzwtWjMJqaqqpd1LlQcHnHAq3NE7kzRC/PfJQDPSVOq0Ph347M/299nXAuPWQ/II9w6Nx4y1NR5WCmp0WBGTk9sWDFYECegcFGgDCdTIBSjIyWdO1xIGCaTXgd0E8yyzjWFQ4Oi50Y5ySNg1pMBnBVUISQt8qAXPs9NmCwo21lXIkEDT6By6Th1TcvovOSflfyrvSoGtyaEApTkkkFNJTKfwnrLGaT70zKzR62zecAHJ40riHfnaGk9e8l3GV3Kclrxssoy8h07BVTw7v38w2HBBhnWGTPng9w7OreXgp21M7/Etjs89UsPkDJbBwjnrhNc3Dtd9ewGagF60Z222AZ/0WhEX9i8RoAYVEoh2swgHpX3U6ryLJoE+ajnNu54rt3sdosaVkEDBXPskinaaGS9yqmy4KQ+htiDsvXK7FMkGDicMHwUUEBiFlf/ep+9Pm43tHTWXcvNb0gTzu/RscuZ3abCsKdMb4VlbE2ysC3p/UJBZw5ixQFGFWiqvHa6LxlZP6L7XVViR8F7qjIwn8Rsndl5jVlBwGcagJj0nUbTf70Psb0PrttEY6qOb9Mfidrm4uAzjsOCqFFxhbahzFsZhLKbaeq7QTFJ9KN9Jx0f2mF44qkvURmD7EttR10fYzUDBq7KgIOmXfiquGGUtVwoK61mC2naNnh5c2XVifm7IyXqsFOzQaVyLFI8t5NrLdw7JBktPZ/UJ6WRkH7/8Gnf4a/D2VXm3idGI5gCSs2zkDxQ80WF4t+RJ+UT60xfgP0oQwrpVN9mo68XN4n4hZJ/O9jDLajyFtneRe8qHxXjwsuUVdd0xXTOa+r4/ir9D7/fW5ZP4ejRJzV33B14RFUc=
 sidebar_class_name: "delete api-method"
 info_path: docs/swagger/vitta-api
 custom_edit_url: null
@@ -33,7 +33,7 @@ import TabItem from "@theme/TabItem";
 
 <MethodEndpoint
   method={"delete"}
-  path={"/v1/transactions/{id}"}
+  path={"/v1/accounts/{id}/transactions/{tId}"}
   context={"endpoint"}
 >
   
@@ -69,7 +69,12 @@ Delete an existing transaction
     <ul>
       <ParamsItem
         className={"paramsItem"}
-        param={{"name":"id","in":"path","description":"ID of Transaction","required":true,"schema":{"type":"string","format":"uuid"},"enumDescriptions":[]}}
+        param={{"name":"id","in":"path","description":"ID of Account","required":true,"schema":{"type":"string","format":"uuid"},"enumDescriptions":[]}}
+      >
+        
+      </ParamsItem><ParamsItem
+        className={"paramsItem"}
+        param={{"name":"tId","in":"path","description":"ID of Transaction","required":true,"schema":{"type":"string","format":"uuid"},"enumDescriptions":[]}}
       >
         
       </ParamsItem>

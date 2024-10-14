@@ -96,12 +96,12 @@ func TestUpdatePayee(t *testing.T) {
 func TestDeletePayee(t *testing.T) {
 	tests := []testCase{
 		{
-			"error due to auth", http.MethodDelete, "/v1/payees/invalid-uuid", false, "invalid-body",
+			"error due to auth", http.MethodDelete, "/v1/payees/invalid-uuid", false, "",
 			nil,
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error due to bad request", http.MethodDelete, "/v1/payees/invalid-uuid", true, "invalid-body",
+			"error due to bad payee id", http.MethodDelete, "/v1/payees/invalid-uuid", true, "",
 			nil,
 			http.StatusBadRequest, "invalid UUID",
 		},

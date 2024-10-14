@@ -22,22 +22,22 @@ func New(cfg *config.Config, db database.DBIface) http.Handler {
 
 	mux := http.NewServeMux()
 
-	// accounts
-	mux.HandleFunc("POST /v1/accounts", h.CreateAccount)
-	mux.HandleFunc("PATCH /v1/accounts/{id}", h.UpdateAccount)
-	mux.HandleFunc("DELETE /v1/accounts/{id}", h.DeleteAccount)
-	mux.HandleFunc("GET /v1/accounts", h.GetAccounts)
 	// payees
 	mux.HandleFunc("POST /v1/payees", h.CreatePayee)
 	mux.HandleFunc("PATCH /v1/payees/{id}", h.UpdatePayee)
 	mux.HandleFunc("DELETE /v1/payees/{id}", h.DeletePayee)
 	mux.HandleFunc("GET /v1/payees", h.GetPayees)
+	// accounts
+	mux.HandleFunc("POST /v1/accounts", h.CreateAccount)
+	mux.HandleFunc("PATCH /v1/accounts/{id}", h.UpdateAccount)
+	mux.HandleFunc("DELETE /v1/accounts/{id}", h.DeleteAccount)
+	mux.HandleFunc("GET /v1/accounts", h.GetAccounts)
 	// transactions
-	mux.HandleFunc("POST /v1/transactions", h.CreateTransaction)
-	mux.HandleFunc("PUT /v1/transactions", h.ImportTransactions)
-	mux.HandleFunc("PATCH /v1/transactions/{id}", h.UpdateTransaction)
-	mux.HandleFunc("DELETE /v1/transactions/{id}", h.DeleteTransaction)
-	mux.HandleFunc("GET /v1/transactions", h.GetTransactions)
+	mux.HandleFunc("POST /v1/accounts/{id}/transactions", h.CreateTransaction)
+	mux.HandleFunc("PUT /v1/accounts/{id}/transactions", h.ImportTransactions)
+	mux.HandleFunc("PATCH /v1/accounts/{id}/transactions/{tId}", h.UpdateTransaction)
+	mux.HandleFunc("DELETE /v1/accounts/{id}/transactions/{tId}", h.DeleteTransaction)
+	mux.HandleFunc("GET /v1/accounts/{id}/transactions", h.GetTransactions)
 	// budgets
 	mux.HandleFunc("POST /v1/groups", h.CreateGroup)
 	mux.HandleFunc("PATCH /v1/groups/{id}", h.UpdateGroup)

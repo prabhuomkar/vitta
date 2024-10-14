@@ -107,12 +107,12 @@ func TestUpdateAccount(t *testing.T) {
 func TestDeleteAccount(t *testing.T) {
 	tests := []testCase{
 		{
-			"error due to auth", http.MethodDelete, "/v1/accounts/invalid-uuid", false, "invalid-body",
+			"error due to auth", http.MethodDelete, "/v1/accounts/invalid-uuid", false, "",
 			nil,
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error due to bad request", http.MethodDelete, "/v1/accounts/invalid-uuid", true, "invalid-body",
+			"error due to bad account id", http.MethodDelete, "/v1/accounts/invalid-uuid", true, "",
 			nil,
 			http.StatusBadRequest, "invalid UUID",
 		},
