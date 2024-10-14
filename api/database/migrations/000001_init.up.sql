@@ -47,7 +47,8 @@ CREATE TABLE transactions (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (account_id) REFERENCES accounts(id),
     FOREIGN KEY (category_id) REFERENCES categories(id),
-    FOREIGN KEY (payee_id) REFERENCES payees(id)
+    FOREIGN KEY (payee_id) REFERENCES payees(id),
+    UNIQUE (account_id, notes, credit, debit, cleared_at)
 );
 
 CREATE TABLE budgets (

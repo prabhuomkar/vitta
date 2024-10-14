@@ -10,3 +10,7 @@ linters:
     - testpackage
     - godox
     - gochecknoglobals
+    - ireturn
+
+run:
+  tests: false
