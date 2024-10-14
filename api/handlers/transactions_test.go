@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"testing"
 
@@ -11,10 +12,12 @@ import (
 
 var (
 	testTransactionName = "House Party Food"
-	testPayeeName       = "Swiggy"
 	testCategoryID      = uuid.MustParse("01927f3e-11b6-7a79-bbc7-affae59272ae")
 	testPayeeID         = uuid.MustParse("01927f3e-5609-703b-b067-f9b9dd9d8ee2")
 	testAccountID       = uuid.MustParse("01927f3e-6ecf-7091-987f-8aa23adcda09")
+	testTransactionID   = uuid.MustParse("01927f3e-6ecf-7091-987f-8aa23addda09")
+	transactionRowCols  = []string{"id", "account_id", "category_id", "payee_id", "name", "credit",
+		"debit", "notes", "cleared_at", "created_at", "updated_at", "category_name", "payee_name"}
 )
 
 func TestCreateTransaction(t *testing.T) {
@@ -65,11 +68,41 @@ func TestUpdateTransaction(t *testing.T) {
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error due to bad request", http.MethodPatch, "/v1/transactions/invalid-uuid", true, "invalid-body",
+			"error due to bad payee id", http.MethodPatch, "/v1/transactions/invalid-uuid", true, "invalid-body",
 			nil,
 			http.StatusBadRequest, "invalid UUID",
 		},
-		// TODO(omkar): Add more unit test cases
+		{
+			"error due to bad request", http.MethodPatch, "/v1/transactions/" + testTransactionID.String(), true, "invalid-body",
+			nil,
+			http.StatusBadRequest, "invalid character",
+		},
+		{
+			"error updating transaction in database", http.MethodPatch, "/v1/transactions/" + testTransactionID.String(), true,
+			`{"accountId":"` + testAccountID.String() + `","categoryId":"` + testCategoryID.String() +
+				`","payeeId":"` + testPayeeID.String() + `","name":"Some name","notes":"Some notes",` +
+				`"credit":4.20,"debit":4.20}`,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectExec("UPDATE transactions").WithArgs(
+					testAccountID, &testCategoryID, &testPayeeID, 4.20, 4.20, "Some name",
+					"Some notes", pgxmock.AnyArg(), pgxmock.AnyArg(), testTransactionID,
+				).WillReturnError(pgx.ErrTxClosed)
+			},
+			http.StatusInternalServerError, "tx is closed",
+		},
+		{
+			"success updating transaction", http.MethodPatch, "/v1/transactions/" + testTransactionID.String(), true,
+			`{"accountId":"` + testAccountID.String() + `","categoryId":"` + testCategoryID.String() +
+				`","payeeId":"` + testPayeeID.String() + `","name":"Some name","notes":"Some notes",` +
+				`"credit":4.20,"debit":4.20}`,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectExec("UPDATE transactions").WithArgs(
+					testAccountID, &testCategoryID, &testPayeeID, 4.20, 4.20, "Some name",
+					"Some notes", pgxmock.AnyArg(), pgxmock.AnyArg(), testTransactionID,
+				).WillReturnResult(pgxmock.NewResult("UPDATE", 1))
+			},
+			http.StatusNoContent, "",
+		},
 	}
 	for _, tc := range tests {
 		tc.Run(t)
@@ -79,7 +112,7 @@ func TestUpdateTransaction(t *testing.T) {
 func TestDeleteTransaction(t *testing.T) {
 	tests := []testCase{
 		{
-			"error due to auth", http.MethodDelete, "/v1/transactions/invalid-uuid", false, "invalid-body",
+			"error due to auth", http.MethodDelete, "/v1/payees/invalid-uuid", false, "invalid-body",
 			nil,
 			http.StatusUnauthorized, "Unauthorized",
 		},
@@ -88,7 +121,22 @@ func TestDeleteTransaction(t *testing.T) {
 			nil,
 			http.StatusBadRequest, "invalid UUID",
 		},
-		// TODO(omkar): Add more unit test cases
+		{
+			"error deleting transaction in database", http.MethodDelete, "/v1/transactions/" + testTransactionID.String(), true,
+			``,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectExec("DELETE FROM transactions").WithArgs(testTransactionID).WillReturnError(pgx.ErrTxClosed)
+			},
+			http.StatusInternalServerError, "tx is closed",
+		},
+		{
+			"success deleting transaction", http.MethodDelete, "/v1/transactions/" + testTransactionID.String(), true,
+			``,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectExec("DELETE FROM transactions").WithArgs(testTransactionID).WillReturnResult(pgxmock.NewResult("DELETE", 1))
+			},
+			http.StatusNoContent, "",
+		},
 	}
 	for _, tc := range tests {
 		tc.Run(t)
@@ -102,95 +150,37 @@ func TestGetTransactions(t *testing.T) {
 			nil,
 			http.StatusUnauthorized, "Unauthorized",
 		},
-		// TODO(omkar): Add more unit test cases
-	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
-}
-
-func TestCreatePayee(t *testing.T) {
-	tests := []testCase{
 		{
-			"error due to auth", http.MethodPost, "/v1/payees", false, "invalid-body",
-			nil,
-			http.StatusUnauthorized, "Unauthorized",
-		},
-		{
-			"error due to bad request", http.MethodPost, "/v1/payees", true, "invalid-body",
-			nil,
-			http.StatusBadRequest, "invalid character",
-		},
-		{
-			"error inserting payee to database", http.MethodPost, "/v1/payees", true,
-			`{"name":"` + testPayeeName + `"}`,
+			"error getting transactions from db", http.MethodGet, "/v1/transactions", true, "",
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectExec("INSERT INTO payees").WithArgs(pgxmock.AnyArg(), testPayeeName,
-					pgxmock.AnyArg(), pgxmock.AnyArg()).WillReturnError(pgx.ErrTxClosed)
+				mock.ExpectQuery("SELECT *").WillReturnError(pgx.ErrNoRows)
 			},
-			http.StatusInternalServerError, "tx is closed",
+			http.StatusInternalServerError, "no rows",
 		},
 		{
-			"success creating payee", http.MethodPost, "/v1/payees", true,
-			`{"name":"` + testPayeeName + `"}`,
+			"error scanning transactions rows from db", http.MethodGet, "/v1/transactions", true, "",
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectExec("INSERT INTO payees").WithArgs(pgxmock.AnyArg(), testPayeeName,
-					pgxmock.AnyArg(), pgxmock.AnyArg()).WillReturnResult(pgxmock.NewResult("INSERT", 1))
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(transactionRowCols).AddRow("invalid", "invalid", "invalid",
+					"invalid", "invalid", "invalid", "invalid", "invalid", "invalid", "invalid", "invalid", "invalid", "invalid"))
 			},
-			http.StatusCreated, testPayeeName,
-		},
-	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
-}
-
-func TestUpdatePayee(t *testing.T) {
-	tests := []testCase{
-		{
-			"error due to auth", http.MethodPatch, "/v1/payees/invalid-uuid", false, "invalid-body",
-			nil,
-			http.StatusUnauthorized, "Unauthorized",
+			http.StatusInternalServerError, "Scanning value error",
 		},
 		{
-			"error due to bad request", http.MethodPatch, "/v1/payees/invalid-uuid", true, "invalid-body",
-			nil,
-			http.StatusBadRequest, "invalid UUID",
-		},
-		// TODO(omkar): Add more unit test cases
-	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
-}
-
-func TestDeletePayee(t *testing.T) {
-	tests := []testCase{
-		{
-			"error due to auth", http.MethodDelete, "/v1/payees/invalid-uuid", false, "invalid-body",
-			nil,
-			http.StatusUnauthorized, "Unauthorized",
+			"error reading transactions rows from db", http.MethodGet, "/v1/transactions", true, "",
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(transactionRowCols).RowError(0, errors.New("some error in db")))
+			},
+			http.StatusInternalServerError, "some error in db",
 		},
 		{
-			"error due to bad request", http.MethodDelete, "/v1/payees/invalid-uuid", true, "invalid-body",
-			nil,
-			http.StatusBadRequest, "invalid UUID",
+			"success", http.MethodGet, "/v1/transactions", true, "",
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(transactionRowCols).AddRow(testTransactionID,
+					testAccountID, &testCategoryID, &testPayeeID, "Some transaction", 4.20, 4.20, "Some notes",
+					&testAccountTime, testAccountTime, testAccountTime, &testCategoryName, &testPayeeName))
+			},
+			http.StatusOK, testAccountID.String(),
 		},
-		// TODO(omkar): Add more unit test cases
-	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
-}
-
-func TestGetPayees(t *testing.T) {
-	tests := []testCase{
-		{
-			"error due to auth", http.MethodGet, "/v1/payees", false, "",
-			nil,
-			http.StatusUnauthorized, "Unauthorized",
-		},
-		// TODO(omkar): Add more unit test cases
 	}
 	for _, tc := range tests {
 		tc.Run(t)

@@ -79,6 +79,7 @@ func (h *Handler) CreateGroup(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&group)
 	if err != nil {
+		slog.Error("error decoding create group request", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
 		return
@@ -86,6 +87,7 @@ func (h *Handler) CreateGroup(w http.ResponseWriter, r *http.Request) {
 
 	group.ID, err = uuid.NewV7()
 	if err != nil {
+		slog.Error("error creating group id", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -97,6 +99,7 @@ func (h *Handler) CreateGroup(w http.ResponseWriter, r *http.Request) {
 	_, err = h.db.Exec(r.Context(), queryCreateGroup,
 		group.ID, group.Name, group.Notes, group.CreatedAt, group.UpdatedAt)
 	if err != nil {
+		slog.Error("error creating group in database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -116,6 +119,7 @@ func (h *Handler) UpdateGroup(w http.ResponseWriter, r *http.Request) {
 
 	groupID, err := uuid.Parse(id)
 	if err != nil {
+		slog.Error("error parsing group id", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
 		return
@@ -125,6 +129,7 @@ func (h *Handler) UpdateGroup(w http.ResponseWriter, r *http.Request) {
 
 	err = json.NewDecoder(r.Body).Decode(&group)
 	if err != nil {
+		slog.Error("error decoding update group request", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
 		return
@@ -135,6 +140,7 @@ func (h *Handler) UpdateGroup(w http.ResponseWriter, r *http.Request) {
 	_, err = h.db.Exec(r.Context(), queryUpdateGroup,
 		group.Name, group.Notes, group.UpdatedAt, groupID)
 	if err != nil {
+		slog.Error("error updating group in database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -149,6 +155,7 @@ func (h *Handler) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 
 	groupID, err := uuid.Parse(id)
 	if err != nil {
+		slog.Error("error parsing group id", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
 		return
@@ -156,6 +163,7 @@ func (h *Handler) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 
 	_, err = h.db.Exec(r.Context(), queryDeleteGroup, groupID)
 	if err != nil {
+		slog.Error("error deleting group in database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -170,6 +178,7 @@ func (h *Handler) CreateCategory(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&category)
 	if err != nil {
+		slog.Error("error decoding create category request", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
 		return
@@ -177,6 +186,7 @@ func (h *Handler) CreateCategory(w http.ResponseWriter, r *http.Request) {
 
 	category.ID, err = uuid.NewV7()
 	if err != nil {
+		slog.Error("error creating category id", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -188,6 +198,7 @@ func (h *Handler) CreateCategory(w http.ResponseWriter, r *http.Request) {
 	_, err = h.db.Exec(r.Context(), queryCreateCategory,
 		category.ID, category.GroupID, category.Name, category.Notes, category.CreatedAt, category.UpdatedAt)
 	if err != nil {
+		slog.Error("error creating category in database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -207,6 +218,7 @@ func (h *Handler) UpdateCategory(w http.ResponseWriter, r *http.Request) {
 
 	categoryID, err := uuid.Parse(id)
 	if err != nil {
+		slog.Error("error parsing category id", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
 		return
@@ -216,6 +228,7 @@ func (h *Handler) UpdateCategory(w http.ResponseWriter, r *http.Request) {
 
 	err = json.NewDecoder(r.Body).Decode(&category)
 	if err != nil {
+		slog.Error("error decoding update category request", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
 		return
@@ -226,6 +239,7 @@ func (h *Handler) UpdateCategory(w http.ResponseWriter, r *http.Request) {
 	_, err = h.db.Exec(r.Context(), queryUpdateCategory,
 		category.Name, category.Notes, category.UpdatedAt, categoryID)
 	if err != nil {
+		slog.Error("error udpating category in database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -240,6 +254,7 @@ func (h *Handler) DeleteCategory(w http.ResponseWriter, r *http.Request) {
 
 	categoryID, err := uuid.Parse(id)
 	if err != nil {
+		slog.Error("error parsing category id", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
 		return
@@ -247,6 +262,7 @@ func (h *Handler) DeleteCategory(w http.ResponseWriter, r *http.Request) {
 
 	_, err = h.db.Exec(r.Context(), queryDeleteCategory, categoryID)
 	if err != nil {
+		slog.Error("error deleting category in database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return

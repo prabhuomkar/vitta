@@ -18,14 +18,6 @@ import (
 )
 
 type (
-	// Payee model.
-	Payee struct {
-		ID        uuid.UUID `json:"id"`
-		Name      string    `json:"name"`
-		CreatedAt time.Time `json:"createdAt"`
-		UpdatedAt time.Time `json:"updatedAt"`
-	}
-
 	// Transaction model.
 	Transaction struct {
 		ID           uuid.UUID  `json:"id"`
@@ -58,11 +50,6 @@ const (
 	queryDeleteTransaction = `DELETE FROM transactions WHERE id=$1`
 	queryGetTransactions   = `SELECT t.*, c.name as category_name, p.name as payee_name FROM transactions AS t` +
 		` LEFT JOIN categories AS c ON t.category_id = c.id LEFT JOIN payees AS p ON t.payee_id = p.id`
-
-	queryCreatePayee = `INSERT INTO payees (id, name, created_at, updated_at) VALUES ($1, $2, $3, $4)`
-	queryUpdatePayee = `UPDATE payees SET name=$1, updated_at=$2 WHERE id=$3`
-	queryDeletePayee = `DELETE FROM payees WHERE id=$1`
-	queryGetPayees   = `SELECT * FROM payees`
 )
 
 func (h *Handler) CreateTransaction(w http.ResponseWriter, r *http.Request) {
@@ -70,6 +57,7 @@ func (h *Handler) CreateTransaction(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&transaction)
 	if err != nil {
+		slog.Error("error decoding create transaction request", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
 		return
@@ -77,6 +65,7 @@ func (h *Handler) CreateTransaction(w http.ResponseWriter, r *http.Request) {
 
 	transaction.ID, err = uuid.NewV7()
 	if err != nil {
+		slog.Error("error creating transaction id", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -90,6 +79,7 @@ func (h *Handler) CreateTransaction(w http.ResponseWriter, r *http.Request) {
 		transaction.Credit, transaction.Debit, transaction.Name, transaction.Notes,
 		nil, transaction.CreatedAt, transaction.UpdatedAt)
 	if err != nil {
+		slog.Error("error creating transaction in database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -109,6 +99,7 @@ func (h *Handler) UpdateTransaction(w http.ResponseWriter, r *http.Request) {
 
 	transactionID, err := uuid.Parse(id)
 	if err != nil {
+		slog.Error("error parsing transaction id", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
 		return
@@ -118,6 +109,7 @@ func (h *Handler) UpdateTransaction(w http.ResponseWriter, r *http.Request) {
 
 	err = json.NewDecoder(r.Body).Decode(&transaction)
 	if err != nil {
+		slog.Error("error decoding update transaction request", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
 		return
@@ -130,6 +122,7 @@ func (h *Handler) UpdateTransaction(w http.ResponseWriter, r *http.Request) {
 		transaction.Credit, transaction.Debit, transaction.Name, transaction.Notes,
 		transaction.ClearedAt, transaction.UpdatedAt, transactionID)
 	if err != nil {
+		slog.Error("error updating transaction in database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -144,6 +137,7 @@ func (h *Handler) DeleteTransaction(w http.ResponseWriter, r *http.Request) {
 
 	transactionID, err := uuid.Parse(id)
 	if err != nil {
+		slog.Error("error parsing transaction id", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
 		return
@@ -151,6 +145,7 @@ func (h *Handler) DeleteTransaction(w http.ResponseWriter, r *http.Request) {
 
 	_, err = h.db.Exec(r.Context(), queryDeleteTransaction, transactionID)
 	if err != nil {
+		slog.Error("error deleting transaction in database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -163,6 +158,7 @@ func (h *Handler) DeleteTransaction(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) GetTransactions(w http.ResponseWriter, r *http.Request) {
 	rows, err := h.db.Query(r.Context(), queryGetTransactions)
 	if err != nil {
+		slog.Error("error getting transactions from database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -178,6 +174,7 @@ func (h *Handler) GetTransactions(w http.ResponseWriter, r *http.Request) {
 			&transaction.Name, &transaction.Credit, &transaction.Debit, &transaction.Notes, &transaction.ClearedAt,
 			&transaction.CreatedAt, &transaction.UpdatedAt, &transaction.CategoryName, &transaction.PayeeName)
 		if err != nil {
+			slog.Error("error scanning transactions row from database", "error", err)
 			buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 			return
@@ -187,6 +184,7 @@ func (h *Handler) GetTransactions(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := rows.Err(); err != nil {
+		slog.Error("error reading transactions rows from database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -372,133 +370,4 @@ func (h *Handler) getDataRows(fileName string, file multipart.File) ([][]string,
 	}
 
 	return rows, nil
-}
-
-func (h *Handler) CreatePayee(w http.ResponseWriter, r *http.Request) {
-	var payee Payee
-
-	err := json.NewDecoder(r.Body).Decode(&payee)
-	if err != nil {
-		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
-
-		return
-	}
-
-	payee.ID, err = uuid.NewV7()
-	if err != nil {
-		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
-
-		return
-	}
-
-	payee.CreatedAt = time.Now()
-	payee.UpdatedAt = payee.CreatedAt
-
-	_, err = h.db.Exec(r.Context(), queryCreatePayee,
-		payee.ID, payee.Name, payee.CreatedAt, payee.UpdatedAt)
-	if err != nil {
-		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
-
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-
-	err = json.NewEncoder(w).Encode(payee)
-	if err != nil {
-		slog.Error("error encoding payee response", "error", err)
-	}
-}
-
-func (h *Handler) UpdatePayee(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
-
-	payeeID, err := uuid.Parse(id)
-	if err != nil {
-		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
-
-		return
-	}
-
-	var payee Payee
-
-	err = json.NewDecoder(r.Body).Decode(&payee)
-	if err != nil {
-		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
-
-		return
-	}
-
-	payee.UpdatedAt = time.Now()
-
-	_, err = h.db.Exec(r.Context(), queryUpdatePayee,
-		payee.Name, payee.UpdatedAt, payeeID)
-	if err != nil {
-		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
-
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusNoContent)
-}
-
-func (h *Handler) DeletePayee(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
-
-	payeeID, err := uuid.Parse(id)
-	if err != nil {
-		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
-
-		return
-	}
-
-	_, err = h.db.Exec(r.Context(), queryDeletePayee, payeeID)
-	if err != nil {
-		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
-
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-}
-
-func (h *Handler) GetPayees(w http.ResponseWriter, r *http.Request) {
-	rows, err := h.db.Query(r.Context(), queryGetPayees)
-	if err != nil {
-		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
-
-		return
-	}
-	defer rows.Close()
-
-	payees := []Payee{}
-
-	for rows.Next() {
-		var payee Payee
-
-		err := rows.Scan(&payee.ID, &payee.Name, &payee.CreatedAt, &payee.UpdatedAt)
-		if err != nil {
-			buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
-
-			return
-		}
-
-		payees = append(payees, payee)
-	}
-
-	if err := rows.Err(); err != nil {
-		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
-
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
-	err = json.NewEncoder(w).Encode(payees)
-	if err != nil {
-		slog.Error("error encoding payees response", "error", err)
-	}
 }
