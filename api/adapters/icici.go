@@ -1,6 +1,7 @@
 package adapters
 
 import (
+	"fmt"
 	"log/slog"
 	"strconv"
 	"strings"
@@ -19,42 +20,21 @@ func newICICI(category string) *ICICI {
 		CreditColumn:  "Deposit Amount (INR )",
 		DebitColumn:   "Withdrawal Amount (INR )",
 	}
+
 	if category == "CC" {
 		cfg.RemarksColumn = "Details"
 		cfg.CreditColumn = "Amount (INR)"
 		cfg.DebitColumn = "Amount (INR)"
 	}
 
-	return &ICICI{
-		cfg: cfg,
-	}
+	return &ICICI{cfg: cfg}
 }
 
-func (i *ICICI) GetTransactions(rows [][]string) []AdapterTransaction { //nolint: cyclop,funlen,gocognit
-	dateIdx, remarkIdx, creditIdx, debitIdx := []int{-1, -1}, []int{-1, -1}, []int{-1, -1}, []int{-1, -1}
-
-	for rowIdx, row := range rows {
-		for colIdx, col := range row {
-			if col == i.cfg.DateColumn {
-				dateIdx = []int{rowIdx, colIdx}
-			}
-
-			if col == i.cfg.RemarksColumn {
-				remarkIdx = []int{rowIdx, colIdx}
-			}
-
-			if col == i.cfg.CreditColumn {
-				creditIdx = []int{rowIdx, colIdx}
-			}
-
-			if col == i.cfg.DebitColumn {
-				debitIdx = []int{rowIdx, colIdx}
-			}
-		}
-	}
+func (i *ICICI) GetTransactions(rows [][]string) []AdapterTransaction {
+	dateIdx, remarkIdx, creditIdx, debitIdx := findIndices(i.cfg, rows)
+	slog.Info("indices", "date", dateIdx, "remark", remarkIdx, "credit", creditIdx, "debit", debitIdx)
 
 	transactions := []AdapterTransaction{}
-
 	idx := dateIdx[0] + 1
 
 	for idx < len(rows) {
@@ -68,15 +48,16 @@ func (i *ICICI) GetTransactions(rows [][]string) []AdapterTransaction { //nolint
 		debit, credit := 0.0, 0.0
 
 		if debitIdx[1] == creditIdx[1] { //nolint: nestif
-			if strings.HasSuffix(strings.ToLower(rows[idx][debitIdx[1]]), "dr.") {
-				debit, err = strconv.ParseFloat(strings.Split(strings.ReplaceAll(rows[idx][debitIdx[1]], ",", ""), " ")[0], 64)
+			amountStr := rows[idx][debitIdx[1]]
+			if strings.HasSuffix(strings.ToLower(amountStr), "dr.") {
+				debit, err = parseAmount(amountStr)
 				if err != nil {
 					slog.Error("error parsing debit amount", "error", err)
 
 					break
 				}
 			} else {
-				credit, err = strconv.ParseFloat(strings.Split(strings.ReplaceAll(rows[idx][creditIdx[1]], ",", ""), " ")[0], 64)
+				credit, err = parseAmount(amountStr)
 				if err != nil {
 					slog.Error("error parsing credit amount", "error", err)
 
@@ -110,4 +91,15 @@ func (i *ICICI) GetTransactions(rows [][]string) []AdapterTransaction { //nolint
 	}
 
 	return transactions
+}
+
+func parseAmount(value string) (float64, error) {
+	cleanedValue := strings.Split(strings.ReplaceAll(value, ",", ""), " ")[0]
+
+	res, err := strconv.ParseFloat(cleanedValue, 64)
+	if err != nil {
+		return 0.0, fmt.Errorf("error parsing amount: %w", err)
+	}
+
+	return res, nil
 }

@@ -638,7 +638,7 @@ components:
         offBudget:
           type: boolean
           example: true
-        type:
+        category:
           type: string
           enum: ["CASH/CHECK IN", "CC", "FD/RD", "EPF", "NPS", "SSY"]
         createdAt:
@@ -724,6 +724,10 @@ components:
           format: float
           multipleOf: 0.2
           example: 10.49
+        clearedAt:
+          type: string
+          format: date-time
+          example: 2024-10-07T01:02:03Z
         createdAt:
           type: string
           format: date-time

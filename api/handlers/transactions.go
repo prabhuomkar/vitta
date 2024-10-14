@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
@@ -40,6 +41,12 @@ type (
 		ClearedAt    *time.Time `json:"clearedAt,omitempty"`
 		CreatedAt    time.Time  `json:"createdAt"`
 		UpdatedAt    time.Time  `json:"updatedAt"`
+	}
+
+	// TransactionsResult model.
+	TransactionsResult struct {
+		Total    int `json:"total"`
+		Imported int `json:"imported"`
 	}
 )
 
@@ -235,6 +242,7 @@ func (h *Handler) ImportTransactions(w http.ResponseWriter, r *http.Request) { /
 
 	bankAdapter := adapters.New(adapter, accountCategory, nil)
 	adapterTransactions := bankAdapter.GetTransactions(rows)
+	importedTransactions := 0
 
 	tx, err := h.db.Begin(r.Context())
 	if err != nil {
@@ -255,28 +263,58 @@ func (h *Handler) ImportTransactions(w http.ResponseWriter, r *http.Request) { /
 			return
 		}
 
-		_, err = tx.Exec(r.Context(), queryCreateTransaction, transactionID, accountID, nil, nil,
-			adapterTransaction.Credit, adapterTransaction.Debit, "imported transaction", adapterTransaction.Remarks,
-			adapterTransaction.Date, transactionTime, transactionTime)
+		_, err = tx.Exec(r.Context(), "SAVEPOINT sp1")
 		if err != nil {
-			slog.Error("error inserting transaction", "error", err)
-
-			err = tx.Rollback(r.Context())
-			if err != nil {
-				slog.Error("error rolling back database txn", "error", err)
-			}
-
+			slog.Error("error storing savepoint", "error", err)
 			buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 			return
 		}
+
+		_, err = tx.Exec(r.Context(), queryCreateTransaction, transactionID, accountID, nil, nil,
+			adapterTransaction.Credit, adapterTransaction.Debit, "imported transaction", adapterTransaction.Remarks,
+			adapterTransaction.Date, transactionTime, transactionTime)
+
+		if err != nil {
+			slog.Error("error inserting transaction", "error", err, "adapterTransaction", adapterTransaction)
+
+			_, rollbackErr := tx.Exec(r.Context(), "ROLLBACK TO SAVEPOINT sp1")
+			if rollbackErr != nil {
+				slog.Error("error rolling back savepoint", "error", rollbackErr)
+			}
+
+			if !strings.Contains(err.Error(), "duplicate key value") {
+				buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
+
+				return
+			}
+		} else {
+			importedTransactions++
+		}
 	}
+
+	defer func(ctx context.Context) {
+		if err != nil {
+			rollBackErr := tx.Rollback(ctx)
+			if rollBackErr != nil {
+				slog.Error("error rolling back database txn", "error", rollBackErr)
+			}
+		}
+	}(r.Context())
 
 	if err := tx.Commit(r.Context()); err != nil {
 		slog.Error("error committing database txn", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	err = json.NewEncoder(w).Encode(TransactionsResult{Total: len(adapterTransactions), Imported: importedTransactions})
+	if err != nil {
+		slog.Error("error encoding transactions result response", "error", err)
 	}
 }
 
