@@ -1,8 +1,7 @@
 import React from 'react';
 import { Box, Flex } from '@chakra-ui/react';
 import Header from './Header';
-import NavigationMenu from './NavigationMenu';
-import NavigationDrawer from './NavigationDrawer';
+import { NavigationDrawer, NavigationMenu } from './navigation';
 
 const MainLayout = ({
   activeLink,
@@ -32,7 +31,12 @@ const MainLayout = ({
         >
           <NavigationMenu onClose={onClose} />
         </Box>
-        <Box as="main" w="100%" padding="1rem">
+        <Box
+          as="main"
+          w="100%"
+          minWidth={['100%', '100%', '50%']}
+          padding="1rem"
+        >
           {children}
         </Box>
       </Flex>
