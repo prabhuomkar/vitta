@@ -32,7 +32,6 @@ func newICICI(category string) *ICICI {
 
 func (i *ICICI) GetTransactions(rows [][]string) []AdapterTransaction {
 	dateIdx, remarkIdx, creditIdx, debitIdx := findIndices(i.cfg, rows)
-	slog.Info("indices", "date", dateIdx, "remark", remarkIdx, "credit", creditIdx, "debit", debitIdx)
 
 	transactions := []AdapterTransaction{}
 	idx := dateIdx[0] + 1
@@ -50,14 +49,14 @@ func (i *ICICI) GetTransactions(rows [][]string) []AdapterTransaction {
 		if debitIdx[1] == creditIdx[1] { //nolint: nestif
 			amountStr := rows[idx][debitIdx[1]]
 			if strings.HasSuffix(strings.ToLower(amountStr), "dr.") {
-				debit, err = parseAmount(amountStr)
+				debit, err = parseTransactionAmount(amountStr)
 				if err != nil {
 					slog.Error("error parsing debit amount", "error", err)
 
 					break
 				}
 			} else {
-				credit, err = parseAmount(amountStr)
+				credit, err = parseTransactionAmount(amountStr)
 				if err != nil {
 					slog.Error("error parsing credit amount", "error", err)
 
@@ -93,12 +92,12 @@ func (i *ICICI) GetTransactions(rows [][]string) []AdapterTransaction {
 	return transactions
 }
 
-func parseAmount(value string) (float64, error) {
+func parseTransactionAmount(value string) (float64, error) {
 	cleanedValue := strings.Split(strings.ReplaceAll(value, ",", ""), " ")[0]
 
 	res, err := strconv.ParseFloat(cleanedValue, 64)
 	if err != nil {
-		return 0.0, fmt.Errorf("error parsing amount: %w", err)
+		return 0.0, fmt.Errorf("error parsing transaction amount: %w", err)
 	}
 
 	return res, nil
