@@ -168,14 +168,14 @@ func TestGetTransactions(t *testing.T) {
 		{
 			"error getting transactions from db", http.MethodGet, "/v1/accounts/" + testAccountID.String() + "/transactions", true, "",
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WillReturnError(pgx.ErrNoRows)
+				mock.ExpectQuery("SELECT *").WithArgs(testAccountID).WillReturnError(pgx.ErrNoRows)
 			},
 			http.StatusInternalServerError, "no rows",
 		},
 		{
 			"error scanning transactions rows from db", http.MethodGet, "/v1/accounts/" + testAccountID.String() + "/transactions", true, "",
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(transactionRowCols).AddRow("invalid", "invalid", "invalid",
+				mock.ExpectQuery("SELECT *").WithArgs(testAccountID).WillReturnRows(pgxmock.NewRows(transactionRowCols).AddRow("invalid", "invalid", "invalid",
 					"invalid", "invalid", "invalid", "invalid", "invalid", "invalid", "invalid", "invalid", "invalid", "invalid"))
 			},
 			http.StatusInternalServerError, "Scanning value error",
@@ -183,14 +183,14 @@ func TestGetTransactions(t *testing.T) {
 		{
 			"error reading transactions rows from db", http.MethodGet, "/v1/accounts/" + testAccountID.String() + "/transactions", true, "",
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(transactionRowCols).RowError(0, errors.New("some error in db")))
+				mock.ExpectQuery("SELECT *").WithArgs(testAccountID).WillReturnRows(pgxmock.NewRows(transactionRowCols).RowError(0, errors.New("some error in db")))
 			},
 			http.StatusInternalServerError, "some error in db",
 		},
 		{
 			"success", http.MethodGet, "/v1/accounts/" + testAccountID.String() + "/transactions", true, "",
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(transactionRowCols).AddRow(testTransactionID,
+				mock.ExpectQuery("SELECT *").WithArgs(testAccountID).WillReturnRows(pgxmock.NewRows(transactionRowCols).AddRow(testTransactionID,
 					testAccountID, &testCategoryID, &testPayeeID, "Some transaction", 4.20, 4.20, "Some notes",
 					&testAccountTime, testAccountTime, testAccountTime, &testCategoryName, &testPayeeName))
 			},

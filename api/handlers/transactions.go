@@ -49,7 +49,7 @@ const (
 		` credit=$4, debit=$5, name=$6, notes=$7, cleared_at=$8, updated_at=$9 WHERE account_id=$1 AND id=$10`
 	queryDeleteTransaction = `DELETE FROM transactions WHERE account_id=$1 AND id=$2`
 	queryGetTransactions   = `SELECT t.*, c.name as category_name, p.name as payee_name FROM transactions AS t` +
-		` LEFT JOIN categories AS c ON t.category_id = c.id LEFT JOIN payees AS p ON t.payee_id = p.id`
+		` LEFT JOIN categories AS c ON t.category_id = c.id LEFT JOIN payees AS p ON t.payee_id = p.id WHERE t.account_id=$1`
 )
 
 func (h *Handler) CreateTransaction(w http.ResponseWriter, r *http.Request) {
@@ -81,6 +81,7 @@ func (h *Handler) CreateTransaction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	transaction.AccountID = accountID
 	transaction.CreatedAt = time.Now()
 	transaction.UpdatedAt = transaction.CreatedAt
 
@@ -106,7 +107,7 @@ func (h *Handler) CreateTransaction(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) UpdateTransaction(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	tId := r.PathValue("tId")
+	tID := r.PathValue("tId")
 
 	accountID, err := uuid.Parse(id)
 	if err != nil {
@@ -116,7 +117,7 @@ func (h *Handler) UpdateTransaction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	transactionID, err := uuid.Parse(tId)
+	transactionID, err := uuid.Parse(tID)
 	if err != nil {
 		slog.Error("error parsing transaction id", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
@@ -153,7 +154,7 @@ func (h *Handler) UpdateTransaction(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) DeleteTransaction(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	tId := r.PathValue("tId")
+	tID := r.PathValue("tId")
 
 	accountID, err := uuid.Parse(id)
 	if err != nil {
@@ -163,7 +164,7 @@ func (h *Handler) DeleteTransaction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	transactionID, err := uuid.Parse(tId)
+	transactionID, err := uuid.Parse(tID)
 	if err != nil {
 		slog.Error("error parsing transaction id", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
@@ -184,7 +185,17 @@ func (h *Handler) DeleteTransaction(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetTransactions(w http.ResponseWriter, r *http.Request) {
-	rows, err := h.db.Query(r.Context(), queryGetTransactions)
+	id := r.PathValue("id")
+
+	accountID, err := uuid.Parse(id)
+	if err != nil {
+		slog.Error("error parsing account id", "error", err)
+		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
+
+		return
+	}
+
+	rows, err := h.db.Query(r.Context(), queryGetTransactions, accountID)
 	if err != nil {
 		slog.Error("error getting transactions from database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
@@ -228,14 +239,24 @@ func (h *Handler) GetTransactions(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) ImportTransactions(w http.ResponseWriter, r *http.Request) { //nolint: funlen,cyclop
-	accountIDQuery := r.URL.Query().Get("accountId")
-	accountCategory := r.URL.Query().Get("accountCategory")
 	adapter := r.URL.Query().Get("adapter")
+	id := r.PathValue("id")
 
-	accountID, err := uuid.Parse(accountIDQuery)
+	accountID, err := uuid.Parse(id)
 	if err != nil {
 		slog.Error("error parsing account id", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
+
+		return
+	}
+
+	var account Account
+
+	err = h.db.QueryRow(r.Context(), queryGetAccount, accountID).Scan(&account.ID,
+		&account.Name, &account.OffBudget, &account.Category, &account.CreatedAt, &account.UpdatedAt)
+	if err != nil {
+		slog.Error("error getting account from database", "error", err)
+		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return
 	}
@@ -267,7 +288,7 @@ func (h *Handler) ImportTransactions(w http.ResponseWriter, r *http.Request) { /
 		return
 	}
 
-	bankAdapter := adapters.New(adapter, accountCategory, nil)
+	bankAdapter := adapters.New(adapter, account.Category, nil)
 	adapterTransactions := bankAdapter.GetTransactions(rows)
 	importedTransactions := 0
 
