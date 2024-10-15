@@ -312,6 +312,7 @@ func (h *Handler) SetBudget(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) GetBudget(w http.ResponseWriter, r *http.Request) {
 	rows, err := h.db.Query(r.Context(), queryGetBudget)
 	if err != nil {
+		slog.Error("error getting budgets from database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -326,6 +327,7 @@ func (h *Handler) GetBudget(w http.ResponseWriter, r *http.Request) {
 		err := rows.Scan(&budget.ID, &budget.Budgeted, &budget.Spent, &budget.Year, &budget.Month,
 			&budget.CategoryID, &budget.CategoryName, &budget.GroupID, &budget.GroupName)
 		if err != nil {
+			slog.Error("error scanning budgets row from database", "error", err)
 			buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 			return
@@ -335,6 +337,7 @@ func (h *Handler) GetBudget(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := rows.Err(); err != nil {
+		slog.Error("error reading budgets rows from database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return

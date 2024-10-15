@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 	"testing"
@@ -14,6 +15,9 @@ var (
 	testGroupName    = "Recurring Expenses"
 	testCategoryName = "Swiggy Online"
 	testGroupID      = uuid.MustParse("01927f36-44b8-7e62-a7a9-395eacab562b")
+	testBudgetID     = uuid.MustParse("01928eeb-b65c-7840-beaa-a1adb8c75956")
+	budgetRowCols    = []string{"id", "budgeted", "spent", "year", "month", "category_id",
+		"category_name", "group_id", "group_name"}
 )
 
 func TestCreateGroup(t *testing.T) {
@@ -239,6 +243,87 @@ func TestDeleteCategory(t *testing.T) {
 				mock.ExpectExec("DELETE FROM categories").WithArgs(testCategoryID).WillReturnResult(pgxmock.NewResult("DELETE", 1))
 			},
 			http.StatusNoContent, "",
+		},
+	}
+	executeTests(t, tests)
+}
+
+func TestSetBudget(t *testing.T) {
+	tests := []testCase{
+		{
+			"error due to auth", http.MethodPut, "/v1/budgets", false, strings.NewReader("invalid-body"),
+			nil, nil,
+			http.StatusUnauthorized, "Unauthorized",
+		},
+		{
+			"error due to bad request", http.MethodPut, "/v1/budgets", true, strings.NewReader("invalid-body"),
+			nil, nil,
+			http.StatusBadRequest, "invalid character",
+		},
+		{
+			"error setting budget in database", http.MethodPut, "/v1/budgets", true,
+			strings.NewReader(`{"categoryId":"` + testCategoryID.String() + `","year":2024,"month":10,"budgeted":500.69}`),
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectExec("INSERT INTO budgets").WithArgs(pgxmock.AnyArg(), testCategoryID,
+					uint16(2024), uint8(10), 500.69, pgxmock.AnyArg(), pgxmock.AnyArg()).WillReturnError(pgx.ErrTxClosed)
+			},
+			http.StatusInternalServerError, "tx is closed",
+		},
+		{
+			"success setting budget", http.MethodPut, "/v1/budgets", true,
+			strings.NewReader(`{"categoryId":"` + testCategoryID.String() + `","year":2024,"month":10,"budgeted":500.69}`),
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectExec("INSERT INTO budgets").WithArgs(pgxmock.AnyArg(), testCategoryID,
+					uint16(2024), uint8(10), 500.69, pgxmock.AnyArg(), pgxmock.AnyArg()).WillReturnResult(pgxmock.NewResult("INSERT", 1))
+			},
+			http.StatusOK, "500.69",
+		},
+	}
+	executeTests(t, tests)
+}
+
+func TestGetBudget(t *testing.T) {
+	tests := []testCase{
+		{
+			"error due to auth", http.MethodGet, "/v1/budgets", false, nil,
+			nil, nil,
+			http.StatusUnauthorized, "Unauthorized",
+		},
+		{
+			"error getting budgets from db", http.MethodGet, "/v1/budgets", true, nil,
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnError(pgx.ErrNoRows)
+			},
+			http.StatusInternalServerError, "no rows",
+		},
+		{
+			"error scanning budgets rows from db", http.MethodGet, "/v1/budgets", true, nil,
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(budgetRowCols).AddRow("invalid", "budgeted",
+					"spent", "year", "month", "category_id", "category_name", "group_id", "group_name"))
+			},
+			http.StatusInternalServerError, "Scanning value error",
+		},
+		{
+			"error reading budgets rows from db", http.MethodGet, "/v1/budgets", true, nil,
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(budgetRowCols).RowError(0, errors.New("some error in db")))
+			},
+			http.StatusInternalServerError, "some error in db",
+		},
+		{
+			"success", http.MethodGet, "/v1/budgets", true, nil,
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(budgetRowCols).
+					AddRow(testBudgetID, 500.69, 4.20, uint16(2024), uint8(10), testCategoryID, testCategoryName, testGroupID, testGroupName))
+			},
+			http.StatusOK, testBudgetID.String(),
 		},
 	}
 	executeTests(t, tests)
