@@ -49,9 +49,7 @@ func TestCreateGroup(t *testing.T) {
 			http.StatusCreated, testGroupName,
 		},
 	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
+	executeTests(t, tests)
 }
 
 func TestUpdateGroup(t *testing.T) {
@@ -62,34 +60,73 @@ func TestUpdateGroup(t *testing.T) {
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error due to bad request", http.MethodPatch, "/v1/groups/invalid-uuid", true, strings.NewReader("invalid-body"),
+			"error due to bad group id", http.MethodPatch, "/v1/groups/invalid-uuid", true, strings.NewReader("invalid-body"),
 			nil, nil,
 			http.StatusBadRequest, "invalid UUID",
 		},
-		// TODO(omkar): Add more unit test cases
+		{
+			"error due to bad request", http.MethodPatch, "/v1/groups/" + testGroupID.String(), true, strings.NewReader("invalid-body"),
+			nil, nil,
+			http.StatusBadRequest, "invalid character",
+		},
+		{
+			"error updating group in database", http.MethodPatch, "/v1/groups/" + testGroupID.String(), true,
+			strings.NewReader(`{"name":"` + testGroupName + `","notes":"Some notes"}`),
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectExec("UPDATE groups").WithArgs(
+					testGroupName, "Some notes", pgxmock.AnyArg(), testGroupID,
+				).WillReturnError(pgx.ErrTxClosed)
+			},
+			http.StatusInternalServerError, "tx is closed",
+		},
+		{
+			"success updating group", http.MethodPatch, "/v1/groups/" + testGroupID.String(), true,
+			strings.NewReader(`{"name":"` + testGroupName + `","notes":"Some notes"}`),
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectExec("UPDATE groups").WithArgs(
+					testGroupName, "Some notes", pgxmock.AnyArg(), testGroupID,
+				).WillReturnResult(pgxmock.NewResult("UPDATE", 1))
+			},
+			http.StatusNoContent, "",
+		},
 	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
+	executeTests(t, tests)
 }
 
 func TestDeleteGroup(t *testing.T) {
 	tests := []testCase{
 		{
-			"error due to auth", http.MethodDelete, "/v1/groups/invalid-uuid", false, strings.NewReader("invalid-body"),
+			"error due to auth", http.MethodDelete, "/v1/groups/invalid-uuid", false, nil,
 			nil, nil,
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error due to bad request", http.MethodDelete, "/v1/groups/invalid-uuid", true, strings.NewReader("invalid-body"),
+			"error due to bad group id", http.MethodDelete, "/v1/groups/invalid-uuid", true, nil,
 			nil, nil,
 			http.StatusBadRequest, "invalid UUID",
 		},
-		// TODO(omkar): Add more unit test cases
+		{
+			"error deleting group in database", http.MethodDelete, "/v1/groups/" + testGroupID.String(), true,
+			nil,
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectExec("DELETE FROM groups").WithArgs(testGroupID).WillReturnError(pgx.ErrTxClosed)
+			},
+			http.StatusInternalServerError, "tx is closed",
+		},
+		{
+			"success deleting group", http.MethodDelete, "/v1/groups/" + testGroupID.String(), true,
+			nil,
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectExec("DELETE FROM groups").WithArgs(testGroupID).WillReturnResult(pgxmock.NewResult("DELETE", 1))
+			},
+			http.StatusNoContent, "",
+		},
 	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
+	executeTests(t, tests)
 }
 
 func TestCreateCategory(t *testing.T) {
@@ -127,9 +164,7 @@ func TestCreateCategory(t *testing.T) {
 			http.StatusCreated, testCategoryName,
 		},
 	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
+	executeTests(t, tests)
 }
 
 func TestUpdateCategory(t *testing.T) {
@@ -140,32 +175,71 @@ func TestUpdateCategory(t *testing.T) {
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error due to bad request", http.MethodPatch, "/v1/categories/invalid-uuid", true, strings.NewReader("invalid-body"),
+			"error due to bad category id", http.MethodPatch, "/v1/categories/invalid-uuid", true, strings.NewReader("invalid-body"),
 			nil, nil,
 			http.StatusBadRequest, "invalid UUID",
 		},
-		// TODO(omkar): Add more unit test cases
+		{
+			"error due to bad request", http.MethodPatch, "/v1/categories/" + testCategoryID.String(), true, strings.NewReader("invalid-body"),
+			nil, nil,
+			http.StatusBadRequest, "invalid character",
+		},
+		{
+			"error updating category in database", http.MethodPatch, "/v1/categories/" + testCategoryID.String(), true,
+			strings.NewReader(`{"name":"` + testCategoryName + `","notes":"Some notes","groupId":"` + testGroupID.String() + `"}`),
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectExec("UPDATE categories").WithArgs(
+					testCategoryName, "Some notes", testGroupID, pgxmock.AnyArg(), testCategoryID,
+				).WillReturnError(pgx.ErrTxClosed)
+			},
+			http.StatusInternalServerError, "tx is closed",
+		},
+		{
+			"success updating category", http.MethodPatch, "/v1/categories/" + testCategoryID.String(), true,
+			strings.NewReader(`{"name":"` + testCategoryName + `","notes":"Some notes","groupId":"` + testGroupID.String() + `"}`),
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectExec("UPDATE categories").WithArgs(
+					testCategoryName, "Some notes", testGroupID, pgxmock.AnyArg(), testCategoryID,
+				).WillReturnResult(pgxmock.NewResult("UPDATE", 1))
+			},
+			http.StatusNoContent, "",
+		},
 	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
+	executeTests(t, tests)
 }
 
 func TestDeleteCategory(t *testing.T) {
 	tests := []testCase{
 		{
-			"error due to auth", http.MethodDelete, "/v1/categories/invalid-uuid", false, strings.NewReader("invalid-body"),
+			"error due to auth", http.MethodDelete, "/v1/categories/invalid-uuid", false, nil,
 			nil, nil,
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error due to bad request", http.MethodDelete, "/v1/categories/invalid-uuid", true, strings.NewReader("invalid-body"),
+			"error due to bad category id", http.MethodDelete, "/v1/categories/invalid-uuid", true, nil,
 			nil, nil,
 			http.StatusBadRequest, "invalid UUID",
 		},
-		// TODO(omkar): Add more unit test cases
+		{
+			"error deleting category in database", http.MethodDelete, "/v1/categories/" + testCategoryID.String(), true,
+			nil,
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectExec("DELETE FROM categories").WithArgs(testCategoryID).WillReturnError(pgx.ErrTxClosed)
+			},
+			http.StatusInternalServerError, "tx is closed",
+		},
+		{
+			"success deleting category", http.MethodDelete, "/v1/categories/" + testCategoryID.String(), true,
+			nil,
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectExec("DELETE FROM categories").WithArgs(testCategoryID).WillReturnResult(pgxmock.NewResult("DELETE", 1))
+			},
+			http.StatusNoContent, "",
+		},
 	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
+	executeTests(t, tests)
 }

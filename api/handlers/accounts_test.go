@@ -57,9 +57,7 @@ func TestCreateAccount(t *testing.T) {
 			http.StatusCreated, testAccountName,
 		},
 	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
+	executeTests(t, tests)
 }
 
 func TestUpdateAccount(t *testing.T) {
@@ -104,9 +102,7 @@ func TestUpdateAccount(t *testing.T) {
 			http.StatusNoContent, "",
 		},
 	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
+	executeTests(t, tests)
 }
 
 func TestDeleteAccount(t *testing.T) {
@@ -140,9 +136,7 @@ func TestDeleteAccount(t *testing.T) {
 			http.StatusNoContent, "",
 		},
 	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
+	executeTests(t, tests)
 }
 
 func TestGetAccounts(t *testing.T) {
@@ -186,7 +180,5 @@ func TestGetAccounts(t *testing.T) {
 			http.StatusOK, testAccountID.String(),
 		},
 	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
+	executeTests(t, tests)
 }

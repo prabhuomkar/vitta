@@ -61,7 +61,7 @@ const (
 	queryDeleteGroup    = `DELETE FROM groups WHERE id=$1`
 	queryCreateCategory = `INSERT INTO categories (id, group_id, name, notes, created_at, updated_at)` +
 		` VALUES ($1, $2, $3, $4, $5, $6)`
-	queryUpdateCategory = `UPDATE categories SET name=$1, notes=$2, updated_at=$3 WHERE id=$4`
+	queryUpdateCategory = `UPDATE categories SET name=$1, notes=$2, group_id=$3, updated_at=$4 WHERE id=$5`
 	queryDeleteCategory = `DELETE FROM categories WHERE id=$1`
 	querySetBudget      = `INSERT INTO budgets (id, category_id, year, month, budgeted, created_at,` +
 		` updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (year, month, category_id) DO UPDATE SET budgeted=$5`
@@ -237,7 +237,7 @@ func (h *Handler) UpdateCategory(w http.ResponseWriter, r *http.Request) {
 	category.UpdatedAt = time.Now()
 
 	_, err = h.db.Exec(r.Context(), queryUpdateCategory,
-		category.Name, category.Notes, category.UpdatedAt, categoryID)
+		category.Name, category.Notes, category.GroupID, category.UpdatedAt, categoryID)
 	if err != nil {
 		slog.Error("error udpating category in database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)

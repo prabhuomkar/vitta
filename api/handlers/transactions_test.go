@@ -68,9 +68,7 @@ func TestCreateTransaction(t *testing.T) {
 			http.StatusCreated, testTransactionName,
 		},
 	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
+	executeTests(t, tests)
 }
 
 func TestUpdateTransaction(t *testing.T) {
@@ -124,9 +122,7 @@ func TestUpdateTransaction(t *testing.T) {
 			http.StatusNoContent, "",
 		},
 	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
+	executeTests(t, tests)
 }
 
 func TestDeleteTransaction(t *testing.T) {
@@ -163,9 +159,7 @@ func TestDeleteTransaction(t *testing.T) {
 			http.StatusNoContent, "",
 		},
 	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
+	executeTests(t, tests)
 }
 
 func TestGetTransactions(t *testing.T) {
@@ -211,9 +205,7 @@ func TestGetTransactions(t *testing.T) {
 			http.StatusOK, testAccountID.String(),
 		},
 	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
+	executeTests(t, tests)
 }
 
 func TestImportTransactions(t *testing.T) {
@@ -283,9 +275,7 @@ func TestImportTransactions(t *testing.T) {
 			http.StatusOK, `"total":1,"imported":1`,
 		},
 	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
+	executeTests(t, tests)
 }
 
 func getMockCSV(t *testing.T, fail bool) (io.Reader, http.Header) {

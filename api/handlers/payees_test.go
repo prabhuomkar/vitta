@@ -48,9 +48,7 @@ func TestCreatePayee(t *testing.T) {
 			http.StatusCreated, testPayeeName,
 		},
 	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
+	executeTests(t, tests)
 }
 
 func TestUpdatePayee(t *testing.T) {
@@ -93,9 +91,7 @@ func TestUpdatePayee(t *testing.T) {
 			http.StatusNoContent, "",
 		},
 	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
+	executeTests(t, tests)
 }
 
 func TestDeletePayee(t *testing.T) {
@@ -129,9 +125,7 @@ func TestDeletePayee(t *testing.T) {
 			http.StatusNoContent, "",
 		},
 	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
+	executeTests(t, tests)
 }
 
 func TestGetPayees(t *testing.T) {
@@ -175,7 +169,5 @@ func TestGetPayees(t *testing.T) {
 			http.StatusOK, testPayeeID.String(),
 		},
 	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
+	executeTests(t, tests)
 }
