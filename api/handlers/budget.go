@@ -277,6 +277,7 @@ func (h *Handler) SetBudget(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&budget)
 	if err != nil {
+		slog.Error("error decoding set budget request", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
 		return
@@ -284,6 +285,7 @@ func (h *Handler) SetBudget(w http.ResponseWriter, r *http.Request) {
 
 	budget.ID, err = uuid.NewV7()
 	if err != nil {
+		slog.Error("error creating budget id", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -295,6 +297,7 @@ func (h *Handler) SetBudget(w http.ResponseWriter, r *http.Request) {
 	_, err = h.db.Exec(r.Context(), querySetBudget,
 		budget.ID, budget.CategoryID, budget.Year, budget.Month, budget.Budgeted, budget.CreatedAt, budget.UpdatedAt)
 	if err != nil {
+		slog.Error("error setting budget in database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return
