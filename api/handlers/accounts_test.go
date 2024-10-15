@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -14,7 +15,7 @@ import (
 var (
 	testAccountName = "ICICI Bank"
 	testOffBudget   = true
-	testCategory    = "CASH/CHECK IN"
+	testCategory    = "CC"
 	testAccountTime = time.Now()
 	accountRowCols  = []string{"id", "name", "off_budget", "category", "created_at", "updated_at"}
 )
@@ -22,19 +23,20 @@ var (
 func TestCreateAccount(t *testing.T) {
 	tests := []testCase{
 		{
-			"error due to auth", http.MethodPost, "/v1/accounts", false, "",
-			nil,
+			"error due to auth", http.MethodPost, "/v1/accounts", false, nil,
+			nil, nil,
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error due to bad request", http.MethodPost, "/v1/accounts", true, "invalid-body",
-			nil,
+			"error due to bad request", http.MethodPost, "/v1/accounts", true, strings.NewReader("invalid-body"),
+			nil, nil,
 			http.StatusBadRequest, "invalid character",
 		},
 		{
 			"error inserting account to database", http.MethodPost, "/v1/accounts", true,
-			`{"name":"` + testAccountName + `","offBudget":` + strconv.FormatBool(testOffBudget) +
-				`,"category":"` + testCategory + `"}`,
+			strings.NewReader(`{"name":"` + testAccountName + `","offBudget":` + strconv.FormatBool(testOffBudget) +
+				`,"category":"` + testCategory + `"}`),
+			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectExec("INSERT INTO accounts").WithArgs(pgxmock.AnyArg(),
 					testAccountName, &testOffBudget, testCategory, pgxmock.AnyArg(),
@@ -44,8 +46,9 @@ func TestCreateAccount(t *testing.T) {
 		},
 		{
 			"success creating account", http.MethodPost, "/v1/accounts", true,
-			`{"name":"` + testAccountName + `","offBudget":` + strconv.FormatBool(testOffBudget) +
-				`,"category":"` + testCategory + `"}`,
+			strings.NewReader(`{"name":"` + testAccountName + `","offBudget":` + strconv.FormatBool(testOffBudget) +
+				`,"category":"` + testCategory + `"}`),
+			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectExec("INSERT INTO accounts").WithArgs(pgxmock.AnyArg(),
 					testAccountName, &testOffBudget, testCategory, pgxmock.AnyArg(),
@@ -54,32 +57,31 @@ func TestCreateAccount(t *testing.T) {
 			http.StatusCreated, testAccountName,
 		},
 	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
+	executeTests(t, tests)
 }
 
 func TestUpdateAccount(t *testing.T) {
 	tests := []testCase{
 		{
-			"error due to auth", http.MethodPatch, "/v1/accounts/invalid-uuid", false, "invalid-body",
-			nil,
+			"error due to auth", http.MethodPatch, "/v1/accounts/invalid-uuid", false, strings.NewReader("invalid-body"),
+			nil, nil,
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error due to bad account id", http.MethodPatch, "/v1/accounts/invalid-uuid", true, "invalid-body",
-			nil,
+			"error due to bad account id", http.MethodPatch, "/v1/accounts/invalid-uuid", true, strings.NewReader("invalid-body"),
+			nil, nil,
 			http.StatusBadRequest, "invalid UUID",
 		},
 		{
-			"error due to bad request", http.MethodPatch, "/v1/accounts/" + testAccountID.String(), true, "invalid-body",
-			nil,
+			"error due to bad request", http.MethodPatch, "/v1/accounts/" + testAccountID.String(), true, strings.NewReader("invalid-body"),
+			nil, nil,
 			http.StatusBadRequest, "invalid character",
 		},
 		{
 			"error updating account in database", http.MethodPatch, "/v1/accounts/" + testAccountID.String(), true,
-			`{"name":"` + testAccountName + `","offBudget":` + strconv.FormatBool(testOffBudget) +
-				`,"category":"` + testCategory + `"}`,
+			strings.NewReader(`{"name":"` + testAccountName + `","offBudget":` + strconv.FormatBool(testOffBudget) +
+				`,"category":"` + testCategory + `"}`),
+			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectExec("UPDATE accounts").WithArgs(
 					testAccountName, &testOffBudget, testCategory, pgxmock.AnyArg(), testAccountID,
@@ -89,8 +91,9 @@ func TestUpdateAccount(t *testing.T) {
 		},
 		{
 			"success updating account", http.MethodPatch, "/v1/accounts/" + testAccountID.String(), true,
-			`{"name":"` + testAccountName + `","offBudget":` + strconv.FormatBool(testOffBudget) +
-				`,"category":"` + testCategory + `"}`,
+			strings.NewReader(`{"name":"` + testAccountName + `","offBudget":` + strconv.FormatBool(testOffBudget) +
+				`,"category":"` + testCategory + `"}`),
+			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectExec("UPDATE accounts").WithArgs(
 					testAccountName, &testOffBudget, testCategory, pgxmock.AnyArg(), testAccountID,
@@ -99,26 +102,25 @@ func TestUpdateAccount(t *testing.T) {
 			http.StatusNoContent, "",
 		},
 	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
+	executeTests(t, tests)
 }
 
 func TestDeleteAccount(t *testing.T) {
 	tests := []testCase{
 		{
-			"error due to auth", http.MethodDelete, "/v1/accounts/invalid-uuid", false, "",
-			nil,
+			"error due to auth", http.MethodDelete, "/v1/accounts/invalid-uuid", false, nil,
+			nil, nil,
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error due to bad account id", http.MethodDelete, "/v1/accounts/invalid-uuid", true, "",
-			nil,
+			"error due to bad account id", http.MethodDelete, "/v1/accounts/invalid-uuid", true, nil,
+			nil, nil,
 			http.StatusBadRequest, "invalid UUID",
 		},
 		{
 			"error deleting account in database", http.MethodDelete, "/v1/accounts/" + testAccountID.String(), true,
-			``,
+			nil,
+			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectExec("DELETE FROM accounts").WithArgs(testAccountID).WillReturnError(pgx.ErrTxClosed)
 			},
@@ -126,48 +128,51 @@ func TestDeleteAccount(t *testing.T) {
 		},
 		{
 			"success deleting account", http.MethodDelete, "/v1/accounts/" + testAccountID.String(), true,
-			``,
+			nil,
+			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectExec("DELETE FROM accounts").WithArgs(testAccountID).WillReturnResult(pgxmock.NewResult("DELETE", 1))
 			},
 			http.StatusNoContent, "",
 		},
 	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
+	executeTests(t, tests)
 }
 
 func TestGetAccounts(t *testing.T) {
 	tests := []testCase{
 		{
-			"error due to auth", http.MethodGet, "/v1/accounts", false, "",
-			nil,
+			"error due to auth", http.MethodGet, "/v1/accounts", false, nil,
+			nil, nil,
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error getting accounts from db", http.MethodGet, "/v1/accounts", true, "",
+			"error getting accounts from db", http.MethodGet, "/v1/accounts", true, nil,
+			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectQuery("SELECT *").WillReturnError(pgx.ErrNoRows)
 			},
 			http.StatusInternalServerError, "no rows",
 		},
 		{
-			"error scanning accounts rows from db", http.MethodGet, "/v1/accounts", true, "",
+			"error scanning accounts rows from db", http.MethodGet, "/v1/accounts", true, nil,
+			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(accountRowCols).AddRow("invalid", "ok", "false", "category", "bad-time", "bad-time"))
 			},
 			http.StatusInternalServerError, "Scanning value error",
 		},
 		{
-			"error reading accounts rows from db", http.MethodGet, "/v1/accounts", true, "",
+			"error reading accounts rows from db", http.MethodGet, "/v1/accounts", true, nil,
+			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(accountRowCols).RowError(0, errors.New("some error in db")))
 			},
 			http.StatusInternalServerError, "some error in db",
 		},
 		{
-			"success", http.MethodGet, "/v1/accounts", true, "",
+			"success", http.MethodGet, "/v1/accounts", true, nil,
+			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(accountRowCols).AddRow(testAccountID.String(), testAccountName, &testOffBudget, testCategory,
 					testAccountTime, testAccountTime))
@@ -175,7 +180,5 @@ func TestGetAccounts(t *testing.T) {
 			http.StatusOK, testAccountID.String(),
 		},
 	}
-	for _, tc := range tests {
-		tc.Run(t)
-	}
+	executeTests(t, tests)
 }
