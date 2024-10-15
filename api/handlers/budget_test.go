@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/google/uuid"
@@ -18,18 +19,19 @@ var (
 func TestCreateGroup(t *testing.T) {
 	tests := []testCase{
 		{
-			"error due to auth", http.MethodPost, "/v1/groups", false, "invalid-body",
-			nil,
+			"error due to auth", http.MethodPost, "/v1/groups", false, strings.NewReader("invalid-body"),
+			nil, nil,
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error due to bad request", http.MethodPost, "/v1/groups", true, "invalid-body",
-			nil,
+			"error due to bad request", http.MethodPost, "/v1/groups", true, strings.NewReader("invalid-body"),
+			nil, nil,
 			http.StatusBadRequest, "invalid character",
 		},
 		{
 			"error inserting group to database", http.MethodPost, "/v1/groups", true,
-			`{"name":"` + testGroupName + `"}`,
+			strings.NewReader(`{"name":"` + testGroupName + `"}`),
+			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectExec("INSERT INTO groups").WithArgs(pgxmock.AnyArg(), testGroupName,
 					"", pgxmock.AnyArg(), pgxmock.AnyArg()).WillReturnError(pgx.ErrTxClosed)
@@ -38,7 +40,8 @@ func TestCreateGroup(t *testing.T) {
 		},
 		{
 			"success creating group", http.MethodPost, "/v1/groups", true,
-			`{"name":"` + testGroupName + `"}`,
+			strings.NewReader(`{"name":"` + testGroupName + `"}`),
+			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectExec("INSERT INTO groups").WithArgs(pgxmock.AnyArg(), testGroupName,
 					"", pgxmock.AnyArg(), pgxmock.AnyArg()).WillReturnResult(pgxmock.NewResult("INSERT", 1))
@@ -54,13 +57,13 @@ func TestCreateGroup(t *testing.T) {
 func TestUpdateGroup(t *testing.T) {
 	tests := []testCase{
 		{
-			"error due to auth", http.MethodPatch, "/v1/groups/invalid-uuid", false, "invalid-body",
-			nil,
+			"error due to auth", http.MethodPatch, "/v1/groups/invalid-uuid", false, strings.NewReader("invalid-body"),
+			nil, nil,
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error due to bad request", http.MethodPatch, "/v1/groups/invalid-uuid", true, "invalid-body",
-			nil,
+			"error due to bad request", http.MethodPatch, "/v1/groups/invalid-uuid", true, strings.NewReader("invalid-body"),
+			nil, nil,
 			http.StatusBadRequest, "invalid UUID",
 		},
 		// TODO(omkar): Add more unit test cases
@@ -73,13 +76,13 @@ func TestUpdateGroup(t *testing.T) {
 func TestDeleteGroup(t *testing.T) {
 	tests := []testCase{
 		{
-			"error due to auth", http.MethodDelete, "/v1/groups/invalid-uuid", false, "invalid-body",
-			nil,
+			"error due to auth", http.MethodDelete, "/v1/groups/invalid-uuid", false, strings.NewReader("invalid-body"),
+			nil, nil,
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error due to bad request", http.MethodDelete, "/v1/groups/invalid-uuid", true, "invalid-body",
-			nil,
+			"error due to bad request", http.MethodDelete, "/v1/groups/invalid-uuid", true, strings.NewReader("invalid-body"),
+			nil, nil,
 			http.StatusBadRequest, "invalid UUID",
 		},
 		// TODO(omkar): Add more unit test cases
@@ -92,18 +95,19 @@ func TestDeleteGroup(t *testing.T) {
 func TestCreateCategory(t *testing.T) {
 	tests := []testCase{
 		{
-			"error due to auth", http.MethodPost, "/v1/categories", false, "invalid-body",
-			nil,
+			"error due to auth", http.MethodPost, "/v1/categories", false, strings.NewReader("invalid-body"),
+			nil, nil,
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error due to bad request", http.MethodPost, "/v1/categories", true, "invalid-body",
-			nil,
+			"error due to bad request", http.MethodPost, "/v1/categories", true, strings.NewReader("invalid-body"),
+			nil, nil,
 			http.StatusBadRequest, "invalid character",
 		},
 		{
 			"error inserting category to database", http.MethodPost, "/v1/categories", true,
-			`{"name":"` + testCategoryName + `","groupId":"` + testGroupID.String() + `"}`,
+			strings.NewReader(`{"name":"` + testCategoryName + `","groupId":"` + testGroupID.String() + `"}`),
+			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectExec("INSERT INTO categories").WithArgs(pgxmock.AnyArg(),
 					testGroupID, testCategoryName, "", pgxmock.AnyArg(),
@@ -113,7 +117,8 @@ func TestCreateCategory(t *testing.T) {
 		},
 		{
 			"success creating category", http.MethodPost, "/v1/categories", true,
-			`{"name":"` + testCategoryName + `","groupId":"` + testGroupID.String() + `"}`,
+			strings.NewReader(`{"name":"` + testCategoryName + `","groupId":"` + testGroupID.String() + `"}`),
+			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectExec("INSERT INTO categories").WithArgs(pgxmock.AnyArg(),
 					testGroupID, testCategoryName, "", pgxmock.AnyArg(),
@@ -130,13 +135,13 @@ func TestCreateCategory(t *testing.T) {
 func TestUpdateCategory(t *testing.T) {
 	tests := []testCase{
 		{
-			"error due to auth", http.MethodPatch, "/v1/categories/invalid-uuid", false, "invalid-body",
-			nil,
+			"error due to auth", http.MethodPatch, "/v1/categories/invalid-uuid", false, strings.NewReader("invalid-body"),
+			nil, nil,
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error due to bad request", http.MethodPatch, "/v1/categories/invalid-uuid", true, "invalid-body",
-			nil,
+			"error due to bad request", http.MethodPatch, "/v1/categories/invalid-uuid", true, strings.NewReader("invalid-body"),
+			nil, nil,
 			http.StatusBadRequest, "invalid UUID",
 		},
 		// TODO(omkar): Add more unit test cases
@@ -149,13 +154,13 @@ func TestUpdateCategory(t *testing.T) {
 func TestDeleteCategory(t *testing.T) {
 	tests := []testCase{
 		{
-			"error due to auth", http.MethodDelete, "/v1/categories/invalid-uuid", false, "invalid-body",
-			nil,
+			"error due to auth", http.MethodDelete, "/v1/categories/invalid-uuid", false, strings.NewReader("invalid-body"),
+			nil, nil,
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error due to bad request", http.MethodDelete, "/v1/categories/invalid-uuid", true, "invalid-body",
-			nil,
+			"error due to bad request", http.MethodDelete, "/v1/categories/invalid-uuid", true, strings.NewReader("invalid-body"),
+			nil, nil,
 			http.StatusBadRequest, "invalid UUID",
 		},
 		// TODO(omkar): Add more unit test cases

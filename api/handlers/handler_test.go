@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 	"vitta/config"
 
@@ -18,7 +18,8 @@ type testCase struct {
 	method               string
 	path                 string
 	auth                 bool
-	body                 string
+	body                 io.Reader
+	headers              http.Header
 	mockDBFunc           func(pgxmock.PgxPoolIface)
 	expectedCode         int
 	expectedBodyContains string
@@ -35,16 +36,20 @@ func (tc *testCase) Run(t *testing.T) {
 			tc.mockDBFunc(mockDB)
 		}
 
-		req, err := http.NewRequestWithContext(context.TODO(), tc.method, tc.path, strings.NewReader(tc.body))
+		req, err := http.NewRequestWithContext(context.TODO(), tc.method, tc.path, tc.body)
 		if err != nil {
 			require.NoError(t, err)
+		}
+
+		for key, value := range tc.headers {
+			req.Header.Add(key, value[0])
 		}
 
 		if tc.auth {
 			req.SetBasicAuth("vitta", "vittaT3st!")
 		}
 
-		h := New(&config.Config{AdminUsername: "vitta", AdminPassword: "vittaT3st!"}, mockDB)
+		h := New(&config.Config{AdminUsername: "vitta", AdminPassword: "vittaT3st!", UploadMemoryLimit: 1048576}, mockDB)
 
 		res := httptest.NewRecorder()
 
