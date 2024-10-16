@@ -61,7 +61,7 @@ const (
 	queryDeleteGroup    = `DELETE FROM groups WHERE id=$1`
 	queryCreateCategory = `INSERT INTO categories (id, group_id, name, notes, created_at, updated_at)` +
 		` VALUES ($1, $2, $3, $4, $5, $6)`
-	queryUpdateCategory = `UPDATE categories SET name=$1, notes=$2, updated_at=$3 WHERE id=$4`
+	queryUpdateCategory = `UPDATE categories SET name=$1, notes=$2, group_id=$3, updated_at=$4 WHERE id=$5`
 	queryDeleteCategory = `DELETE FROM categories WHERE id=$1`
 	querySetBudget      = `INSERT INTO budgets (id, category_id, year, month, budgeted, created_at,` +
 		` updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (year, month, category_id) DO UPDATE SET budgeted=$5`
@@ -237,7 +237,7 @@ func (h *Handler) UpdateCategory(w http.ResponseWriter, r *http.Request) {
 	category.UpdatedAt = time.Now()
 
 	_, err = h.db.Exec(r.Context(), queryUpdateCategory,
-		category.Name, category.Notes, category.UpdatedAt, categoryID)
+		category.Name, category.Notes, category.GroupID, category.UpdatedAt, categoryID)
 	if err != nil {
 		slog.Error("error udpating category in database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
@@ -277,6 +277,7 @@ func (h *Handler) SetBudget(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&budget)
 	if err != nil {
+		slog.Error("error decoding set budget request", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
 
 		return
@@ -284,6 +285,7 @@ func (h *Handler) SetBudget(w http.ResponseWriter, r *http.Request) {
 
 	budget.ID, err = uuid.NewV7()
 	if err != nil {
+		slog.Error("error creating budget id", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -295,6 +297,7 @@ func (h *Handler) SetBudget(w http.ResponseWriter, r *http.Request) {
 	_, err = h.db.Exec(r.Context(), querySetBudget,
 		budget.ID, budget.CategoryID, budget.Year, budget.Month, budget.Budgeted, budget.CreatedAt, budget.UpdatedAt)
 	if err != nil {
+		slog.Error("error setting budget in database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -312,6 +315,7 @@ func (h *Handler) SetBudget(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) GetBudget(w http.ResponseWriter, r *http.Request) {
 	rows, err := h.db.Query(r.Context(), queryGetBudget)
 	if err != nil {
+		slog.Error("error getting budgets from database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -326,6 +330,7 @@ func (h *Handler) GetBudget(w http.ResponseWriter, r *http.Request) {
 		err := rows.Scan(&budget.ID, &budget.Budgeted, &budget.Spent, &budget.Year, &budget.Month,
 			&budget.CategoryID, &budget.CategoryName, &budget.GroupID, &budget.GroupName)
 		if err != nil {
+			slog.Error("error scanning budgets row from database", "error", err)
 			buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 			return
@@ -335,6 +340,7 @@ func (h *Handler) GetBudget(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := rows.Err(); err != nil {
+		slog.Error("error reading budgets rows from database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return

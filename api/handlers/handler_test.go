@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 	"vitta/config"
 
@@ -18,40 +18,47 @@ type testCase struct {
 	method               string
 	path                 string
 	auth                 bool
-	body                 string
+	body                 io.Reader
+	headers              http.Header
 	mockDBFunc           func(pgxmock.PgxPoolIface)
 	expectedCode         int
 	expectedBodyContains string
 }
 
-func (tc *testCase) Run(t *testing.T) {
+func executeTests(t *testing.T, tests []testCase) {
 	t.Helper()
-	t.Run(tc.name, func(t *testing.T) {
-		mockDB, err := pgxmock.NewPool()
-		require.NoError(t, err)
-		defer mockDB.Close()
-
-		if tc.mockDBFunc != nil {
-			tc.mockDBFunc(mockDB)
-		}
-
-		req, err := http.NewRequestWithContext(context.TODO(), tc.method, tc.path, strings.NewReader(tc.body))
-		if err != nil {
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			mockDB, err := pgxmock.NewPool()
 			require.NoError(t, err)
-		}
+			defer mockDB.Close()
 
-		if tc.auth {
-			req.SetBasicAuth("vitta", "vittaT3st!")
-		}
+			if tc.mockDBFunc != nil {
+				tc.mockDBFunc(mockDB)
+			}
 
-		h := New(&config.Config{AdminUsername: "vitta", AdminPassword: "vittaT3st!"}, mockDB)
+			req, err := http.NewRequestWithContext(context.TODO(), tc.method, tc.path, tc.body)
+			if err != nil {
+				require.NoError(t, err)
+			}
 
-		res := httptest.NewRecorder()
+			for key, value := range tc.headers {
+				req.Header.Add(key, value[0])
+			}
 
-		handler := h
-		handler.ServeHTTP(res, req)
+			if tc.auth {
+				req.SetBasicAuth("vitta", "vittaT3st!")
+			}
 
-		assert.Equal(t, tc.expectedCode, res.Code)
-		assert.Contains(t, res.Body.String(), tc.expectedBodyContains)
-	})
+			h := New(&config.Config{AdminUsername: "vitta", AdminPassword: "vittaT3st!", UploadMemoryLimit: 1048576}, mockDB)
+
+			res := httptest.NewRecorder()
+
+			handler := h
+			handler.ServeHTTP(res, req)
+
+			assert.Equal(t, tc.expectedCode, res.Code)
+			assert.Contains(t, res.Body.String(), tc.expectedBodyContains)
+		})
+	}
 }

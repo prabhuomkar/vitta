@@ -48,7 +48,7 @@ func New(cfg *config.Config, db database.DBIface) http.Handler {
 	mux.HandleFunc("GET /v1/budgets", h.GetBudget)
 	mux.HandleFunc("PUT /v1/budgets", h.SetBudget)
 
-	return h.basicAuthMiddleware(mux)
+	return h.corsMiddleware(h.basicAuthMiddleware(mux))
 }
 
 // ErrorResponse model.
@@ -75,6 +75,23 @@ func (h *Handler) basicAuthMiddleware(next http.Handler) http.Handler {
 
 		if !ok || username != h.cfg.AdminUsername || password != h.cfg.AdminPassword {
 			buildErrorResponse(w, "Unauthorized", http.StatusUnauthorized)
+
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+// Middleware for CORS related operations.
+func (h *Handler) corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PATCH, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
 
 			return
 		}
