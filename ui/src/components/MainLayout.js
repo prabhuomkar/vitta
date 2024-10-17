@@ -1,16 +1,17 @@
-import React from 'react';
-import { Box, Flex } from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { Box, Flex, useDisclosure } from '@chakra-ui/react';
 import Header from './Header';
 import { NavigationDrawer, NavigationMenu } from './navigation';
 
-const MainLayout = ({
-  activeLink,
-  onLinkClick,
-  isOpen,
-  onOpen,
-  onClose,
-  children
-}) => {
+const MainLayout = ({ children }) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [activeLink, setActiveLink] = useState('');
+
+  const handleLinkClick = link => {
+    setActiveLink(link);
+    onClose();
+  };
+
   return (
     <Box bg="gray.100" minH="100vh">
       <Header onOpen={onOpen} logoSrc="/logo.png" />
@@ -28,6 +29,7 @@ const MainLayout = ({
           borderColor="gray.200"
           zIndex="9"
           transform="translateZ(0)"
+          overflowY="scroll"
         >
           <NavigationMenu onClose={onClose} />
         </Box>
@@ -44,7 +46,7 @@ const MainLayout = ({
         isOpen={isOpen}
         onClose={onClose}
         activeLink={activeLink}
-        onLinkClick={onLinkClick}
+        onLinkClick={handleLinkClick}
       />
     </Box>
   );

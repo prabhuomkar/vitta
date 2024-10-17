@@ -1,4 +1,3 @@
-// App.js
 import React from 'react';
 import {
   BrowserRouter as Router,
@@ -6,12 +5,10 @@ import {
   Route,
   useNavigate
 } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, AccountsProvider } from './context';
 import MainLayout from './components/MainLayout';
 import Auth from './components/Auth';
-import Home from './pages/Home';
-import About from './pages/About';
-import Contact from './pages/Contact';
+import { Home, About, Contact, Accounts, Account } from './pages';
 import PrivateRoute from './components/common/PrivateRoute';
 
 const AppRoutes = () => {
@@ -26,14 +23,18 @@ const AppRoutes = () => {
           element={
             <PrivateRoute
               element={
-                <MainLayout>
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/home" element={<Home />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/contact" element={<Contact />} />
-                  </Routes>
-                </MainLayout>
+                <AccountsProvider>
+                  <MainLayout>
+                    <Routes>
+                      <Route path="/" element={<Home />} />
+                      <Route path="/home" element={<Home />} />
+                      <Route path="/about" element={<About />} />
+                      <Route path="/contact" element={<Contact />} />
+                      <Route path="/accounts" element={<Accounts />} />
+                      <Route path="/account/:id" element={<Account />} />
+                    </Routes>
+                  </MainLayout>
+                </AccountsProvider>
               }
             />
           }

@@ -8,7 +8,7 @@ export const AuthProvider = ({ children, navigate }) => {
   );
 
   const login = (username, password) => {
-    if (username === 'vittauser' && password === 'vittapassword') {
+    if (username === 'vitta-user' && password === 'vitta@1234') {
       setIsAuthenticated(true);
       localStorage.setItem('isAuthenticated', 'true');
       navigate('/');

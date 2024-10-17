@@ -93,7 +93,8 @@ const Auth = () => {
               name="username"
               placeholder="Enter your username"
               onChange={handleChange}
-              borderColor={errors.username ? 'red.300' : 'gray.300'}
+              borderColor={errors.username ? 'red.500' : 'gray.300'}
+              borderWidth={errors.username ? '2px' : '1px'}
               focusBorderColor={primaryColor}
             />
             {errors.username && <Box color="red.500">{errors.username}</Box>}
@@ -105,7 +106,8 @@ const Auth = () => {
               name="password"
               placeholder="Enter your password"
               onChange={handleChange}
-              borderColor={errors.password ? 'red.300' : 'gray.300'}
+              borderColor={errors.password ? 'red.500' : 'gray.300'}
+              borderWidth={errors.password ? '2px' : '1px'}
               focusBorderColor={primaryColor}
             />
             {errors.password && <Box color="red.500">{errors.password}</Box>}
