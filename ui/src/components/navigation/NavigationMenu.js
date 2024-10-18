@@ -107,7 +107,7 @@ const NavigationMenu = ({ onClose }) => {
           padding="0.5rem 1rem"
           justify="space-between"
         >
-          <Text>Accounts</Text>
+          <Text>ACCOUNTS</Text>
           <Popover
             placement="auto-end"
             isOpen={isPopoverOpen}
@@ -125,7 +125,7 @@ const NavigationMenu = ({ onClose }) => {
               <PopoverContent>
                 <PopoverArrow />
                 <PopoverCloseButton position="absolute" top="8px" />
-                <PopoverHeader>Add Account</PopoverHeader>
+                <PopoverHeader>ADD ACCOUNT</PopoverHeader>
                 <PopoverBody>
                   <FormControl
                     id="account-name"

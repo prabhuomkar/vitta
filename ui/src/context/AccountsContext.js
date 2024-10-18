@@ -40,10 +40,12 @@ export const AccountsProvider = ({ children }) => {
 
   const updateAccount = async (id, accountData) => {
     try {
-      const updatedAccount = await editAccount(id, accountData);
+      await editAccount(id, accountData);
+
+      // Update the local state with the latest account data
       setAccounts(prevAccounts =>
         prevAccounts.map(account =>
-          account.id === id ? updatedAccount : account
+          account.id === id ? { ...account, ...accountData } : account
         )
       );
     } catch (err) {
