@@ -9,10 +9,12 @@ import {
   useTheme,
   Image
 } from '@chakra-ui/react';
+import { useAuth } from '../context/AuthContext';
 
-const Login = () => {
+const Auth = () => {
   const theme = useTheme();
   const primaryColor = theme.colors.primary;
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     username: '',
@@ -21,7 +23,8 @@ const Login = () => {
 
   const [errors, setErrors] = useState({
     username: '',
-    password: ''
+    password: '',
+    login: ''
   });
 
   const handleChange = e => {
@@ -41,21 +44,26 @@ const Login = () => {
   const handleSubmit = () => {
     let hasError = false;
 
-    // Validate username
     if (!formData.username) {
       setErrors(prev => ({ ...prev, username: 'Username is required' }));
       hasError = true;
     }
 
-    // Validate password
     if (!formData.password) {
       setErrors(prev => ({ ...prev, password: 'Password is required' }));
       hasError = true;
     }
 
     if (!hasError) {
-      // eslint-disable-next-line no-console
-      console.log(formData);
+      try {
+        login(formData.username, formData.password);
+      } catch (error) {
+        setErrors({
+          username: '',
+          password: '',
+          login: error.message
+        });
+      }
     }
   };
 
@@ -77,7 +85,6 @@ const Login = () => {
         borderColor="gray.200"
       >
         <Stack spacing={4} align="center">
-          {' '}
           <Image src="/logo.png" alt="Logo" boxSize="64px" mb={2} />
           <FormControl id="username">
             <FormLabel>Username</FormLabel>
@@ -86,9 +93,11 @@ const Login = () => {
               name="username"
               placeholder="Enter your username"
               onChange={handleChange}
-              borderColor={errors.username ? 'red.300' : 'gray.300'}
+              borderColor={errors.username ? 'red.500' : 'gray.300'}
+              borderWidth={errors.username ? '2px' : '1px'}
               focusBorderColor={primaryColor}
             />
+            {errors.username && <Box color="red.500">{errors.username}</Box>}
           </FormControl>
           <FormControl id="password">
             <FormLabel>Password</FormLabel>
@@ -97,10 +106,17 @@ const Login = () => {
               name="password"
               placeholder="Enter your password"
               onChange={handleChange}
-              borderColor={errors.password ? 'red.300' : 'gray.300'}
+              borderColor={errors.password ? 'red.500' : 'gray.300'}
+              borderWidth={errors.password ? '2px' : '1px'}
               focusBorderColor={primaryColor}
             />
+            {errors.password && <Box color="red.500">{errors.password}</Box>}
           </FormControl>
+          {errors.login && (
+            <Box color="red.500" textAlign="center">
+              {errors.login}
+            </Box>
+          )}
           <Button
             colorScheme={primaryColor}
             bg={primaryColor}
@@ -116,4 +132,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Auth;
