@@ -1,45 +1,53 @@
-import React, { useState } from 'react';
-import { useDisclosure } from '@chakra-ui/react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React from 'react';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useNavigate
+} from 'react-router-dom';
+import { AuthProvider, AccountsProvider } from './context';
 import MainLayout from './components/MainLayout';
-import Login from './components/Login';
-import Home from './pages/Home';
-import About from './pages/About';
-import Contact from './pages/Contact';
+import Auth from './components/Auth';
+import { Home, About, Contact, Accounts, Account } from './pages';
+import PrivateRoute from './components/common/PrivateRoute';
 
-const App = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [activeLink, setActiveLink] = useState('');
-
-  const handleLinkClick = link => {
-    setActiveLink(link);
-    onClose();
-  };
+const AppRoutes = () => {
+  const navigate = useNavigate();
 
   return (
-    <Router>
+    <AuthProvider navigate={navigate}>
       <Routes>
-        <Route path="/login" element={<Login />} />
-
+        <Route path="/auth" element={<Auth />} />
         <Route
           path="*"
           element={
-            <MainLayout
-              activeLink={activeLink}
-              onLinkClick={handleLinkClick}
-              isOpen={isOpen}
-              onOpen={onOpen}
-              onClose={onClose}
-            >
-              <Routes>
-                <Route path="/home" element={<Home />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-              </Routes>
-            </MainLayout>
+            <PrivateRoute
+              element={
+                <AccountsProvider>
+                  <MainLayout>
+                    <Routes>
+                      <Route path="/" element={<Home />} />
+                      <Route path="/home" element={<Home />} />
+                      <Route path="/about" element={<About />} />
+                      <Route path="/contact" element={<Contact />} />
+                      <Route path="/accounts" element={<Accounts />} />
+                      <Route path="/account/:id" element={<Account />} />
+                    </Routes>
+                  </MainLayout>
+                </AccountsProvider>
+              }
+            />
           }
         />
       </Routes>
+    </AuthProvider>
+  );
+};
+
+const App = () => {
+  return (
+    <Router>
+      <AppRoutes />
     </Router>
   );
 };

@@ -3,7 +3,7 @@ import { Box, Heading } from '@chakra-ui/react';
 
 const About = () => {
   return (
-    <Box as="main" w="100%" padding="1rem">
+    <Box as="main" w="100%">
       <Heading>About</Heading>
     </Box>
   );
