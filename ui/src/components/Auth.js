@@ -9,7 +9,7 @@ import {
   useTheme,
   Image
 } from '@chakra-ui/react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context';
 
 const Auth = () => {
   const theme = useTheme();

@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   fetchAccounts,
   addAccount,
@@ -18,8 +18,10 @@ export const AccountsProvider = ({ children }) => {
       setLoading(true);
       const data = await fetchAccounts();
       setAccounts(data);
+      return { success: true };
     } catch (err) {
       setError(err);
+      return { success: false, error: err };
     } finally {
       setLoading(false);
     }
@@ -33,8 +35,10 @@ export const AccountsProvider = ({ children }) => {
     try {
       const newAccount = await addAccount(accountData);
       setAccounts(prevAccounts => [...prevAccounts, newAccount]);
+      return { success: true };
     } catch (err) {
       setError(err);
+      return { success: false, error: err };
     }
   };
 
@@ -48,8 +52,10 @@ export const AccountsProvider = ({ children }) => {
           account.id === id ? { ...account, ...accountData } : account
         )
       );
+      return { success: true };
     } catch (err) {
       setError(err);
+      return { success: false, error: err };
     }
   };
 
@@ -59,8 +65,10 @@ export const AccountsProvider = ({ children }) => {
       setAccounts(prevAccounts =>
         prevAccounts.filter(account => account.id !== id)
       );
+      return { success: true };
     } catch (err) {
       setError(err);
+      return { success: false, error: err };
     }
   };
 
@@ -80,4 +88,8 @@ export const AccountsProvider = ({ children }) => {
       {children}
     </AccountsContext.Provider>
   );
+};
+
+export const useAccounts = () => {
+  return useContext(AccountsContext);
 };

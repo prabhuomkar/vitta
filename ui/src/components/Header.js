@@ -11,7 +11,7 @@ import {
   Button
 } from '@chakra-ui/react';
 import { HamburgerIcon } from '@chakra-ui/icons';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context';
 
 const Header = ({ onOpen, logoSrc }) => {
   const { logout } = useAuth();
