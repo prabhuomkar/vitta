@@ -5,7 +5,7 @@ description: "Get all existing accounts"
 sidebar_label: "Get all existing accounts"
 hide_title: true
 hide_table_of_contents: true
-api: eJy1VE2P20YM/SsCz6MPO3a3q1Mdx0mMFlujzhZoDR8oibYmK82oM5R3DUP/vaCsbLTJIj31JIHz+Mgh35sLMB49pDtY5LltDXvYK7ANOWRtzbqAFI7Ez4cKPOWt03yGdHeBDL3OFy2XkO723V6BI99Y48lDeoFpksinIJ873QgfpLBt85y8MOXWMBkWCDZNpfO+ZPzZC+4CPi+pRvnjc0OQAjqHZ1CgmWo/itvsM+UMChonjbO+VtfFCOPZaXMEBQframRIoW11AQroCeumEkgyuZ3+lP08C2/f5Fl4M89uw2w2m4c4x5vZ7HCD89sDyA2x+N1UZ0jZtdQpMFjTa5W+Mq+X6+U6eIvmAToF9nB42xZH4lFSZm1FaMZZA3uOTEfrzq9WMG0tq1suth/j5cfV8tdgfQcKlktQ8P5d/Mc7ULDavAcFd5stKNhu/4K9kDpCpmLBP5xQgUwh65peXGaaTGfhJAmTm0/JJE2mafLm79fG0jbF/1yjU8Ca+4RBn/B9yEPXCXKWTL7X4r3BlksyLNqjQtLnr2l2bZicwSpYOWcdCN9LwAfiAKsqoCftWZtjgF8NUxOXdvCRiBTFLRCfJjGOXeVO5HxvqtZVkELJ3Pg0jk+aGcOCahsdqnOkLYjPvrhwKya56n3kxeeBC4mw9yjRmWD6/rU52B44jOtPKRMsNmv49m6LzTrYNpTrw+DQ4GBd0OMHE2PeL5lq1NJ54zArW1s/oPulqaOaZK6Vzsn43ihXw8CiwbykYBoloEZ3TuP48fExwv40su4YD6k+/m29XN1tV+E0SqKS60p4ZWrXPidREiUSaqznGs2o1I/W8+Kyz4NjeuK4qVAbYey7uwyr28FpAgpw9F6W1rMcXC4Zerp3VddJ+J+WxLi7vYITOo2ZTHonBiwJC3L9th/ofFUrNSKPE1Zt/9h9+yLK1p+l9GH1SVp4uezrctXwFe4vD6c5j5j7Jq9Kufci65q6DtTQSDuEoFP/nb9B7x+tK0b5zRCCbt913b/+Dxt2
+api: eJy1VMFu20YQ/RViziuRUuS65qmKoiRCC1eo4gKJoMNwORI3JnfZ3aFsQeC/F0MxDp0Y7qknErMzb97OvLdnYDwESLcw19o1lgPsFLiaPLJxdpVDCgfip0MFgXTjDZ8g3Z4hw2D0vOEC0u2u3SnwFGpnAwVIzzBNEvnkFLQ3teBBCptGawqCpJ1lsiwpWNel0V3L+GuQvDMEXVCF8senmiAF9B5PoMAwVWEQd9lX0gwKai/E2Vy6m3yQE9gbewAFe+crZEihaUwOCugRq7qUlGRyM/0l+3U2unmjs9H1VXYzymazqxFe4fVstr/Gq5s9yA0x/9OWJ0jZN9QqsFjRS52+I68Wq8Uqeov2HloFbr9/2+QH4kFR5lxJaIdVPbpGpoPzpxc72KaS1S3mm4/x4uNy8Xu0ugUFiwUoeP8u/usdKFiu34OC2/UGFGw2n2HXKsAcayb/OmujjTZCWHtCpnzOr84zR6YRm4qegUyT6Ww0SUbJ9adkkibTNHnz5aUhNnX+P/doFbDhrqBXM/wcCtC2kjlLJj8r985iwwVZFqVSLuVXLyl8ZZm8xTJaeu88CN7zhA/EEZZlRI8msLGHCL/bqyIuXO86kTSKtyA+TmIcetAfyYfOgo0vIYWCuQ5pHB8NM45yqtx4X57GxoG48ptnN2KpizsGzn0auIAIepclqpScjr+xe9cl9uP6W9pE8/UKfrzbfL2KNjVps+/9HO2dj7r83vKouyVThUaY1x6zonHVPfrf6mpckcy1NJps6Gx1sRfMa9QFRdNxAmpw5zSOHx4extidjp0/xH1piP9YLZa3m+VoOk7GBVel4MrULjwn42ScSKh2gSu0g1avrefZZZ8Gx/TIcV2isYLYsTv3q9vCcQIKcPC6Fi6wHJzPGQa682XbSvifhsTm252CI3qDmUx6K3YtCHNx6/YM93S6qJVqkccRy6Z7Gn98P2XrT1L6sPwkFJ4v+7Jc1X8F+9sza08D5I7kRSl3QWRdUduC6ok0fQha9d/1awzhwfl8UF/3IWh3bdv+C9EsKu8=
 sidebar_class_name: "get api-method"
 info_path: docs/swagger/vitta-api
 custom_edit_url: null
@@ -139,6 +139,15 @@ Get all existing accounts
                         
                       </SchemaItem><SchemaItem
                         collapsible={false}
+                        name={"adapter"}
+                        required={false}
+                        schemaName={"string"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"string","example":"icici"}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={false}
                         name={"createdAt"}
                         required={false}
                         schemaName={"date-time"}
@@ -169,7 +178,7 @@ Get all existing accounts
                   value={"Example (from schema)"}
                 >
                   <ResponseSamples
-                    responseExample={"[\n  {\n    \"id\": \"01926b84-93cb-75b9-b445-a5a744f7a59f\",\n    \"name\": \"ICICI Bank\",\n    \"offBudget\": true,\n    \"category\": \"CASH/CHECK IN\",\n    \"createdAt\": \"2024-10-07T01:02:03Z\",\n    \"updatedAt\": \"2024-10-07T01:02:03Z\"\n  }\n]"}
+                    responseExample={"[\n  {\n    \"id\": \"01926b84-93cb-75b9-b445-a5a744f7a59f\",\n    \"name\": \"ICICI Bank\",\n    \"offBudget\": true,\n    \"category\": \"CASH/CHECK IN\",\n    \"adapter\": \"icici\",\n    \"createdAt\": \"2024-10-07T01:02:03Z\",\n    \"updatedAt\": \"2024-10-07T01:02:03Z\"\n  }\n]"}
                     language={"json"}
                   >
                     

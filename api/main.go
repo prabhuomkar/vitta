@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"vitta/adapters"
 	"vitta/config"
 	"vitta/database"
 	"vitta/handlers"
@@ -35,7 +36,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	handler := handlers.New(cfg, db)
+	adapters, err := adapters.New(cfg.AdaptersConfigPath)
+	if err != nil {
+		slog.Error("error initializing adapters", "error", err)
+		os.Exit(1)
+	}
+
+	handler := handlers.New(cfg, db, adapters)
 
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", cfg.Port),

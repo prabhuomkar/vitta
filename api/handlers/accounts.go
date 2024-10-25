@@ -15,14 +15,15 @@ type Account struct {
 	Name      string    `json:"name"`
 	OffBudget *bool     `json:"offBudget"`
 	Category  string    `json:"category"`
+	Adapter   string    `json:"adapter"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 const (
-	queryCreateAccount = `INSERT INTO accounts (id, name, off_budget, category, created_at, updated_at)` +
-		` VALUES ($1, $2, $3, $4, $5, $6)`
-	queryUpdateAccount = `UPDATE accounts SET name=$1, off_budget=$2, category=$3, updated_at=$4 WHERE id=$5`
+	queryCreateAccount = `INSERT INTO accounts (id, name, off_budget, category, adapter, created_at, updated_at)` +
+		` VALUES ($1, $2, $3, $4, $5, $6, $7)`
+	queryUpdateAccount = `UPDATE accounts SET name=$1, off_budget=$2, category=$3, adapter=$4, updated_at=$5 WHERE id=$6`
 	queryDeleteAccount = `DELETE FROM accounts WHERE id=$1`
 	queryGetAccount    = "SELECT * FROM accounts WHERE id=$1"
 	queryGetAccounts   = `SELECT * FROM accounts ORDER BY created_at DESC`
@@ -51,7 +52,8 @@ func (h *Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	account.UpdatedAt = account.CreatedAt
 
 	_, err = h.db.Exec(r.Context(), queryCreateAccount,
-		account.ID, account.Name, account.OffBudget, account.Category, account.CreatedAt, account.UpdatedAt)
+		account.ID, account.Name, account.OffBudget, account.Category, account.Adapter,
+		account.CreatedAt, account.UpdatedAt)
 	if err != nil {
 		slog.Error("error creating account in database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
@@ -92,7 +94,7 @@ func (h *Handler) UpdateAccount(w http.ResponseWriter, r *http.Request) {
 	account.UpdatedAt = time.Now()
 
 	_, err = h.db.Exec(r.Context(), queryUpdateAccount,
-		account.Name, account.OffBudget, account.Category, account.UpdatedAt, accountID)
+		account.Name, account.OffBudget, account.Category, account.Adapter, account.UpdatedAt, accountID)
 	if err != nil {
 		slog.Error("error updating account in database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
@@ -142,7 +144,7 @@ func (h *Handler) GetAccounts(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var acc Account
 
-		err := rows.Scan(&acc.ID, &acc.Name, &acc.OffBudget, &acc.Category, &acc.CreatedAt, &acc.UpdatedAt)
+		err := rows.Scan(&acc.ID, &acc.Name, &acc.OffBudget, &acc.Category, &acc.Adapter, &acc.CreatedAt, &acc.UpdatedAt)
 		if err != nil {
 			slog.Error("error scanning accounts row from database", "error", err)
 			buildErrorResponse(w, err.Error(), http.StatusInternalServerError)

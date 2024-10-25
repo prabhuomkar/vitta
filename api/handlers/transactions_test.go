@@ -214,12 +214,12 @@ func TestImportTransactions(t *testing.T) {
 	sampleBytes3, ctype3 := getMockCSV(t, false)
 	tests := []testCase{
 		{
-			"error due to auth", http.MethodPut, "/v1/accounts/" + testAccountID.String() + "/transactions?adapter=icici", false, nil,
+			"error due to auth", http.MethodPut, "/v1/accounts/" + testAccountID.String() + "/transactions", false, nil,
 			nil, nil,
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error getting account from db", http.MethodPut, "/v1/accounts/" + testAccountID.String() + "/transactions?adapter=icici", true, nil,
+			"error getting account from db", http.MethodPut, "/v1/accounts/" + testAccountID.String() + "/transactions", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectQuery("SELECT *").WithArgs(testAccountID).WillReturnError(pgx.ErrNoRows)
@@ -227,29 +227,29 @@ func TestImportTransactions(t *testing.T) {
 			http.StatusInternalServerError, "no rows",
 		},
 		{
-			"error parsing multi part form", http.MethodPut, "/v1/accounts/" + testAccountID.String() + "/transactions?adapter=icici", true, nil,
+			"error parsing multi part form", http.MethodPut, "/v1/accounts/" + testAccountID.String() + "/transactions", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectQuery("SELECT *").WithArgs(testAccountID).WillReturnRows(pgxmock.NewRows(accountRowCols).AddRow(testAccountID.String(), testAccountName, &testOffBudget, testCategory,
-					testAccountTime, testAccountTime))
+					testAdapter, testAccountTime, testAccountTime))
 			},
 			http.StatusBadRequest, "request Content-Type isn't multipart/form-data",
 		},
 		{
-			"error getting data rows", http.MethodPut, "/v1/accounts/" + testAccountID.String() + "/transactions?adapter=icici", true,
+			"error getting data rows", http.MethodPut, "/v1/accounts/" + testAccountID.String() + "/transactions", true,
 			sampleBytes1, ctype1,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectQuery("SELECT *").WithArgs(testAccountID).WillReturnRows(pgxmock.NewRows(accountRowCols).AddRow(testAccountID.String(), testAccountName, &testOffBudget, testCategory,
-					testAccountTime, testAccountTime))
+					testAdapter, testAccountTime, testAccountTime))
 			},
 			http.StatusInternalServerError, "error opening file",
 		},
 		{
-			"error inserting transaction to database", http.MethodPut, "/v1/accounts/" + testAccountID.String() + "/transactions?adapter=icici", true,
+			"error inserting transaction to database", http.MethodPut, "/v1/accounts/" + testAccountID.String() + "/transactions", true,
 			sampleBytes2, ctype2,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectQuery("SELECT *").WithArgs(testAccountID).WillReturnRows(pgxmock.NewRows(accountRowCols).AddRow(testAccountID.String(), testAccountName, &testOffBudget, testCategory,
-					testAccountTime, testAccountTime))
+					testAdapter, testAccountTime, testAccountTime))
 				mock.ExpectBeginTx(pgx.TxOptions{})
 				mock.ExpectExec("SAVEPOINT sp1").WillReturnResult(pgxmock.NewResult("SAVEPOINT", 1))
 				mock.ExpectExec("INSERT INTO transactions").WithArgs(pgxmock.AnyArg(),
@@ -260,11 +260,11 @@ func TestImportTransactions(t *testing.T) {
 			http.StatusInternalServerError, "tx is closed",
 		},
 		{
-			"success", http.MethodPut, "/v1/accounts/" + testAccountID.String() + "/transactions?adapter=icici", true,
+			"success", http.MethodPut, "/v1/accounts/" + testAccountID.String() + "/transactions", true,
 			sampleBytes3, ctype3,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectQuery("SELECT *").WithArgs(testAccountID).WillReturnRows(pgxmock.NewRows(accountRowCols).AddRow(testAccountID.String(), testAccountName, &testOffBudget, testCategory,
-					testAccountTime, testAccountTime))
+					testAdapter, testAccountTime, testAccountTime))
 				mock.ExpectBeginTx(pgx.TxOptions{})
 				mock.ExpectExec("SAVEPOINT sp1").WillReturnResult(pgxmock.NewResult("SAVEPOINT", 1))
 				mock.ExpectExec("INSERT INTO transactions").WithArgs(pgxmock.AnyArg(),

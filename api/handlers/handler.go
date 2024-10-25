@@ -4,20 +4,23 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
+	"vitta/adapters"
 	"vitta/config"
 	"vitta/database"
 )
 
 // Handler configuration.
 type Handler struct {
-	cfg *config.Config
-	db  database.DBIface
+	cfg      *config.Config
+	db       database.DBIface
+	adapters map[string]adapters.Config
 }
 
-func New(cfg *config.Config, db database.DBIface) http.Handler {
+func New(cfg *config.Config, db database.DBIface, adapters map[string]adapters.Config) http.Handler {
 	h := &Handler{
-		cfg: cfg,
-		db:  db,
+		cfg:      cfg,
+		db:       db,
+		adapters: adapters,
 	}
 
 	mux := http.NewServeMux()

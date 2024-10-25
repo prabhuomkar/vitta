@@ -240,7 +240,6 @@ func (h *Handler) GetTransactions(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) ImportTransactions(w http.ResponseWriter, r *http.Request) { //nolint: funlen,cyclop
-	adapter := r.URL.Query().Get("adapter")
 	id := r.PathValue("id")
 
 	accountID, err := uuid.Parse(id)
@@ -254,7 +253,7 @@ func (h *Handler) ImportTransactions(w http.ResponseWriter, r *http.Request) { /
 	var account Account
 
 	err = h.db.QueryRow(r.Context(), queryGetAccount, accountID).Scan(&account.ID,
-		&account.Name, &account.OffBudget, &account.Category, &account.CreatedAt, &account.UpdatedAt)
+		&account.Name, &account.OffBudget, &account.Category, &account.Adapter, &account.CreatedAt, &account.UpdatedAt)
 	if err != nil {
 		slog.Error("error getting account from database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
@@ -289,8 +288,8 @@ func (h *Handler) ImportTransactions(w http.ResponseWriter, r *http.Request) { /
 		return
 	}
 
-	bankAdapter := adapters.New(adapter, account.Category, nil)
-	adapterTransactions := bankAdapter.GetTransactions(rows)
+	slog.Info("adapter", "config", h.adapters[account.Adapter+"-"+account.Category])
+	adapterTransactions := adapters.GetTransactions(h.adapters[account.Adapter+"-"+account.Category], rows)
 	importedTransactions := 0
 
 	tx, err := h.db.Begin(r.Context())
