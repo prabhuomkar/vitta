@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"vitta/adapters"
 	"vitta/config"
 
 	"github.com/pashagolub/pgxmock/v4"
@@ -50,7 +51,15 @@ func executeTests(t *testing.T, tests []testCase) {
 				req.SetBasicAuth("vitta", "vittaT3st!")
 			}
 
-			h := New(&config.Config{AdminUsername: "vitta", AdminPassword: "vittaT3st!", UploadMemoryLimit: 1048576}, mockDB)
+			h := New(&config.Config{AdminUsername: "vitta", AdminPassword: "vittaT3st!",
+				UploadMemoryLimit: 1048576}, mockDB, map[string]adapters.Config{"icici-CC": {
+				DateName:        "Transaction Date",
+				DateFormats:     []string{"02/01/2006"},
+				Remarks:         "Details",
+				Credit:          "Amount (INR)",
+				Debit:           "Amount (INR)",
+				TransactionDiff: []string{"cr.", "dr."},
+			}})
 
 			res := httptest.NewRecorder()
 

@@ -3,6 +3,7 @@ CREATE TABLE accounts (
     name TEXT UNIQUE NOT NULL,
     off_budget BOOLEAN NOT NULL,
     category TEXT NOT NULL,
+    adapter TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

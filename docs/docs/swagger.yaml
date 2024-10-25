@@ -487,12 +487,6 @@ paths:
           schema:
             type: string
             format: uuid
-        - name: adapter
-          in: query
-          description: Adapter type for import
-          required: true
-          schema:
-            type: string
       summary: Import transactions
       operationId: importTransactions
       security:
@@ -685,6 +679,9 @@ components:
         category:
           type: string
           enum: ["CASH/CHECK IN", "CC", "FD/RD", "EPF", "NPS", "SSY"]
+        adapter:
+          type: string
+          example: "icici"
         createdAt:
           type: string
           format: date-time

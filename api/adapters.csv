@@ -1,0 +1,3 @@
+name,category,dateName,dateFormats,remarks,credit,debit,transactionDiff
+icici,CASH/CHECK IN,Transaction Date,"02/01/2006",Transaction Remarks,Deposit Amount (INR ),Withdrawal Amount (INR ),
+icici,CC,Transaction Date,"02/01/2006;02,01,2006",Details,Amount (INR),Amount (INR),"cr.;dr."

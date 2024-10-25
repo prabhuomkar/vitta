@@ -16,8 +16,9 @@ var (
 	testAccountName = "ICICI Bank"
 	testOffBudget   = true
 	testCategory    = "CC"
+	testAdapter     = "icici"
 	testAccountTime = time.Now()
-	accountRowCols  = []string{"id", "name", "off_budget", "category", "created_at", "updated_at"}
+	accountRowCols  = []string{"id", "name", "off_budget", "category", "adapter", "created_at", "updated_at"}
 )
 
 func TestCreateAccount(t *testing.T) {
@@ -35,11 +36,11 @@ func TestCreateAccount(t *testing.T) {
 		{
 			"error inserting account to database", http.MethodPost, "/v1/accounts", true,
 			strings.NewReader(`{"name":"` + testAccountName + `","offBudget":` + strconv.FormatBool(testOffBudget) +
-				`,"category":"` + testCategory + `"}`),
+				`,"category":"` + testCategory + `","adapter":"` + testAdapter + `"}`),
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectExec("INSERT INTO accounts").WithArgs(pgxmock.AnyArg(),
-					testAccountName, &testOffBudget, testCategory, pgxmock.AnyArg(),
+					testAccountName, &testOffBudget, testCategory, testAdapter, pgxmock.AnyArg(),
 					pgxmock.AnyArg()).WillReturnError(pgx.ErrTxClosed)
 			},
 			http.StatusInternalServerError, "tx is closed",
@@ -47,11 +48,11 @@ func TestCreateAccount(t *testing.T) {
 		{
 			"success creating account", http.MethodPost, "/v1/accounts", true,
 			strings.NewReader(`{"name":"` + testAccountName + `","offBudget":` + strconv.FormatBool(testOffBudget) +
-				`,"category":"` + testCategory + `"}`),
+				`,"category":"` + testCategory + `","adapter":"` + testAdapter + `"}`),
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectExec("INSERT INTO accounts").WithArgs(pgxmock.AnyArg(),
-					testAccountName, &testOffBudget, testCategory, pgxmock.AnyArg(),
+					testAccountName, &testOffBudget, testCategory, testAdapter, pgxmock.AnyArg(),
 					pgxmock.AnyArg()).WillReturnResult(pgxmock.NewResult("INSERT", 1))
 			},
 			http.StatusCreated, testAccountName,
@@ -80,11 +81,11 @@ func TestUpdateAccount(t *testing.T) {
 		{
 			"error updating account in database", http.MethodPatch, "/v1/accounts/" + testAccountID.String(), true,
 			strings.NewReader(`{"name":"` + testAccountName + `","offBudget":` + strconv.FormatBool(testOffBudget) +
-				`,"category":"` + testCategory + `"}`),
+				`,"category":"` + testCategory + `","adapter":"` + testAdapter + `"}`),
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectExec("UPDATE accounts").WithArgs(
-					testAccountName, &testOffBudget, testCategory, pgxmock.AnyArg(), testAccountID,
+					testAccountName, &testOffBudget, testCategory, testAdapter, pgxmock.AnyArg(), testAccountID,
 				).WillReturnError(pgx.ErrTxClosed)
 			},
 			http.StatusInternalServerError, "tx is closed",
@@ -92,11 +93,11 @@ func TestUpdateAccount(t *testing.T) {
 		{
 			"success updating account", http.MethodPatch, "/v1/accounts/" + testAccountID.String(), true,
 			strings.NewReader(`{"name":"` + testAccountName + `","offBudget":` + strconv.FormatBool(testOffBudget) +
-				`,"category":"` + testCategory + `"}`),
+				`,"category":"` + testCategory + `","adapter":"` + testAdapter + `"}`),
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectExec("UPDATE accounts").WithArgs(
-					testAccountName, &testOffBudget, testCategory, pgxmock.AnyArg(), testAccountID,
+					testAccountName, &testOffBudget, testCategory, testAdapter, pgxmock.AnyArg(), testAccountID,
 				).WillReturnResult(pgxmock.NewResult("UPDATE", 1))
 			},
 			http.StatusNoContent, "",
@@ -158,7 +159,7 @@ func TestGetAccounts(t *testing.T) {
 			"error scanning accounts rows from db", http.MethodGet, "/v1/accounts", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(accountRowCols).AddRow("invalid", "ok", "false", "category", "bad-time", "bad-time"))
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(accountRowCols).AddRow("invalid", "ok", "false", "category", "adapter", "bad-time", "bad-time"))
 			},
 			http.StatusInternalServerError, "Scanning value error",
 		},
@@ -175,7 +176,7 @@ func TestGetAccounts(t *testing.T) {
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(accountRowCols).AddRow(testAccountID.String(), testAccountName, &testOffBudget, testCategory,
-					testAccountTime, testAccountTime))
+					testAdapter, testAccountTime, testAccountTime))
 			},
 			http.StatusOK, testAccountID.String(),
 		},
