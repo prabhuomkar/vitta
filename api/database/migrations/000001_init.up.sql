@@ -22,7 +22,7 @@ CREATE TABLE categories (
     notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (group_id) REFERENCES groups(id),
+    FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE,
     UNIQUE (group_id, name)
 );
 
@@ -45,9 +45,9 @@ CREATE TABLE transactions (
     cleared_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (account_id) REFERENCES accounts(id),
-    FOREIGN KEY (category_id) REFERENCES categories(id),
-    FOREIGN KEY (payee_id) REFERENCES payees(id),
+    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
+    FOREIGN KEY (payee_id) REFERENCES payees(id) ON DELETE SET NULL,
     UNIQUE (account_id, notes, credit, debit, cleared_at)
 );
 
@@ -59,6 +59,6 @@ CREATE TABLE budgets (
     budgeted DOUBLE PRECISION,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (category_id) REFERENCES categories(id),
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
     UNIQUE (year, month, category_id)
 );
