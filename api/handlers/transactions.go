@@ -49,7 +49,8 @@ const (
 		` credit=$4, debit=$5, name=$6, notes=$7, cleared_at=$8, updated_at=$9 WHERE account_id=$1 AND id=$10`
 	queryDeleteTransaction = `DELETE FROM transactions WHERE account_id=$1 AND id=$2`
 	queryGetTransactions   = `SELECT t.*, c.name as category_name, p.name as payee_name FROM transactions AS t` +
-		` LEFT JOIN categories AS c ON t.category_id = c.id LEFT JOIN payees AS p ON t.payee_id = p.id WHERE t.account_id=$1`
+		` LEFT JOIN categories AS c ON t.category_id = c.id LEFT JOIN payees AS p ON t.payee_id = p.id` +
+		` WHERE t.account_id=$1 ORDER BY t.created_at DESC`
 )
 
 func (h *Handler) CreateTransaction(w http.ResponseWriter, r *http.Request) {

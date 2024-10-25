@@ -25,7 +25,7 @@ const (
 	queryUpdateAccount = `UPDATE accounts SET name=$1, off_budget=$2, category=$3, updated_at=$4 WHERE id=$5`
 	queryDeleteAccount = `DELETE FROM accounts WHERE id=$1`
 	queryGetAccount    = "SELECT * FROM accounts WHERE id=$1"
-	queryGetAccounts   = `SELECT * FROM accounts`
+	queryGetAccounts   = `SELECT * FROM accounts ORDER BY created_at DESC`
 )
 
 func (h *Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {
