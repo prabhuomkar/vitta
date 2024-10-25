@@ -21,7 +21,7 @@ const (
 	queryCreatePayee = `INSERT INTO payees (id, name, created_at, updated_at) VALUES ($1, $2, $3, $4)`
 	queryUpdatePayee = `UPDATE payees SET name=$1, updated_at=$2 WHERE id=$3`
 	queryDeletePayee = `DELETE FROM payees WHERE id=$1`
-	queryGetPayees   = `SELECT * FROM payees`
+	queryGetPayees   = `SELECT * FROM payees ORDER BY created_at DESC`
 )
 
 func (h *Handler) CreatePayee(w http.ResponseWriter, r *http.Request) {
