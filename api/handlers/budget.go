@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
+	"strconv"
 	"time"
 
 	uuid "github.com/google/uuid"
@@ -71,7 +72,7 @@ const (
 		` (SELECT c.*, g.name as group_name FROM categories AS c LEFT JOIN groups as g ON c.group_id = g.id` +
 		`) AS cg ON budgets.category_id = cg.id LEFT JOIN (SELECT category_id, SUM(credit) AS total_credit,` +
 		` SUM(debit) AS total_debit, SUM(credit - debit) AS spent FROM transactions GROUP BY category_id` +
-		`) AS t ON cg.id = t.category_id;`
+		`) AS t ON cg.id = t.category_id WHERE budgets.year=$1 AND budgets.month=$2;`
 )
 
 func (h *Handler) CreateGroup(w http.ResponseWriter, r *http.Request) {
@@ -313,7 +314,26 @@ func (h *Handler) SetBudget(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetBudget(w http.ResponseWriter, r *http.Request) {
-	rows, err := h.db.Query(r.Context(), queryGetBudget)
+	yearQ := r.URL.Query().Get("year")
+	monthQ := r.URL.Query().Get("month")
+
+	year, err := strconv.Atoi(yearQ)
+	if err != nil {
+		slog.Error("error converting year to int", "error", err)
+		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
+
+		return
+	}
+
+	month, err := strconv.Atoi(monthQ)
+	if err != nil {
+		slog.Error("error converting month to int", "error", err)
+		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
+
+		return
+	}
+
+	rows, err := h.db.Query(r.Context(), queryGetBudget, year, month)
 	if err != nil {
 		slog.Error("error getting budgets from database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)

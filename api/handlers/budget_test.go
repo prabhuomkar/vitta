@@ -287,41 +287,54 @@ func TestSetBudget(t *testing.T) {
 func TestGetBudget(t *testing.T) {
 	tests := []testCase{
 		{
-			"error due to auth", http.MethodGet, "/v1/budgets", false, nil,
+			"error due to auth", http.MethodGet, "/v1/budgets?year=2024&month=10", false, nil,
 			nil, nil,
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error getting budgets from db", http.MethodGet, "/v1/budgets", true, nil,
+			"error due to bad year", http.MethodGet, "/v1/budgets?year=NA&month=10", true, nil,
+			nil, nil,
+			http.StatusBadRequest, "parsing",
+		},
+		{
+			"error due to bad month", http.MethodGet, "/v1/budgets?year=2024&month=NA", true, nil,
+			nil, nil,
+			http.StatusBadRequest, "parsing",
+		},
+		{
+			"error getting budgets from db", http.MethodGet, "/v1/budgets?year=2024&month=10", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WillReturnError(pgx.ErrNoRows)
+				mock.ExpectQuery("SELECT *").WithArgs(2024, 10).WillReturnError(pgx.ErrNoRows)
 			},
 			http.StatusInternalServerError, "no rows",
 		},
 		{
-			"error scanning budgets rows from db", http.MethodGet, "/v1/budgets", true, nil,
+			"error scanning budgets rows from db", http.MethodGet, "/v1/budgets?year=2024&month=10", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(budgetRowCols).AddRow("invalid", "budgeted",
-					"spent", "year", "month", "category_id", "category_name", "group_id", "group_name"))
+				mock.ExpectQuery("SELECT *").WithArgs(2024, 10).WillReturnRows(pgxmock.NewRows(budgetRowCols).
+					AddRow("invalid", "budgeted",
+						"spent", "year", "month", "category_id", "category_name", "group_id", "group_name"))
 			},
 			http.StatusInternalServerError, "Scanning value error",
 		},
 		{
-			"error reading budgets rows from db", http.MethodGet, "/v1/budgets", true, nil,
+			"error reading budgets rows from db", http.MethodGet, "/v1/budgets?year=2024&month=10", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(budgetRowCols).RowError(0, errors.New("some error in db")))
+				mock.ExpectQuery("SELECT *").WithArgs(2024, 10).WillReturnRows(pgxmock.NewRows(budgetRowCols).
+					RowError(0, errors.New("some error in db")))
 			},
 			http.StatusInternalServerError, "some error in db",
 		},
 		{
-			"success", http.MethodGet, "/v1/budgets", true, nil,
+			"success", http.MethodGet, "/v1/budgets?year=2024&month=10", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(budgetRowCols).
-					AddRow(testBudgetID, 500.69, 4.20, uint16(2024), uint8(10), testCategoryID, testCategoryName, testGroupID, testGroupName))
+				mock.ExpectQuery("SELECT *").WithArgs(2024, 10).WillReturnRows(pgxmock.NewRows(budgetRowCols).
+					AddRow(testBudgetID, 500.69, 4.20, uint16(2024), uint8(10), testCategoryID, testCategoryName,
+						testGroupID, testGroupName))
 			},
 			http.StatusOK, testBudgetID.String(),
 		},
