@@ -1,12 +1,12 @@
 import React from 'react';
 import { Box, Heading } from '@chakra-ui/react';
 
-const Contact = () => {
+const Budgets = () => {
   return (
     <Box as="main" w="100%">
-      <Heading>Contact</Heading>
+      <Heading>Budgets</Heading>
     </Box>
   );
 };
 
-export default Contact;
+export default Budgets;

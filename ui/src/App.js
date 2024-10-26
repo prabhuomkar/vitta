@@ -5,11 +5,17 @@ import {
   Route,
   useNavigate
 } from 'react-router-dom';
-import { AuthProvider, AccountsProvider } from './context';
+import {
+  AuthProvider,
+  AccountsProvider,
+  TransactionsProvider,
+  PayeesProvider
+} from './context';
 import MainLayout from './components/MainLayout';
 import Auth from './components/Auth';
-import { Home, About, Contact, Accounts, Account } from './pages';
+import { Home, Budgets, Payees, Accounts, Account } from './pages';
 import PrivateRoute from './components/common/PrivateRoute';
+import './App.css';
 
 const AppRoutes = () => {
   const navigate = useNavigate();
@@ -24,16 +30,23 @@ const AppRoutes = () => {
             <PrivateRoute
               element={
                 <AccountsProvider>
-                  <MainLayout>
-                    <Routes>
-                      <Route path="/" element={<Home />} />
-                      <Route path="/home" element={<Home />} />
-                      <Route path="/about" element={<About />} />
-                      <Route path="/contact" element={<Contact />} />
-                      <Route path="/accounts" element={<Accounts />} />
-                      <Route path="/account/:id" element={<Account />} />
-                    </Routes>
-                  </MainLayout>
+                  <TransactionsProvider>
+                    <PayeesProvider>
+                      <MainLayout>
+                        <Routes>
+                          <Route path="/" element={<Home />} />
+                          <Route path="/home" element={<Home />} />
+                          <Route path="/budgets" element={<Budgets />} />
+                          <Route path="/payees" element={<Payees />} />
+                          <Route path="/accounts" element={<Accounts />} />
+                          <Route
+                            path="/account/:accountId"
+                            element={<Account />}
+                          />
+                        </Routes>
+                      </MainLayout>
+                    </PayeesProvider>
+                  </TransactionsProvider>
                 </AccountsProvider>
               }
             />

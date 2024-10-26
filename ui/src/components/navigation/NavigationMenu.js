@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   VStack,
@@ -27,14 +27,14 @@ import {
   useToast
 } from '@chakra-ui/react';
 import { PlusSquareIcon } from '@chakra-ui/icons';
-import { AccountsContext } from '../../context/AccountsContext';
+import { useAccounts } from '../../context';
 import { NAV_ITEMS, ACCOUNT_CATEGORIES } from '../common/constants';
 
 const NavigationMenu = ({ onClose }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const currentPath = location.pathname;
-  const { accounts, createAccount, loading } = useContext(AccountsContext);
+  const { accounts, createAccount, loading } = useAccounts();
 
   const theme = useTheme();
   const primaryColor = theme.colors.primary;
@@ -64,7 +64,7 @@ const NavigationMenu = ({ onClose }) => {
         title: 'Account added.',
         description: 'The account has been successfully added.',
         status: 'success',
-        duration: 3000,
+        duration: 1500,
         isClosable: true
       });
 
@@ -90,7 +90,7 @@ const NavigationMenu = ({ onClose }) => {
               onClose();
             }}
             width="100%"
-            padding="0.5rem 1rem"
+            padding="0.4rem 0.8rem"
             bg={currentPath === `/${item}` ? 'gray.100' : 'transparent'}
             color="black"
             borderRadius="md"
@@ -104,7 +104,7 @@ const NavigationMenu = ({ onClose }) => {
         <Flex
           align="center"
           width="100%"
-          padding="0.5rem 1rem"
+          paddingLeft="0.8rem"
           justify="space-between"
         >
           <Text>ACCOUNTS</Text>
@@ -190,7 +190,7 @@ const NavigationMenu = ({ onClose }) => {
             <div>Loading...</div>
           </Skeleton>
         ) : accounts.length === 0 ? (
-          <Text padding="0.5rem 1rem" color="gray.500">
+          <Text padding="0.4rem 0.8rem" color="gray.500">
             No accounts available
           </Text>
         ) : (
@@ -201,7 +201,7 @@ const NavigationMenu = ({ onClose }) => {
               to={`/account/${account.id}`}
               onClick={onClose}
               width="100%"
-              padding="0.5rem 1rem"
+              padding="0.4rem 0.8rem"
               bg={
                 currentPath === `/account/${account.id}`
                   ? 'gray.100'
