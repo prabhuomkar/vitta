@@ -196,6 +196,19 @@ paths:
     get:
       tags:
         - Budgets
+      parameters:
+        - name: year
+          in: query
+          schema:
+            type: integer
+          required: true
+          description: Year for the budget
+        - name: month
+          in: query
+          schema:
+            type: integer
+          required: true
+          description: Month for the budget
       summary: Get Budget
       operationId: getBudget
       security:
@@ -207,6 +220,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BudgetResult'
+        '400':
+          description: Bad Request
         '401':
           description: Unauthenticated
         '500':
