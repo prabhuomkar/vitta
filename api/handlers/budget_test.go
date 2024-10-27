@@ -16,6 +16,7 @@ var (
 	testCategoryName = "Swiggy Online"
 	testGroupID      = uuid.MustParse("01927f36-44b8-7e62-a7a9-395eacab562b")
 	testBudgetID     = uuid.MustParse("01928eeb-b65c-7840-beaa-a1adb8c75956")
+	testAmount       = 42.69
 	budgetRowCols    = []string{"id", "budgeted", "spent", "year", "month", "category_id",
 		"category_name", "group_id", "group_name"}
 )
@@ -314,8 +315,8 @@ func TestGetBudget(t *testing.T) {
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectQuery("SELECT *").WithArgs(2024, 10).WillReturnRows(pgxmock.NewRows(budgetRowCols).
-					AddRow("invalid", "budgeted",
-						"spent", "year", "month", "category_id", "category_name", "group_id", "group_name"))
+					AddRow(&testAccountID, testAmount,
+						testAmount, uint16(testAccountTime.Year()), uint8(10), &testCategoryID, &testCategoryName, &testGroupID, &testGroupName))
 			},
 			http.StatusInternalServerError, "Scanning value error",
 		},
@@ -333,7 +334,7 @@ func TestGetBudget(t *testing.T) {
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectQuery("SELECT *").WithArgs(2024, 10).WillReturnRows(pgxmock.NewRows(budgetRowCols).
-					AddRow(testBudgetID, 500.69, 4.20, uint16(2024), uint8(10), testCategoryID, testCategoryName,
+					AddRow(&testBudgetID, 500.69, 4.20, uint16(2024), uint8(10), &testCategoryID, &testCategoryName,
 						testGroupID, testGroupName))
 			},
 			http.StatusOK, testBudgetID.String(),
