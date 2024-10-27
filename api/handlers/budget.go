@@ -67,12 +67,12 @@ const (
 	querySetBudget      = `INSERT INTO budgets (id, category_id, year, month, budgeted, created_at,` +
 		` updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (year, month, category_id) DO UPDATE SET budgeted=$5`
 	queryGetBudget = `SELECT budgets.id AS id, COALESCE(budgets.budgeted, 0) AS budgeted, COALESCE(t.spent, 0) AS spent,` +
-		` budgets.year AS year, budgets.month AS month, cg.id AS category_id, cg.name AS category_name,` +
-		` cg.group_id AS group_id, cg.group_name AS group_name FROM budgets RIGHT JOIN` +
+		` COALESCE(budgets.year, $1) AS year, COALESCE(budgets.month, $2) AS month, cg.id AS category_id,` +
+		` cg.name AS category_name, cg.group_id AS group_id, cg.group_name AS group_name FROM budgets RIGHT JOIN` +
 		` (SELECT c.*, g.name as group_name FROM categories AS c LEFT JOIN groups as g ON c.group_id = g.id` +
-		`) AS cg ON budgets.category_id = cg.id LEFT JOIN (SELECT category_id, SUM(credit) AS total_credit,` +
-		` SUM(debit) AS total_debit, SUM(credit - debit) AS spent FROM transactions GROUP BY category_id` +
-		`) AS t ON cg.id = t.category_id WHERE budgets.year=$1 AND budgets.month=$2;`
+		`) AS cg ON budgets.category_id = cg.id AND budgets.year = $1 AND budgets.month = $2` +
+		` LEFT JOIN (SELECT category_id, SUM(credit) AS total_credit, SUM(debit) AS total_debit,` +
+		` SUM(credit - debit) AS spent FROM transactions GROUP BY category_id) AS t ON cg.id = t.category_id`
 )
 
 func (h *Handler) CreateGroup(w http.ResponseWriter, r *http.Request) {
