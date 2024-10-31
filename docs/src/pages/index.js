@@ -47,7 +47,7 @@ function InfoItem({Svg, title, description}) {
 
 function HowItWorksItem({Svg, svgDirection, title, description}) {
   return (
-    <div className={clsx('row row--align-center margin-top--lg margin-bottom--lg')}>
+    <div className={clsx('row row--align-center margin-top--lg margin-bottom--lg', styles.howItWorks)}>
       <div className={clsx('col col--5 col--offset-1')}>
         {svgDirection == 'left' ? (
           <div className="">
@@ -173,7 +173,7 @@ export default function Home() {
         <section className={styles.infoItems}>
           <div className="container">
             <Heading as="h1" align="center" className="custom__font">
-              Benefits
+              — Benefits —
             </Heading>
             <div className="row">
               {BenefitList.map((props, idx) => (
@@ -185,7 +185,7 @@ export default function Home() {
         <section className={styles.infoItems}>
           <div className="container">
             <Heading as="h1" align="center" className="custom__font">
-              How It Works?
+              — How It Works? —
             </Heading>
             {HowItWorksList.map((props, idx) => (
               <HowItWorksItem key={idx} {...props} />
@@ -195,11 +195,11 @@ export default function Home() {
         <section className={styles.infoItems}>
           <div className="container">
             <Heading as="h1" align="center" className="custom__font">
-              FAQ
+              — FAQ —
             </Heading>
             {FAQList.map(({q, a}, idx) => (
               <div key={idx} className={clsx(styles.faqItem, 'padding-top--sm', 'padding-bottom--sm')}>
-                — <span style={{'fontSize': '110%', 'fontWeight': 'bold'}}>{q}</span><br/>
+                <span style={{'fontSize': '110%', 'fontWeight': 'bold'}}>{q}</span><br/>
                 {a}
               </div>
             ))}

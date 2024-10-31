@@ -6,7 +6,6 @@
   --ifm-color-primary-light: #044b30;
   --ifm-color-primary-lighter: #054e33;
   --ifm-color-primary-lightest: #055839;
-  --ifm-footer-background-color: #04442c;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
@@ -21,6 +20,10 @@
   --ifm-color-primary-lightest: #1fffb3;
   --ifm-background-color: #000000;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+.footer, .footer--dark {
+  --ifm-footer-background-color: #2c3c36;
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
