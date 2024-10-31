@@ -328,7 +328,8 @@ func (h *Handler) GetCategories(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var category Category
 
-		err := rows.Scan(&category.ID, &category.GroupID, &category.Name, &category.Notes, &category.CreatedAt, &category.UpdatedAt)
+		err := rows.Scan(&category.ID, &category.GroupID, &category.Name, &category.Notes,
+			&category.CreatedAt, &category.UpdatedAt)
 		if err != nil {
 			slog.Error("error scanning categories row from database", "error", err)
 			buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
