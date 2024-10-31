@@ -43,7 +43,6 @@ type (
 
 	// BudgetResult model.
 	BudgetResult struct {
-		ID           *uuid.UUID `json:"id"`
 		Budgeted     float64    `json:"budgeted"`
 		Spent        float64    `json:"spent"`
 		Year         uint16     `json:"year"`
@@ -66,7 +65,7 @@ const (
 	queryDeleteCategory = `DELETE FROM categories WHERE id=$1`
 	querySetBudget      = `INSERT INTO budgets (id, category_id, year, month, budgeted, created_at,` +
 		` updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (year, month, category_id) DO UPDATE SET budgeted=$5`
-	queryGetBudget = `SELECT budgets.id AS id, COALESCE(budgets.budgeted, 0) AS budgeted, COALESCE(t.spent, 0) AS spent,` +
+	queryGetBudget = `SELECT COALESCE(budgets.budgeted, 0) AS budgeted, COALESCE(t.spent, 0) AS spent,` +
 		` COALESCE(budgets.year, $1) AS year, COALESCE(budgets.month, $2) AS month, cg.id AS category_id,` +
 		` cg.name AS category_name, g.id AS group_id, g.name AS group_name FROM groups AS g LEFT JOIN categories AS cg` +
 		` ON cg.group_id = g.id LEFT JOIN budgets ON budgets.category_id = cg.id AND budgets.year = $1 AND` +
@@ -346,7 +345,7 @@ func (h *Handler) GetBudget(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var budget BudgetResult
 
-		err := rows.Scan(&budget.ID, &budget.Budgeted, &budget.Spent, &budget.Year, &budget.Month,
+		err := rows.Scan(&budget.Budgeted, &budget.Spent, &budget.Year, &budget.Month,
 			&budget.CategoryID, &budget.CategoryName, &budget.GroupID, &budget.GroupName)
 		if err != nil {
 			slog.Error("error scanning budgets row from database", "error", err)
