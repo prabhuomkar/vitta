@@ -214,7 +214,7 @@ paths:
       security:
         - basicAuth: []
       responses:
-        '201':
+        '200':
           description: Success
           content:
             application/json:
@@ -240,7 +240,7 @@ paths:
               $ref: '#/components/schemas/Budget'
         required: true
       responses:
-        '201':
+        '200':
           description: Success
           content:
             application/json:
@@ -514,7 +514,7 @@ paths:
               format: binary
         required: true
       responses:
-        '201':
+        '200':
           description: Success
           content:
             application/json:

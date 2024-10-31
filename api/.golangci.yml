@@ -11,6 +11,5 @@ linters:
     - godox
     - gochecknoglobals
     - ireturn
-
 run:
   tests: false
