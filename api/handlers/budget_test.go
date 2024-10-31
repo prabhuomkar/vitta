@@ -15,10 +15,10 @@ var (
 	testGroupName    = "Recurring Expenses"
 	testCategoryName = "Swiggy Online"
 	testGroupID      = uuid.MustParse("01927f36-44b8-7e62-a7a9-395eacab562b")
-	testBudgetID     = uuid.MustParse("01928eeb-b65c-7840-beaa-a1adb8c75956")
 	testAmount       = 42.69
-	budgetRowCols    = []string{"budgeted", "spent", "year", "month", "category_id",
-		"category_name", "group_id", "group_name"}
+	groupRowCols     = []string{"id", "name", "notes", "created_at", "updated_at"}
+	categoryRowCols  = []string{"id", "groupId", "name", "notes", "created_at", "updated_at"}
+	budgetRowCols    = []string{"budgeted", "spent", "year", "month", "category_id", "category_name"}
 )
 
 func TestCreateGroup(t *testing.T) {
@@ -129,6 +129,50 @@ func TestDeleteGroup(t *testing.T) {
 				mock.ExpectExec("DELETE FROM groups").WithArgs(testGroupID).WillReturnResult(pgxmock.NewResult("DELETE", 1))
 			},
 			http.StatusNoContent, "",
+		},
+	}
+	executeTests(t, tests)
+}
+
+func TestGetGroups(t *testing.T) {
+	tests := []testCase{
+		{
+			"error due to auth", http.MethodGet, "/v1/groups", false, nil,
+			nil, nil,
+			http.StatusUnauthorized, "Unauthorized",
+		},
+		{
+			"error getting groups from db", http.MethodGet, "/v1/groups", true, nil,
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnError(pgx.ErrNoRows)
+			},
+			http.StatusInternalServerError, "no rows",
+		},
+		{
+			"error scanning groups rows from db", http.MethodGet, "/v1/groups", true, nil,
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(groupRowCols).AddRow("invalid", "ok", "no", "bad-time", "bad-time"))
+			},
+			http.StatusInternalServerError, "Scanning value error",
+		},
+		{
+			"error reading groups rows from db", http.MethodGet, "/v1/groups", true, nil,
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(groupRowCols).RowError(0, errors.New("some error in db")))
+			},
+			http.StatusInternalServerError, "some error in db",
+		},
+		{
+			"success", http.MethodGet, "/v1/groups", true, nil,
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(groupRowCols).AddRow(testGroupID.String(), testGroupName,
+					"notes", testAccountTime, testAccountTime))
+			},
+			http.StatusOK, testGroupID.String(),
 		},
 	}
 	executeTests(t, tests)
@@ -249,6 +293,50 @@ func TestDeleteCategory(t *testing.T) {
 	executeTests(t, tests)
 }
 
+func TestGetCategories(t *testing.T) {
+	tests := []testCase{
+		{
+			"error due to auth", http.MethodGet, "/v1/categories", false, nil,
+			nil, nil,
+			http.StatusUnauthorized, "Unauthorized",
+		},
+		{
+			"error getting categories from db", http.MethodGet, "/v1/categories", true, nil,
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnError(pgx.ErrNoRows)
+			},
+			http.StatusInternalServerError, "no rows",
+		},
+		{
+			"error scanning categories rows from db", http.MethodGet, "/v1/categories", true, nil,
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(categoryRowCols).AddRow("invalid", "invalid", "ok", "ok", "bad-time", "bad-time"))
+			},
+			http.StatusInternalServerError, "Scanning value error",
+		},
+		{
+			"error reading categories rows from db", http.MethodGet, "/v1/categories", true, nil,
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(categoryRowCols).RowError(0, errors.New("some error in db")))
+			},
+			http.StatusInternalServerError, "some error in db",
+		},
+		{
+			"success", http.MethodGet, "/v1/categories", true, nil,
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(categoryRowCols).AddRow(
+					testCategoryID.String(), testGroupID.String(), testCategoryName, "notes", testAccountTime, testAccountTime))
+			},
+			http.StatusOK, testCategoryID.String(),
+		},
+	}
+	executeTests(t, tests)
+}
+
 func TestSetBudget(t *testing.T) {
 	tests := []testCase{
 		{
@@ -315,8 +403,7 @@ func TestGetBudget(t *testing.T) {
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectQuery("SELECT *").WithArgs(2024, 10).WillReturnRows(pgxmock.NewRows(budgetRowCols).
-					AddRow(testAmount, testAmount, uint16(testAccountTime.Year()), uint8(10), &testCategoryID,
-						&testCategoryName, &testGroupID, &testGroupName))
+					AddRow(500.69, 4.20, uint16(2024), uint8(10), "invalid", "invalid"))
 			},
 			http.StatusInternalServerError, "Scanning value error",
 		},
@@ -334,8 +421,7 @@ func TestGetBudget(t *testing.T) {
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectQuery("SELECT *").WithArgs(2024, 10).WillReturnRows(pgxmock.NewRows(budgetRowCols).
-					AddRow(500.69, 4.20, uint16(2024), uint8(10), &testCategoryID, &testCategoryName,
-						testGroupID, testGroupName))
+					AddRow(500.69, 4.20, uint16(2024), uint8(10), testCategoryID, testCategoryName))
 			},
 			http.StatusOK, "500.69",
 		},

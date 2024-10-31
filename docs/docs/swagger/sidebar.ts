@@ -18,6 +18,12 @@ const sidebar: SidebarsConfig = {
         },
         {
           type: "doc",
+          id: "swagger/get-groups",
+          label: "Get all existing groups",
+          className: "api-method get",
+        },
+        {
+          type: "doc",
           id: "swagger/update-group",
           label: "Update an existing group",
           className: "api-method patch",
@@ -33,6 +39,12 @@ const sidebar: SidebarsConfig = {
           id: "swagger/create-category",
           label: "Create a new category",
           className: "api-method post",
+        },
+        {
+          type: "doc",
+          id: "swagger/get-categories",
+          label: "Get all existing categories",
+          className: "api-method get",
         },
         {
           type: "doc",

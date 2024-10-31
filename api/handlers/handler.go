@@ -45,9 +45,11 @@ func New(cfg *config.Config, db database.DBIface, adapters map[string]adapters.C
 	mux.HandleFunc("POST /v1/groups", h.CreateGroup)
 	mux.HandleFunc("PATCH /v1/groups/{id}", h.UpdateGroup)
 	mux.HandleFunc("DELETE /v1/groups/{id}", h.DeleteGroup)
+	mux.HandleFunc("GET /v1/groups", h.GetGroups)
 	mux.HandleFunc("POST /v1/categories", h.CreateCategory)
 	mux.HandleFunc("PATCH /v1/categories/{id}", h.UpdateCategory)
 	mux.HandleFunc("DELETE /v1/categories/{id}", h.DeleteCategory)
+	mux.HandleFunc("GET /v1/categories", h.GetCategories)
 	mux.HandleFunc("GET /v1/budgets", h.GetBudget)
 	mux.HandleFunc("PUT /v1/budgets", h.SetBudget)
 
