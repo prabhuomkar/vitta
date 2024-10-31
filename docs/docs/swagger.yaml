@@ -51,6 +51,24 @@ paths:
           description: Unauthenticated
         '500':
           description: Internal Error
+    get:
+      tags:
+        - Budgets
+      summary: Get all existing groups
+      operationId: getGroups
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Groups'
+        '401':
+          description: Unauthenticated
+        '500':
+          description: Internal Error
   /v1/groups/{id}:
     patch:
       tags:
@@ -131,6 +149,24 @@ paths:
                 $ref: '#/components/schemas/Category'
         '400':
           description: Bad request
+        '401':
+          description: Unauthenticated
+        '500':
+          description: Internal Error
+    get:
+      tags:
+        - Budgets
+      summary: Get all existing categories
+      operationId: getCategories
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categories'
         '401':
           description: Unauthenticated
         '500':
@@ -649,6 +685,10 @@ components:
           format: date-time
           example: 2024-10-07T01:02:03Z
           readOnly: true
+    Groups:
+      type: array
+      items:
+        $ref: '#/components/schemas/Group'
     Category:
       type: object
       properties:
@@ -677,6 +717,10 @@ components:
           format: date-time
           example: 2024-10-07T01:02:03Z
           readOnly: true
+    Categories:
+      type: array
+      items:
+        $ref: '#/components/schemas/Category'
     Account:
       type: object
       properties:
@@ -861,15 +905,6 @@ components:
         categoryName:
           type: string
           example: Groceries
-          readOnly: true
-        groupId:
-          type: string
-          format: uuid
-          example: 01926b84-93cb-75b9-b445-a5a744f7a59f
-          readOnly: true
-        groupName:
-          type: string
-          example: Recurring Expenses
           readOnly: true
         month:
           type: integer
