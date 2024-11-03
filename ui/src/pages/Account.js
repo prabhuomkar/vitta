@@ -1,7 +1,12 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Box, useTheme, useToast } from '@chakra-ui/react';
 import { useParams } from 'react-router-dom';
-import { useAccounts, usePayees, useTransactions } from '../context';
+import {
+  useAccounts,
+  usePayees,
+  useCategories,
+  useTransactions
+} from '../context';
 import {
   AccountHeader,
   AddTransactionModal,
@@ -27,6 +32,7 @@ const Account = () => {
   } = useTransactions();
   const { accounts } = useAccounts();
   const { payees } = usePayees();
+  const { categories } = useCategories();
   const [isModalOpen, setModalOpen] = useState(false);
   const [localTransactions, setLocalTransactions] = useState(transactions);
   const [validationErrors, setValidationErrors] = useState({});
@@ -185,6 +191,7 @@ const Account = () => {
         handleSaveChanges={handleSaveChanges}
         validationErrors={validationErrors}
         payees={payees}
+        categories={categories}
         handleCheckboxChange={handleCheckboxChange}
         handleDelete={handleDelete}
       />

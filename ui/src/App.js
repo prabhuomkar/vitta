@@ -9,7 +9,10 @@ import {
   AuthProvider,
   AccountsProvider,
   TransactionsProvider,
-  PayeesProvider
+  PayeesProvider,
+  BudgetsProvider,
+  GroupsProvider,
+  CategoriesProvider
 } from './context';
 import MainLayout from './components/MainLayout';
 import Auth from './components/Auth';
@@ -32,19 +35,28 @@ const AppRoutes = () => {
                 <AccountsProvider>
                   <TransactionsProvider>
                     <PayeesProvider>
-                      <MainLayout>
-                        <Routes>
-                          <Route path="/" element={<Home />} />
-                          <Route path="/home" element={<Home />} />
-                          <Route path="/budgets" element={<Budgets />} />
-                          <Route path="/payees" element={<Payees />} />
-                          <Route path="/accounts" element={<Accounts />} />
-                          <Route
-                            path="/account/:accountId"
-                            element={<Account />}
-                          />
-                        </Routes>
-                      </MainLayout>
+                      <BudgetsProvider>
+                        <GroupsProvider>
+                          <CategoriesProvider>
+                            <MainLayout>
+                              <Routes>
+                                <Route path="/" element={<Home />} />
+                                <Route path="/home" element={<Home />} />
+                                <Route path="/budgets" element={<Budgets />} />
+                                <Route path="/payees" element={<Payees />} />
+                                <Route
+                                  path="/accounts"
+                                  element={<Accounts />}
+                                />
+                                <Route
+                                  path="/account/:accountId"
+                                  element={<Account />}
+                                />
+                              </Routes>
+                            </MainLayout>
+                          </CategoriesProvider>
+                        </GroupsProvider>
+                      </BudgetsProvider>
                     </PayeesProvider>
                   </TransactionsProvider>
                 </AccountsProvider>

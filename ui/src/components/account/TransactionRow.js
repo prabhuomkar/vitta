@@ -9,6 +9,7 @@ const TransactionRow = ({
   handleSaveChanges,
   validationErrors,
   payees,
+  categories,
   handleCheckboxChange,
   handleDelete
 }) => (
@@ -37,6 +38,23 @@ const TransactionRow = ({
       </Select>
     </Td>
     <Td padding="0.5rem">
+      <Select
+        placeholder="Select Category"
+        value={transaction.categoryId || ''}
+        onChange={e => handleInputChange(index, 'categoryId', e.target.value)}
+        onBlur={() => handleSaveChanges(index)}
+        borderColor={
+          validationErrors[index]?.categoryId ? 'red.500' : undefined
+        }
+      >
+        {categories.map(category => (
+          <option key={category.id} value={category.id}>
+            {category.name}
+          </option>
+        ))}
+      </Select>
+    </Td>
+    <Td padding="0.5rem" width="10%">
       <Input
         type="number"
         value={transaction.credit || 0}
@@ -46,7 +64,7 @@ const TransactionRow = ({
         onBlur={() => handleSaveChanges(index)}
       />
     </Td>
-    <Td padding="0.5rem">
+    <Td padding="0.5rem" width="10%">
       <Input
         type="number"
         value={transaction.debit || 0}
