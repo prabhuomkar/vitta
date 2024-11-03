@@ -26,6 +26,7 @@ import {
   Input,
   FormErrorMessage,
   Tooltip,
+  Textarea,
   useTheme
 } from '@chakra-ui/react';
 import {
@@ -122,6 +123,7 @@ const Budgets = () => {
     if (!acc[groupId]) {
       acc[groupId] = {
         groupName: item.groupName,
+        groupNotes: item.groupNotes,
         groupId,
         categories: [],
         budgeted: 0,
@@ -184,11 +186,12 @@ const Budgets = () => {
     }
 
     const result = await updateGroup(selectedGroupId, {
-      name: editFormData.name
+      name: editFormData.name,
+      notes: editFormData.notes
     });
     if (result.success) {
       setIsEditGroupOpen(false);
-      setEditFormData({ name: '' });
+      setEditFormData({ name: '', notes: '' });
       await getBudgets(selectedYear, selectedMonth);
     } else {
       // eslint-disable-next-line no-console
@@ -414,7 +417,7 @@ const Budgets = () => {
                   <FormErrorMessage>{groupNameError}</FormErrorMessage>
                 )}
               </FormControl>
-              {/* <FormControl mb={4}>
+              <FormControl mb={4}>
                 <FormLabel>Notes</FormLabel>
                 <Textarea
                   name="notes"
@@ -422,7 +425,7 @@ const Budgets = () => {
                   onChange={handleChange}
                   placeholder="Enter Notes"
                 />
-              </FormControl> */}
+              </FormControl>
               <ModalFooter margin="auto" mb={2} p={0}>
                 <Button
                   colorScheme={primaryColor}
@@ -458,7 +461,7 @@ const Budgets = () => {
                   <FormErrorMessage>{groupNameError}</FormErrorMessage>
                 )}
               </FormControl>
-              {/* <FormControl mb={4}>
+              <FormControl mb={4}>
                 <FormLabel>Notes</FormLabel>
                 <Textarea
                   name="notes"
@@ -466,7 +469,7 @@ const Budgets = () => {
                   onChange={handleEditChange}
                   placeholder="Enter Notes"
                 />
-              </FormControl> */}
+              </FormControl>
               <ModalFooter margin="auto" mb={2} p={0}>
                 <Button
                   colorScheme={primaryColor}
@@ -507,16 +510,16 @@ const Budgets = () => {
                   <FormErrorMessage>{categoryNameError}</FormErrorMessage>
                 )}
               </FormControl>
-              {/* <FormControl mb={4}>
+              <FormControl mb={4}>
                 <FormLabel>Notes</FormLabel>
-                <Input
+                <Textarea
                   type="text"
                   name="notes"
                   value={categoryFormData.notes}
                   onChange={handleCategoryChange}
                   placeholder="Enter Notes"
                 />
-              </FormControl> */}
+              </FormControl>
               <ModalFooter margin="auto" mb={2} p={0}>
                 <Button
                   colorScheme={primaryColor}
@@ -555,16 +558,16 @@ const Budgets = () => {
                   <FormErrorMessage>{categoryNameError}</FormErrorMessage>
                 )}
               </FormControl>
-              {/* <FormControl mb={4}>
+              <FormControl mb={4}>
                 <FormLabel>Notes</FormLabel>
-                <Input
+                <Textarea
                   type="text"
                   name="notes"
                   value={editCategoryFormData.notes}
                   onChange={handleEditCategoryChange}
                   placeholder="Enter Notes"
                 />
-              </FormControl> */}
+              </FormControl>
               <ModalFooter margin="auto" mb={2} p={0}>
                 <Button
                   colorScheme={primaryColor}
@@ -670,12 +673,15 @@ const Budgets = () => {
                           <Tooltip
                             hasArrow
                             openDelay={500}
-                            label={group.groupName}
+                            label={group.groupNotes}
                           >
                             <Text
                               cursor="pointer"
                               onClick={() => {
-                                setEditFormData({ name: group.groupName });
+                                setEditFormData({
+                                  name: group.groupName,
+                                  notes: group.groupNotes
+                                });
                                 setSelectedGroupId(group.groupId);
                                 setIsEditGroupOpen(true);
                               }}
@@ -731,7 +737,7 @@ const Budgets = () => {
                                         <Tooltip
                                           hasArrow
                                           openDelay={500}
-                                          label={category.categoryName || ''}
+                                          label={category.categoryNotes || ''}
                                         >
                                           <Text
                                             cursor="pointer"
@@ -740,7 +746,7 @@ const Budgets = () => {
                                                 group.groupId,
                                                 category.categoryId,
                                                 category.categoryName,
-                                                category.notes
+                                                category.categoryNotes
                                               )
                                             }
                                           >
