@@ -892,11 +892,6 @@ components:
     BudgetResult:
       type: object
       properties:
-        id:
-          type: string
-          format: uuid
-          example: 01926b84-93cb-75b9-b445-a5a744f7a59f
-          readOnly: true
         categoryId:
           type: string
           format: uuid
@@ -906,6 +901,21 @@ components:
           type: string
           example: Groceries
           readOnly: true
+        categoryNotes:
+          type: string
+          example: Some markdown notes
+        groupId:
+          type: string
+          format: uuid
+          example: 01926b84-93cb-75b9-b445-a5a744f7a59f
+          readOnly: true
+        groupName:
+          type: string
+          example: Groceries
+          readOnly: true
+        groupNotes:
+          type: string
+          example: Some markdown notes
         month:
           type: integer
           format: int32

@@ -43,12 +43,16 @@ type (
 
 	// BudgetResult model.
 	BudgetResult struct {
-		Budgeted     float64   `json:"budgeted"`
-		Spent        float64   `json:"spent"`
-		Year         uint16    `json:"year"`
-		Month        uint8     `json:"month"`
-		CategoryID   uuid.UUID `json:"categoryId"`
-		CategoryName string    `json:"categoryName"`
+		Budgeted      float64    `json:"budgeted"`
+		Spent         float64    `json:"spent"`
+		Year          uint16     `json:"year"`
+		Month         uint8      `json:"month"`
+		CategoryID    *uuid.UUID `json:"categoryId"`
+		CategoryName  *string    `json:"categoryName"`
+		CategoryNotes *string    `json:"categoryNotes"`
+		GroupID       uuid.UUID  `json:"groupId"`
+		GroupName     string     `json:"groupName"`
+		GroupNotes    string     `json:"groupNotes"`
 	}
 )
 
@@ -67,10 +71,12 @@ const (
 		` updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (year, month, category_id) DO UPDATE SET budgeted=$5`
 	queryGetBudget = `SELECT COALESCE(budgets.budgeted, 0) AS budgeted, COALESCE(t.spent, 0) AS spent,` +
 		` COALESCE(budgets.year, $1) AS year, COALESCE(budgets.month, $2) AS month, cg.id AS category_id,` +
-		` cg.name AS category_name FROM categories AS cg LEFT JOIN budgets ON budgets.category_id = cg.id` +
-		` AND budgets.year = $1 AND budgets.month = $2 LEFT JOIN (SELECT category_id, SUM(credit) AS total_credit,` +
-		` SUM(debit) AS total_debit, SUM(credit - debit) AS spent FROM transactions GROUP BY category_id)` +
-		` AS t ON cg.id = t.category_id`
+		` cg.name AS category_name, cg.notes as category_notes, g.id AS group_id, g.name AS group_name,` +
+		` g.notes as group_notes FROM groups AS g LEFT JOIN categories AS cg` +
+		` ON cg.group_id = g.id LEFT JOIN budgets ON budgets.category_id = cg.id AND budgets.year = $1 AND` +
+		` budgets.month = $2 LEFT JOIN(SELECT category_id, SUM(credit) AS total_credit, SUM(debit) AS total_debit,` +
+		` SUM(credit - debit) AS spent FROM transactions GROUP BY category_id) AS t ON cg.id = t.category_id` +
+		` ORDER BY g.created_at ASC`
 )
 
 func (h *Handler) CreateGroup(w http.ResponseWriter, r *http.Request) {
@@ -430,8 +436,8 @@ func (h *Handler) GetBudget(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var budget BudgetResult
 
-		err := rows.Scan(&budget.Budgeted, &budget.Spent, &budget.Year, &budget.Month,
-			&budget.CategoryID, &budget.CategoryName)
+		err := rows.Scan(&budget.Budgeted, &budget.Spent, &budget.Year, &budget.Month, &budget.CategoryID,
+			&budget.CategoryName, &budget.CategoryNotes, &budget.GroupID, &budget.GroupName, &budget.GroupNotes)
 		if err != nil {
 			slog.Error("error scanning budgets row from database", "error", err)
 			buildErrorResponse(w, err.Error(), http.StatusInternalServerError)

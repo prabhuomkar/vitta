@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"testing"
@@ -18,7 +19,8 @@ var (
 	testAmount       = 42.69
 	groupRowCols     = []string{"id", "name", "notes", "created_at", "updated_at"}
 	categoryRowCols  = []string{"id", "groupId", "name", "notes", "created_at", "updated_at"}
-	budgetRowCols    = []string{"budgeted", "spent", "year", "month", "category_id", "category_name"}
+	budgetRowCols    = []string{"budgeted", "spent", "year", "month", "category_id", "category_name", "category_notes",
+		"group_id", "group_name", "group_notes"}
 )
 
 func TestCreateGroup(t *testing.T) {
@@ -403,7 +405,7 @@ func TestGetBudget(t *testing.T) {
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectQuery("SELECT *").WithArgs(2024, 10).WillReturnRows(pgxmock.NewRows(budgetRowCols).
-					AddRow(500.69, 4.20, uint16(2024), uint8(10), "invalid", "invalid"))
+					AddRow(500.69, 4.20, uint16(2024), uint8(10), nil, nil, nil, "invalid", "invalid", "invalid"))
 			},
 			http.StatusInternalServerError, "Scanning value error",
 		},
@@ -421,9 +423,10 @@ func TestGetBudget(t *testing.T) {
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectQuery("SELECT *").WithArgs(2024, 10).WillReturnRows(pgxmock.NewRows(budgetRowCols).
-					AddRow(500.69, 4.20, uint16(2024), uint8(10), testCategoryID, testCategoryName))
+					AddRow(testAmount, 4.20, uint16(2024), uint8(10), &testCategoryID, &testCategoryName, nil,
+						testGroupID, testGroupName, "notes"))
 			},
-			http.StatusOK, "500.69",
+			http.StatusOK, fmt.Sprintf("%.2f", testAmount),
 		},
 	}
 	executeTests(t, tests)
