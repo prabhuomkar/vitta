@@ -66,8 +66,9 @@ const (
 		` VALUES ($1, $2, $3, $4, $5, $6)`
 	queryUpdateCategory = `UPDATE categories SET name=$1, notes=$2, group_id=$3, updated_at=$4 WHERE id=$5`
 	queryDeleteCategory = `DELETE FROM categories WHERE id=$1`
-	queryGetCategories  = `SELECT * FROM categories ORDER BY created_at DESC`
-	querySetBudget      = `INSERT INTO budgets (id, category_id, year, month, budgeted, created_at,` +
+	queryGetCategories  = `SELECT * FROM categories WHERE (name ILIKE '%' || COALESCE(NULLIF($1, ''), '')` +
+		` || '%') ORDER BY created_at DESC`
+	querySetBudget = `INSERT INTO budgets (id, category_id, year, month, budgeted, created_at,` +
 		` updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (year, month, category_id) DO UPDATE SET budgeted=$5`
 	queryGetBudget = `SELECT COALESCE(budgets.budgeted, 0) AS budgeted, COALESCE(t.spent, 0) AS spent,` +
 		` COALESCE(budgets.year, $1) AS year, COALESCE(budgets.month, $2) AS month, cg.id AS category_id,` +
@@ -320,7 +321,9 @@ func (h *Handler) DeleteCategory(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetCategories(w http.ResponseWriter, r *http.Request) {
-	rows, err := h.db.Query(r.Context(), queryGetCategories)
+	searchQuery := r.URL.Query().Get("q")
+
+	rows, err := h.db.Query(r.Context(), queryGetCategories, searchQuery)
 	if err != nil {
 		slog.Error("error getting categories from database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)

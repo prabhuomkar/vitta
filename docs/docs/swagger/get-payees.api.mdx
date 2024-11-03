@@ -5,7 +5,7 @@ description: "Get all existing payees"
 sidebar_label: "Get all existing payees"
 hide_title: true
 hide_table_of_contents: true
-api: eJy1lE1v2zgQhv+KMGfqw6692ehUowgKA4s2gJs91PBhRI0tthLJJUd2BEP/fUFaSZ003T31JGH0zjvDmUc8A+PBQ7mFexyIPOwEGEsOWRm9rqGEA/H0SYAn2TvFA5TbM1TolVz13EC53Y07AY68NdqTh/IM86IIj5q8dMoGNyhh00tJPjhJo5k0Bwla2yoZC+bffNCdwcuGOgxvPFiCEtA5HECAYur8VdxU30gyCLAutM3qUl3VVxrPTukDCNgb1yFDCX2vahBAj9jZNkiK2e38j+rPRXr7TlbpzbK6TavFYpniEm8Wi/0NLm/3EE6I9WfdDlCy62kUoLGjtyr9cN6c1OEwwChAOkKmesX/2VqNTCmrjl64zIv5Ip0VaXHzpZiVxbws3n19q5/e1r+5xiiAFceEiAW8DngYx6BaFLOfAXjQ2HNDmsPCqQ7Jy7dAWWsmp7FN7pwzDoLfS8FH4gTbNqFH5VnpQ2KfGO2IGzOBG7jAACjkx1luf2DsjuR8pLh3LZTQMFtf5vlRMWNaU2eyfTtkykAA+wn7TaDyAtgV/M+DDibBPaqgvGhi70rvTRROg/o7lElW92t4fa7V/TrZWJJqP/0Syd64JOqnvwZlXC51qELn1mHV9Kb7ju697bIuLqRVkrSPZF4IhZVF2VAyzwoQV2cu8/x0OmUYv2bGHfIp1ed/rT/cfdrcpfOsyBru2uAbpnbpc5YVWRFC1njuUF+V+vVqXhz1eWxMj5zbFpUOfrG387S2LRxncYdPV1NjPIfw+VyhpwfXjmMI/9OTC5fSTsARncIqTHm7GwU0hDW5uOnvNIRBSEk2gHHEto83y+vrJ2z8GaKPd19AAL5c9GWxYnoG76dbSg9XzrHJCyUPPuDc0TiCmBrppxCM4v/z79H7k3H1Vb6dQjDuxnH8F7RR7IE=
+api: eJy1VE1v20gM/SsCz6MPu3az0WmNRVAYWOwGcLOHDXKgRrQ1rT5mZyg7gqH/XnAsp06ctqc9SaJIvkfykUdg3HnIH+EeByIPTwosOmyIyYn9CC02BDn8BwpMKy89uQEUeF1Rg5AfgQcrHp6daXcwKijJa2csm04CNoROV1GIi7adi+wJanxS0FlyKH7rEnLYEU80FHjSvTM8BA4FeqNXPVeQPz5JnCNvu9aTF/x5lsnjDWqvNXnJpLuWqWVxQWtrowNg+sWL3/G6DnQOpUDD1PgLe1d8Ic2gwDqhzeaEbsrrHijYdq5Bhhz63pSggJ6xsbW4ZLPb+cfit0V8+0EX8c2yuI2LxWIZ4xJvFovtDS5vtyAVYvl3Ww+Qs+tpVNMcrpG+Z94czG43yAC0I2QqV/xTaiUyxWwaepVlns0X8SyLs5vP2SzP5nn24d/3+PS2/J8xRgVsOAQEWcBbg4dxFK9FNrsWwEOLPVfUsgycSglevieUdcvkWqyjO+c6B+OVfj8RR1jXET0bz6bdnfWroCGuukm4ogsUgUK6n6X2u4zd/rxJvashh4rZ+jxN94YZ45KaLtnWQ2K6sBBn2W9ElSeBXYj/pdGS5LyD8h18AnfTbrvgODXqH4GJVvdreFvX6n4dbSxps51WIixn8J+2BnUYLjVohLl1WFR913xF97ttkiYMpDaaWh+UOV2KlUVdUTRPMlAXNedpejgcEgx/k87t0inUp3+u/7j7a3MXz5MsqbipJa907cRzlmRJJibbeW6wvYD68WhelfrSNqZnTm2NppV8gdtxGtsj7GdhhuczWHWexXw8FujpwdXjKObT+ZNxlsZjUVMJ+RZrT1eYL3fnhxdQvc/rKw3Twd1j3cv/II09OiOA4QYqqAhLcoHJKWClNVm+iLq6dpLlRbOf7j6DAnytq5OO1PSU3Oej2A4XmUNPTqJ88LI9DY0jnJn3kwlG9ev4e/T+0LnyIt5OJhifxnH8BnPdN0g=
 sidebar_class_name: "get api-method"
 info_path: docs/swagger/vitta-api
 custom_edit_url: null
@@ -43,7 +43,39 @@ import TabItem from "@theme/TabItem";
 
 Get all existing payees
 
-<div>
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<details
+  style={{"marginBottom":"1rem"}}
+  className={"openapi-markdown__details"}
+  data-collapsed={false}
+  open={true}
+>
+  <summary
+    style={{}}
+  >
+    <h3
+      className={"openapi-markdown__details-summary-header-params"}
+    >
+      Query Parameters
+    </h3>
+  </summary><div>
+    <ul>
+      <ParamsItem
+        className={"paramsItem"}
+        param={{"name":"q","in":"query","schema":{"type":"string"},"description":"Search query for payees","enumDescriptions":[]}}
+      >
+        
+      </ParamsItem>
+    </ul>
+  </div>
+</details><div>
   <div>
     <ApiTabs
       label={undefined}

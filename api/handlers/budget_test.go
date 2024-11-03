@@ -303,35 +303,38 @@ func TestGetCategories(t *testing.T) {
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error getting categories from db", http.MethodGet, "/v1/categories", true, nil,
+			"error getting categories from db", http.MethodGet, "/v1/categories?q=some", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WillReturnError(pgx.ErrNoRows)
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnError(pgx.ErrNoRows)
 			},
 			http.StatusInternalServerError, "no rows",
 		},
 		{
-			"error scanning categories rows from db", http.MethodGet, "/v1/categories", true, nil,
+			"error scanning categories rows from db", http.MethodGet, "/v1/categories?q=some", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(categoryRowCols).AddRow("invalid", "invalid", "ok", "ok", "bad-time", "bad-time"))
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows(categoryRowCols).
+					AddRow("invalid", "invalid", "ok", "ok", "bad-time", "bad-time"))
 			},
 			http.StatusInternalServerError, "Scanning value error",
 		},
 		{
-			"error reading categories rows from db", http.MethodGet, "/v1/categories", true, nil,
+			"error reading categories rows from db", http.MethodGet, "/v1/categories?q=some", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(categoryRowCols).RowError(0, errors.New("some error in db")))
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows(categoryRowCols).
+					RowError(0, errors.New("some error in db")))
 			},
 			http.StatusInternalServerError, "some error in db",
 		},
 		{
-			"success", http.MethodGet, "/v1/categories", true, nil,
+			"success", http.MethodGet, "/v1/categories?q=some", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(categoryRowCols).AddRow(
-					testCategoryID.String(), testGroupID.String(), testCategoryName, "notes", testAccountTime, testAccountTime))
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(
+					pgxmock.NewRows(categoryRowCols).AddRow(testCategoryID.String(), testGroupID.String(),
+						testCategoryName, "notes", testAccountTime, testAccountTime))
 			},
 			http.StatusOK, testCategoryID.String(),
 		},

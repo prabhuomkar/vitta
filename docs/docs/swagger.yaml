@@ -130,6 +130,12 @@ paths:
     post:
       tags:
         - Budgets
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: Search query for categories
       summary: Create a new category
       operationId: createCategory
       security:
@@ -318,6 +324,12 @@ paths:
     get:
       tags:
         - Payees
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: Search query for payees
       summary: Get all existing payees
       operationId: getPayees
       security:
