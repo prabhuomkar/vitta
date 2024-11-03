@@ -136,35 +136,37 @@ func TestGetPayees(t *testing.T) {
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error getting payees from db", http.MethodGet, "/v1/payees", true, nil,
+			"error getting payees from db", http.MethodGet, "/v1/payees?q=some", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WillReturnError(pgx.ErrNoRows)
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnError(pgx.ErrNoRows)
 			},
 			http.StatusInternalServerError, "no rows",
 		},
 		{
-			"error scanning payees rows from db", http.MethodGet, "/v1/payees", true, nil,
+			"error scanning payees rows from db", http.MethodGet, "/v1/payees?q=some", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(payeeRowCols).AddRow("invalid", "ok", "bad-time", "bad-time"))
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows(payeeRowCols).
+					AddRow("invalid", "ok", "bad-time", "bad-time"))
 			},
 			http.StatusInternalServerError, "Scanning value error",
 		},
 		{
-			"error reading payees rows from db", http.MethodGet, "/v1/payees", true, nil,
+			"error reading payees rows from db", http.MethodGet, "/v1/payees?q=some", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(payeeRowCols).RowError(0, errors.New("some error in db")))
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows(payeeRowCols).
+					RowError(0, errors.New("some error in db")))
 			},
 			http.StatusInternalServerError, "some error in db",
 		},
 		{
-			"success", http.MethodGet, "/v1/payees", true, nil,
+			"success", http.MethodGet, "/v1/payees?q=some", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(payeeRowCols).AddRow(testPayeeID.String(), testPayeeName,
-					testAccountTime, testAccountTime))
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows(payeeRowCols).
+					AddRow(testPayeeID.String(), testPayeeName, testAccountTime, testAccountTime))
 			},
 			http.StatusOK, testPayeeID.String(),
 		},
