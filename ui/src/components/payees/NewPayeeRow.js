@@ -11,6 +11,7 @@ const NewPayeeRow = ({ newPayee, setNewPayee, handleAddPayee }) => {
           onChange={e => setNewPayee(e.target.value)}
           placeholder="New Payee Name"
           maxLength={50}
+          size="sm"
         />
       </Td>
       <Td padding="0.6rem">
@@ -19,6 +20,7 @@ const NewPayeeRow = ({ newPayee, setNewPayee, handleAddPayee }) => {
           icon={<AddIcon />}
           variant="outline"
           onClick={handleAddPayee}
+          size="sm"
         />
       </Td>
     </Tr>

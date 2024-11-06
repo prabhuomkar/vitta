@@ -22,6 +22,7 @@ const AccountRow = ({ account, onDelete, onSave }) => {
           onChange={e => handleFieldChange('name', e.target.value)}
           onBlur={handleBlur}
           placeholder="Account Name"
+          size="sm"
         />
       </Td>
       <Td padding="0.6rem">
@@ -30,6 +31,7 @@ const AccountRow = ({ account, onDelete, onSave }) => {
           onChange={e => handleFieldChange('category', e.target.value)}
           onBlur={handleBlur}
           placeholder="Select Category"
+          size="sm"
         >
           {ACCOUNT_CATEGORIES.map(cat => (
             <option key={cat} value={cat}>
@@ -51,6 +53,7 @@ const AccountRow = ({ account, onDelete, onSave }) => {
           icon={<DeleteIcon />}
           variant="outline"
           onClick={() => onDelete(localAccount.id)}
+          size="sm"
         />
       </Td>
     </Tr>

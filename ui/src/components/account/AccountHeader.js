@@ -44,7 +44,7 @@ const AccountHeader = ({
           width={['100%', 'auto']}
           onClick={() => setModalOpen(true)}
         >
-          Add Transaction
+          Add
         </Button>
         <Button
           leftIcon={<ArrowDownIcon />}
@@ -53,7 +53,7 @@ const AccountHeader = ({
           bgColor={primaryColor}
           onClick={openFileDialog}
         >
-          Import Transactions
+          Import
         </Button>
         <Input
           type="file"

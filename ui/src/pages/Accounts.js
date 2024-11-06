@@ -52,7 +52,13 @@ const Accounts = () => {
 
   return (
     <Box overflowX="auto" borderRadius="md">
-      <Table variant="simple" bg="white" border="gray.300" borderRadius="md">
+      <Table
+        size="sm"
+        variant="simple"
+        bg="white"
+        border="gray.300"
+        borderRadius="md"
+      >
         <Thead>
           <Tr>
             <Th padding="0.6rem">Account Name</Th>

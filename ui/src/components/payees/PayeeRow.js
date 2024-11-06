@@ -21,7 +21,8 @@ const PayeeRow = ({
           }
           placeholder="Payee Name"
           isInvalid={isFieldInvalid}
-          errorBorderColor="red.300"
+          errorBorderColor="red.500"
+          size="sm"
         />
       </Td>
       <Td padding="0.6rem">
@@ -30,6 +31,7 @@ const PayeeRow = ({
           icon={<DeleteIcon />}
           variant="outline"
           onClick={() => handleDelete(payee.id)}
+          size="sm"
         />
       </Td>
     </Tr>

@@ -100,14 +100,15 @@ const NavigationMenu = ({ onClose }) => {
             {item.charAt(0).toUpperCase() + item.slice(1)}
           </Link>
         ))}
-        <Divider />
         <Flex
           align="center"
           width="100%"
           paddingLeft="0.8rem"
           justify="space-between"
         >
-          <Text>ACCOUNTS</Text>
+          <Text fontSize="sm" as="b" color="gray.600">
+            ACCOUNTS
+          </Text>
           <Popover
             placement="auto-end"
             isOpen={isPopoverOpen}
@@ -184,15 +185,25 @@ const NavigationMenu = ({ onClose }) => {
             </Portal>
           </Popover>
         </Flex>
-        <Divider />
         {loading ? (
           <Skeleton width="100%">
             <div>Loading...</div>
           </Skeleton>
         ) : accounts.length === 0 ? (
-          <Text padding="0.4rem 0.8rem" color="gray.500">
-            No accounts available
-          </Text>
+          <Flex
+            textAlign="center"
+            justifyContent="center"
+            alignItems="center"
+            width="100%"
+            flexDirection="column"
+          >
+            <Text fontSize="sm" padding="0.4rem 0.8rem" color="gray.500">
+              No accounts available
+            </Text>
+            <Button onClick={() => setIsPopoverOpen(true)} size="xs">
+              Add account
+            </Button>
+          </Flex>
         ) : (
           accounts.map(account => (
             <Link

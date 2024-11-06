@@ -13,6 +13,9 @@ import {
 import { HamburgerIcon } from '@chakra-ui/icons';
 import { useAuth } from '../context';
 
+const username = process.env.REACT_APP_USERNAME;
+const avatar = username ? username.charAt(0).toUpperCase() : '';
+
 const Header = ({ onOpen, logoSrc }) => {
   const { logout } = useAuth();
   return (
@@ -48,7 +51,7 @@ const Header = ({ onOpen, logoSrc }) => {
           display={{ base: 'none', md: 'block' }}
         />
         <Heading size="md" ml="1rem" display={{ base: 'none', md: 'block' }}>
-          Vitta
+          <span style={{ fontFamily: 'Libre Baskerville, serif' }}>Vitta</span>
         </Heading>
       </Flex>
       <Image
@@ -77,11 +80,11 @@ const Header = ({ onOpen, logoSrc }) => {
             alignItems="center"
             justifyContent="center"
           >
-            AP
+            {avatar}
           </Box>
         </MenuButton>
         <MenuList>
-          <MenuItem>Settings</MenuItem>
+          <MenuItem isDisabled>Settings</MenuItem>
           <MenuItem onClick={logout}>Logout</MenuItem>
         </MenuList>
       </Menu>

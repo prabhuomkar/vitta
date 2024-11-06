@@ -1,41 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Flex,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Collapse,
-  IconButton,
-  Select,
-  Text,
-  Heading,
-  Button,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  FormControl,
-  FormLabel,
-  Input,
-  FormErrorMessage,
-  Tooltip,
-  Textarea,
-  useTheme
-} from '@chakra-ui/react';
-import {
-  ChevronDownIcon,
-  ChevronUpIcon,
-  HamburgerIcon
-} from '@chakra-ui/icons';
+import { Box, useTheme } from '@chakra-ui/react';
 import { useBugdets, useGroups, useCategories } from '../context';
-import { formatCurrency } from '../utils/formatCurrency';
+import {
+  AddGroupModal,
+  EditGroupModal,
+  AddCategoryModal,
+  EditCategoryModal,
+  SetBudgetModal,
+  YearMonthSelector,
+  BudgetsTable
+} from '../components/budgets';
 import { Loading, Error } from '../components';
 
 const Budgets = () => {
@@ -45,85 +19,77 @@ const Budgets = () => {
   const { budgets, loading, error, getBudgets, createBudget } = useBugdets();
   const { createGroup, updateGroup, deleteGroup } = useGroups();
   const { createCategory, updateCategory, deleteCategory } = useCategories();
+
+  // Months and current year setup
   const months = Array.from({ length: 12 }, (_, i) =>
     new Intl.DateTimeFormat('en-US', { month: 'long' }).format(new Date(0, i))
   );
   const currentYear = new Date().getFullYear();
-  const [openGroups, setOpenGroups] = useState(
-    budgets.reduce((acc, item) => {
-      acc[item.groupId] = true;
-      return acc;
-    }, {})
-  );
 
+  // State variables for managing groups, categories, and UI controls
+  const [openGroups, setOpenGroups] = useState(
+    budgets.reduce((acc, item) => ({ ...acc, [item.groupId]: true }), {})
+  );
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [hoveredRow, setHoveredRow] = useState(null);
+  const [hoveredCategory, setHoveredCategory] = useState('');
+
+  // Group management states
   const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
   const [isEditGroupOpen, setIsEditGroupOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    notes: ''
-  });
+  const [formData, setFormData] = useState({ name: '', notes: '' });
+  const [editFormData, setEditFormData] = useState({ name: '' });
+  const [groupNameError, setGroupNameError] = useState('');
+  const [selectedGroupId, setSelectedGroupId] = useState(null);
 
-  const [isEditCategoryOpen, setIsEditCategoryOpen] = useState(false);
-  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
-  const [editCategoryFormData, setEditCategoryFormData] = useState({
-    name: '',
-    notes: ''
-  });
-
+  // Category management states
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
+  const [isEditCategoryOpen, setIsEditCategoryOpen] = useState(false);
   const [categoryFormData, setCategoryFormData] = useState({
     name: '',
     notes: ''
   });
+  const [editCategoryFormData, setEditCategoryFormData] = useState({
+    name: '',
+    notes: ''
+  });
   const [categoryNameError, setCategoryNameError] = useState('');
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
 
-  const [editFormData, setEditFormData] = useState({
-    name: ''
-  });
-  const [groupNameError, setGroupNameError] = useState('');
-  const [hoveredRow, setHoveredRow] = useState(null);
-  const [selectedGroupId, setSelectedGroupId] = useState(null);
-
+  // Budget management states
   const [isSetBudgetOpen, setIsSetBudgetOpen] = useState(false);
-  const [budgetFormData, setBudgetFormData] = useState({
-    budgeted: 0
-  });
-  const [hoveredCategory, setHoveredCategory] = useState('');
+  const [budgetFormData, setBudgetFormData] = useState({ budgeted: 0 });
 
+  // Fetch budgets when selectedYear or selectedMonth changes
   useEffect(() => {
-    const fetchBudgets = async () => {
-      await getBudgets(selectedYear, selectedMonth);
-    };
-
-    fetchBudgets();
+    getBudgets(selectedYear, selectedMonth);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedYear, selectedMonth]);
 
+  // Set initial open groups based on fetched budgets
   useEffect(() => {
-    if (budgets.length > 0) {
-      const initialOpenGroups = budgets.reduce((acc, item) => {
-        acc[item.groupId] = true; // Set all groups to open by default
-        return acc;
-      }, {});
+    if (budgets.length) {
+      const initialOpenGroups = budgets.reduce(
+        (acc, item) => ({ ...acc, [item.groupId]: true }),
+        {}
+      );
       setOpenGroups(initialOpenGroups);
     }
   }, [budgets]);
 
+  // Toggle group open/closed state
   const toggleGroup = groupId => {
-    setOpenGroups(prev => ({
-      ...prev,
-      [groupId]: !prev[groupId]
-    }));
+    setOpenGroups(prev => ({ ...prev, [groupId]: !prev[groupId] }));
   };
 
+  // Group and categorize budgets
   const groupedBudgets = budgets.reduce((acc, item) => {
-    const { groupId } = item;
+    const { groupId, groupName, groupNotes, budgeted, spent } = item;
     if (!acc[groupId]) {
       acc[groupId] = {
-        groupName: item.groupName,
-        groupNotes: item.groupNotes,
+        groupName,
+        groupNotes,
         groupId,
         categories: [],
         budgeted: 0,
@@ -131,32 +97,36 @@ const Budgets = () => {
       };
     }
     acc[groupId].categories.push(item);
-    acc[groupId].budgeted += item.budgeted;
-    acc[groupId].spent += item.spent;
+    acc[groupId].budgeted += budgeted;
+    acc[groupId].spent += spent;
     return acc;
   }, {});
 
   const groupedBudgetsArray = Object.values(groupedBudgets);
 
+  // Handlers for form changes and submissions
   const handleChange = e => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    if (name === 'name' && value.trim() !== '') {
-      setGroupNameError('');
-    }
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === 'name' && value.trim()) setGroupNameError('');
   };
 
   const handleEditChange = e => {
     const { name, value } = e.target;
-    setEditFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setEditFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleCategoryChange = e => {
+    const { name, value } = e.target;
+    setCategoryFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleEditCategoryChange = e => {
+    const { name, value } = e.target;
+    setEditCategoryFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Group operations
   const handleAddGroupSubmit = async e => {
     e.preventDefault();
     if (!formData.name.trim()) {
@@ -211,17 +181,7 @@ const Budgets = () => {
     }
   };
 
-  // Function to handle category form change
-  const handleCategoryChange = e => {
-    const { name, value } = e.target;
-
-    setCategoryFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  // Function to handle adding a new category
+  // Category operations
   const handleAddCategorySubmit = async e => {
     e.preventDefault();
     if (!categoryFormData.name.trim()) {
@@ -232,7 +192,7 @@ const Budgets = () => {
     const result = await createCategory({
       name: categoryFormData.name,
       notes: categoryFormData.notes,
-      groupId: selectedGroupId // Use the selected group ID
+      groupId: selectedGroupId
     });
 
     if (result.success) {
@@ -245,22 +205,13 @@ const Budgets = () => {
     }
   };
 
-  // Function to handle category form change in edit modal
-  const handleEditCategoryChange = e => {
-    const { name, value } = e.target;
-    setEditCategoryFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  // Function to submit the edited category
   const handleEditCategorySubmit = async e => {
     e.preventDefault();
     if (!editCategoryFormData.name.trim()) {
       setCategoryNameError('Category name is required');
       return;
     }
+
     const result = await updateCategory(selectedCategoryId, {
       groupId: selectedGroupId,
       name: editCategoryFormData.name,
@@ -280,10 +231,10 @@ const Budgets = () => {
   const handleDeleteCategory = async () => {
     const result = await deleteCategory(selectedCategoryId);
     if (result.success) {
-      setIsEditCategoryOpen(false); // Close the edit modal
+      setIsEditCategoryOpen(false);
       setEditCategoryFormData({ name: '', notes: '', groupId: '' });
-      setSelectedCategoryId(''); // Clear selected category
-      setSelectedGroupId(''); // Clear selected group
+      setSelectedCategoryId('');
+      setSelectedGroupId('');
       await getBudgets(selectedYear, selectedMonth);
     } else {
       // eslint-disable-next-line no-console
@@ -291,7 +242,7 @@ const Budgets = () => {
     }
   };
 
-  // Open the edit category modal and set selected category data
+  // Open edit modal with selected category data
   const openEditCategoryModal = (
     groupId,
     categoryId,
@@ -314,6 +265,7 @@ const Budgets = () => {
     }
   };
 
+  // Budget operations
   const handleSetBudget = async e => {
     e.preventDefault();
     const result = await createBudget({
@@ -340,477 +292,94 @@ const Budgets = () => {
   return (
     <Box>
       {/* Year and Month Selection */}
-      <Box mb={4}>
-        <Flex
-          justifyContent="space-between"
-          alignItems="center"
-          flexDirection={{ base: 'column', md: 'row' }}
-        >
-          <Heading mb={{ base: 2, md: 0 }}>{selectedYear}</Heading>
-          <Flex
-            alignItems="center"
-            flexDirection={{ base: 'column', md: 'row' }}
-            width={{ base: '100%', md: 'auto' }}
-          >
-            <Select
-              value={selectedMonth}
-              onChange={e => setSelectedMonth(Number(e.target.value))}
-              placeholder="Select Month"
-              width={{ base: '100%', md: 'auto' }}
-              backgroundColor="white"
-              m={2}
-            >
-              {months.map((month, index) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <option key={index} value={index + 1}>
-                  {month}
-                </option>
-              ))}
-            </Select>
-            <Select
-              value={selectedYear}
-              onChange={e => setSelectedYear(Number(e.target.value))}
-              placeholder="Select Year"
-              width={{ base: '100%', md: 'auto' }}
-              backgroundColor="white"
-              m={2}
-            >
-              {Array.from({ length: 5 }, (_, i) => (
-                <option key={i} value={currentYear - 2 + i}>
-                  {currentYear - 2 + i}
-                </option>
-              ))}
-            </Select>
+      <YearMonthSelector
+        selectedYear={selectedYear}
+        selectedMonth={selectedMonth}
+        months={months}
+        currentYear={currentYear}
+        primaryColor={primaryColor}
+        setSelectedYear={setSelectedYear}
+        setSelectedMonth={setSelectedMonth}
+        setIsAddGroupOpen={setIsAddGroupOpen}
+      />
 
-            <Button
-              colorScheme={primaryColor}
-              bg={primaryColor}
-              onClick={() => setIsAddGroupOpen(true)}
-              width={{ base: '100%', md: 'auto' }}
-              ml={{ base: 0, md: 2 }}
-              mt={{ base: 2, md: 0 }}
-            >
-              Add Group
-            </Button>
-          </Flex>
-        </Flex>
-      </Box>
+      {/* Add Group Modal */}
+      <AddGroupModal
+        isOpen={isAddGroupOpen}
+        onClose={() => setIsAddGroupOpen(false)}
+        formData={formData}
+        groupNameError={groupNameError}
+        handleChange={handleChange}
+        handleAddGroupSubmit={handleAddGroupSubmit}
+        primaryColor={primaryColor}
+      />
 
-      {/* Modal for adding group */}
-      <Modal isOpen={isAddGroupOpen} onClose={() => setIsAddGroupOpen(false)}>
-        <ModalOverlay />
-        <ModalContent mx={{ base: '4', md: '0' }}>
-          <ModalHeader>Add Group</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <form onSubmit={handleAddGroupSubmit}>
-              <FormControl mb={4} isInvalid={!!groupNameError}>
-                <FormLabel>Group Name</FormLabel>
-                <Input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="Enter Group Name"
-                />
-                {groupNameError && (
-                  <FormErrorMessage>{groupNameError}</FormErrorMessage>
-                )}
-              </FormControl>
-              <FormControl mb={4}>
-                <FormLabel>Notes</FormLabel>
-                <Textarea
-                  name="notes"
-                  value={formData.notes}
-                  onChange={handleChange}
-                  placeholder="Enter Notes"
-                />
-              </FormControl>
-              <ModalFooter margin="auto" mb={2} p={0}>
-                <Button
-                  colorScheme={primaryColor}
-                  bg={primaryColor}
-                  type="submit"
-                >
-                  Add Group
-                </Button>
-              </ModalFooter>
-            </form>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+      {/* Edit Group Modal */}
+      <EditGroupModal
+        isOpen={isEditGroupOpen}
+        onClose={() => setIsEditGroupOpen(false)}
+        editFormData={editFormData}
+        groupNameError={groupNameError}
+        handleEditChange={handleEditChange}
+        handleEditGroupSubmit={handleEditGroupSubmit}
+        handleDeleteGroup={handleDeleteGroup}
+        primaryColor={primaryColor}
+      />
 
-      {/* Modal for editing group */}
-      <Modal isOpen={isEditGroupOpen} onClose={() => setIsEditGroupOpen(false)}>
-        <ModalOverlay />
-        <ModalContent mx={{ base: '4', md: '0' }}>
-          <ModalHeader>Edit Group</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <form onSubmit={handleEditGroupSubmit}>
-              <FormControl mb={4} isInvalid={!!groupNameError}>
-                <FormLabel>Group Name</FormLabel>
-                <Input
-                  type="text"
-                  name="name"
-                  value={editFormData.name}
-                  onChange={handleEditChange}
-                  placeholder="Enter Group Name"
-                />
-                {groupNameError && (
-                  <FormErrorMessage>{groupNameError}</FormErrorMessage>
-                )}
-              </FormControl>
-              <FormControl mb={4}>
-                <FormLabel>Notes</FormLabel>
-                <Textarea
-                  name="notes"
-                  value={editFormData.notes}
-                  onChange={handleEditChange}
-                  placeholder="Enter Notes"
-                />
-              </FormControl>
-              <ModalFooter margin="auto" mb={2} p={0}>
-                <Button
-                  colorScheme={primaryColor}
-                  bg={primaryColor}
-                  type="submit"
-                  mr={3}
-                >
-                  Update
-                </Button>
-                <Button onClick={handleDeleteGroup}>Delete</Button>
-              </ModalFooter>
-            </form>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-
-      {/* Modal for adding category */}
-      <Modal
+      {/* Add Category Modal */}
+      <AddCategoryModal
         isOpen={isAddCategoryOpen}
         onClose={() => setIsAddCategoryOpen(false)}
-      >
-        <ModalOverlay />
-        <ModalContent mx={{ base: '4', md: '0' }}>
-          <ModalHeader>Add Category</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <form onSubmit={handleAddCategorySubmit}>
-              <FormControl mb={4} isInvalid={!!categoryNameError}>
-                <FormLabel>Category Name</FormLabel>
-                <Input
-                  type="text"
-                  name="name"
-                  value={categoryFormData.name}
-                  onChange={handleCategoryChange}
-                  placeholder="Enter Category Name"
-                />
-                {categoryNameError && (
-                  <FormErrorMessage>{categoryNameError}</FormErrorMessage>
-                )}
-              </FormControl>
-              <FormControl mb={4}>
-                <FormLabel>Notes</FormLabel>
-                <Textarea
-                  type="text"
-                  name="notes"
-                  value={categoryFormData.notes}
-                  onChange={handleCategoryChange}
-                  placeholder="Enter Notes"
-                />
-              </FormControl>
-              <ModalFooter margin="auto" mb={2} p={0}>
-                <Button
-                  colorScheme={primaryColor}
-                  bg={primaryColor}
-                  type="submit"
-                >
-                  Add Category
-                </Button>
-              </ModalFooter>
-            </form>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+        categoryFormData={categoryFormData}
+        categoryNameError={categoryNameError}
+        handleCategoryChange={handleCategoryChange}
+        handleAddCategorySubmit={handleAddCategorySubmit}
+        primaryColor={primaryColor}
+      />
 
       {/* Edit Category Modal */}
-      <Modal
+      <EditCategoryModal
         isOpen={isEditCategoryOpen}
         onClose={() => setIsEditCategoryOpen(false)}
-      >
-        <ModalOverlay />
-        <ModalContent mx={{ base: '4', md: '0' }}>
-          <ModalHeader>Edit Category</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <form onSubmit={handleEditCategorySubmit}>
-              <FormControl mb={4} isInvalid={!!categoryNameError}>
-                <FormLabel>Category Name</FormLabel>
-                <Input
-                  type="text"
-                  name="name"
-                  value={editCategoryFormData.name}
-                  onChange={handleEditCategoryChange}
-                  placeholder="Enter Category Name"
-                />
-                {categoryNameError && (
-                  <FormErrorMessage>{categoryNameError}</FormErrorMessage>
-                )}
-              </FormControl>
-              <FormControl mb={4}>
-                <FormLabel>Notes</FormLabel>
-                <Textarea
-                  type="text"
-                  name="notes"
-                  value={editCategoryFormData.notes}
-                  onChange={handleEditCategoryChange}
-                  placeholder="Enter Notes"
-                />
-              </FormControl>
-              <ModalFooter margin="auto" mb={2} p={0}>
-                <Button
-                  colorScheme={primaryColor}
-                  bg={primaryColor}
-                  type="submit"
-                  mr={3}
-                >
-                  Update
-                </Button>
-                <Button onClick={handleDeleteCategory}>Delete</Button>
-              </ModalFooter>
-            </form>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+        editCategoryFormData={editCategoryFormData}
+        categoryNameError={categoryNameError}
+        handleEditCategoryChange={handleEditCategoryChange}
+        handleEditCategorySubmit={handleEditCategorySubmit}
+        handleDeleteCategory={handleDeleteCategory}
+        primaryColor={primaryColor}
+      />
 
-      <Modal isOpen={isSetBudgetOpen} onClose={() => setIsSetBudgetOpen(false)}>
-        <ModalOverlay />
-        <ModalContent mx={{ base: '4', md: '0' }}>
-          <ModalHeader>Add Budget</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <form onSubmit={handleSetBudget}>
-              <FormControl mb={4}>
-                <FormLabel>Budget</FormLabel>
-                <Input
-                  type="number"
-                  name="budgeted"
-                  value={budgetFormData.budgeted}
-                  onChange={e =>
-                    setBudgetFormData({ budgeted: e.target.value })
-                  }
-                  placeholder="Enter Budget Amount"
-                />
-              </FormControl>
-              <ModalFooter margin="auto" mb={2} p={0}>
-                <Button
-                  colorScheme={primaryColor}
-                  bg={primaryColor}
-                  type="submit"
-                >
-                  Set Budget
-                </Button>
-              </ModalFooter>
-            </form>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+      {/* Set Budget Modal */}
+      <SetBudgetModal
+        isOpen={isSetBudgetOpen}
+        onClose={() => setIsSetBudgetOpen(false)}
+        budgetFormData={budgetFormData}
+        setBudgetFormData={setBudgetFormData}
+        handleSetBudget={handleSetBudget}
+        primaryColor={primaryColor}
+      />
 
-      {/* Table for budgets */}
+      {/* Budgets Table */}
       {!loading && !error && (
-        <Box overflowX="auto">
-          <Table
-            variant="simple"
-            bg="white"
-            border="gray.300"
-            borderRadius="md"
-          >
-            <Thead>
-              <Tr>
-                <Th>Group / Category</Th>
-                <Th>Budgeted</Th>
-                <Th>Spent</Th>
-                <Th>Balance</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {groupedBudgetsArray.length === 0 ? (
-                <Tr>
-                  <Td
-                    padding="0.6rem"
-                    colSpan={4}
-                    textAlign="center"
-                    color="gray.500"
-                  >
-                    <Text>No budgets available</Text>
-                  </Td>
-                </Tr>
-              ) : (
-                groupedBudgetsArray.map(group => (
-                  <React.Fragment key={group.groupId}>
-                    {/* Group Row */}
-                    <Tr
-                      onMouseEnter={() => setHoveredRow(group.groupId)}
-                      onMouseLeave={() => setHoveredRow(null)}
-                    >
-                      <Td width="40%">
-                        <Flex alignItems="center">
-                          <IconButton
-                            size="sm"
-                            variant="outline"
-                            onClick={() => toggleGroup(group.groupId)}
-                            icon={
-                              openGroups[group.groupId] ? (
-                                <ChevronUpIcon boxSize={5} />
-                              ) : (
-                                <ChevronDownIcon boxSize={5} />
-                              )
-                            }
-                            aria-label={`Toggle ${group.groupName}`}
-                            mr={2}
-                          />
-                          <Tooltip
-                            hasArrow
-                            openDelay={500}
-                            label={group.groupNotes}
-                          >
-                            <Text
-                              cursor="pointer"
-                              onClick={() => {
-                                setEditFormData({
-                                  name: group.groupName,
-                                  notes: group.groupNotes
-                                });
-                                setSelectedGroupId(group.groupId);
-                                setIsEditGroupOpen(true);
-                              }}
-                            >
-                              {group.groupName}
-                            </Text>
-                          </Tooltip>
-                          {hoveredRow === group.groupId && (
-                            <IconButton
-                              size="sm"
-                              variant="outline"
-                              icon={<HamburgerIcon />}
-                              onClick={() => {
-                                setIsAddCategoryOpen(true);
-                                setSelectedGroupId(group.groupId);
-                                setCategoryFormData({ name: '', notes: '' });
-                              }}
-                              ml={2}
-                            />
-                          )}
-                        </Flex>
-                      </Td>
-                      <Td width="20%">{formatCurrency(group.budgeted)}</Td>
-                      <Td width="20%">{formatCurrency(group.spent)}</Td>
-                      <Td width="20%">
-                        {formatCurrency(group.budgeted + group.spent)}
-                      </Td>
-                    </Tr>
-                    {/* Collapsible Categories */}
-                    <Tr>
-                      <Td colSpan={4} padding={0}>
-                        <Collapse in={openGroups[group.groupId]} animateOpacity>
-                          <Box>
-                            <Table size="sm">
-                              <Tbody>
-                                {group.categories.map(category => (
-                                  <Tr key={category.categoryId}>
-                                    <Td
-                                      width="40%"
-                                      textAlign="center"
-                                      cursor="pointer"
-                                      onMouseEnter={() =>
-                                        setHoveredCategory(category.categoryId)
-                                      }
-                                      onMouseLeave={() =>
-                                        setHoveredCategory('')
-                                      }
-                                    >
-                                      <Flex
-                                        alignItems="center"
-                                        justifyContent="center"
-                                      >
-                                        <Tooltip
-                                          hasArrow
-                                          openDelay={500}
-                                          label={category.categoryNotes || ''}
-                                        >
-                                          <Text
-                                            cursor="pointer"
-                                            onClick={() =>
-                                              openEditCategoryModal(
-                                                group.groupId,
-                                                category.categoryId,
-                                                category.categoryName,
-                                                category.categoryNotes
-                                              )
-                                            }
-                                          >
-                                            {category.categoryName || (
-                                              <Button
-                                                colorScheme={primaryColor}
-                                                bg={primaryColor}
-                                                size="xs"
-                                              >
-                                                Add Category
-                                              </Button>
-                                            )}
-                                          </Text>
-                                        </Tooltip>
-                                        {category.categoryId && (
-                                          <IconButton
-                                            size="xs"
-                                            variant="outline"
-                                            icon={<HamburgerIcon />}
-                                            onClick={() => {
-                                              setIsSetBudgetOpen(true);
-                                              setSelectedCategoryId(
-                                                category.categoryId
-                                              );
-                                              setBudgetFormData({
-                                                budgeted: category.budgeted
-                                              });
-                                            }}
-                                            ml={2}
-                                            visibility={
-                                              hoveredCategory ===
-                                              category.categoryId
-                                                ? 'visible'
-                                                : 'hidden'
-                                            }
-                                          />
-                                        )}
-                                      </Flex>
-                                    </Td>
-                                    <Td width="20%" textAlign="center">
-                                      {formatCurrency(category.budgeted)}
-                                    </Td>
-                                    <Td width="20%" textAlign="center">
-                                      {formatCurrency(category.spent)}
-                                    </Td>
-                                    <Td width="20%" textAlign="center">
-                                      {formatCurrency(
-                                        category.budgeted + category.spent
-                                      )}
-                                    </Td>
-                                  </Tr>
-                                ))}
-                              </Tbody>
-                            </Table>
-                          </Box>
-                        </Collapse>
-                      </Td>
-                    </Tr>
-                  </React.Fragment>
-                ))
-              )}
-            </Tbody>
-          </Table>
-        </Box>
+        <BudgetsTable
+          groupedBudgetsArray={groupedBudgetsArray}
+          openGroups={openGroups}
+          toggleGroup={toggleGroup}
+          setHoveredRow={setHoveredRow}
+          hoveredRow={hoveredRow}
+          setEditFormData={setEditFormData}
+          setSelectedGroupId={setSelectedGroupId}
+          setIsEditGroupOpen={setIsEditGroupOpen}
+          setIsAddCategoryOpen={setIsAddCategoryOpen}
+          setCategoryFormData={setCategoryFormData}
+          setHoveredCategory={setHoveredCategory}
+          hoveredCategory={hoveredCategory}
+          openEditCategoryModal={openEditCategoryModal}
+          setIsSetBudgetOpen={setIsSetBudgetOpen}
+          setSelectedCategoryId={setSelectedCategoryId}
+          setBudgetFormData={setBudgetFormData}
+          primaryColor={primaryColor}
+        />
       )}
     </Box>
   );

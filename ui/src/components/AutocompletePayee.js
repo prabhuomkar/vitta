@@ -73,7 +73,7 @@ const AutocompletePayee = () => {
         {filteredPayees.length > 0 && (
           <List
             spacing={1}
-            marginTop="0.5rem"
+            marginTop="0.6rem"
             border="1px solid"
             borderColor="gray.300"
             borderRadius="md"
@@ -81,7 +81,7 @@ const AutocompletePayee = () => {
             {filteredPayees.map(payee => (
               <ListItem
                 key={payee.id}
-                padding="0.5rem"
+                padding="0.6rem"
                 cursor="pointer"
                 onClick={() => handlePayeeSelect(payee.name)}
                 _hover={{ bg: 'gray.100' }}
@@ -95,11 +95,11 @@ const AutocompletePayee = () => {
           </List>
         )}
         {!payeeExists && searchQuery && (
-          <Box marginTop="0.5rem">
+          <Box marginTop="0.6rem">
             <Text color="gray.600">
               Payee not found. Would you like to add it?
             </Text>
-            <Button marginTop="0.5rem" onClick={handleAddNewPayee}>
+            <Button marginTop="0.6rem" onClick={handleAddNewPayee}>
               Add `{searchQuery}`
             </Button>
           </Box>

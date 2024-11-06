@@ -13,17 +13,23 @@ const TransactionsTable = ({
   handleDelete
 }) => (
   <Box overflowX="auto" borderRadius="md">
-    <Table variant="simple" bg="white" border="gray.300" borderRadius="md">
+    <Table
+      size="sm"
+      variant="simple"
+      bg="white"
+      border="gray.300"
+      borderRadius="md"
+    >
       <Thead>
         <Tr>
-          <Th padding="0.5rem">Name</Th>
-          <Th padding="0.5rem">Payee</Th>
-          <Th padding="0.5rem">Category</Th>
-          <Th padding="0.5rem">Credit</Th>
-          <Th padding="0.5rem">Debit</Th>
-          <Th padding="0.5rem">Notes</Th>
-          <Th padding="0.5rem">Cleared At</Th>
-          <Th padding="0.5rem">Actions</Th>
+          <Th padding="0.6rem">Name</Th>
+          <Th padding="0.6rem">Payee</Th>
+          <Th padding="0.6rem">Category</Th>
+          <Th padding="0.6rem">Credit</Th>
+          <Th padding="0.6rem">Debit</Th>
+          <Th padding="0.6rem">Notes</Th>
+          <Th padding="0.6rem">Cleared</Th>
+          <Th padding="0.6rem">Actions</Th>
         </Tr>
       </Thead>
       <Tbody>

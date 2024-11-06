@@ -8,7 +8,10 @@ export const AuthProvider = ({ children, navigate }) => {
   );
 
   const login = (username, password) => {
-    if (username === 'vitta-user' && password === 'vitta@1234') {
+    if (
+      username === process.env.REACT_APP_USERNAME &&
+      password === process.env.REACT_APP_PASSWORD
+    ) {
       setIsAuthenticated(true);
       localStorage.setItem('isAuthenticated', 'true');
       navigate('/');
