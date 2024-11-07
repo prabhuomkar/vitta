@@ -180,19 +180,19 @@ const BudgetsTable = ({
                                       openDelay={500}
                                       label={category.categoryNotes || ''}
                                     >
-                                      <Text
-                                        cursor="pointer"
-                                        onClick={() =>
-                                          openEditCategoryModal(
-                                            group.groupId,
-                                            category.categoryId,
-                                            category.categoryName,
-                                            category.categoryNotes
-                                          )
-                                        }
-                                      >
+                                      <Text cursor="pointer">
                                         {category.categoryName || (
-                                          <Button size="xs">
+                                          <Button
+                                            size="xs"
+                                            onClick={() =>
+                                              openEditCategoryModal(
+                                                group.groupId,
+                                                category.categoryId,
+                                                category.categoryName,
+                                                category.categoryNotes
+                                              )
+                                            }
+                                          >
                                             Add Category
                                           </Button>
                                         )}
