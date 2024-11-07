@@ -516,6 +516,25 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: Search query for transactions
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int64
+            example: 1
+          description: Page number
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            format: int64
+            example: 1
+          description: Number of transactions per page
       summary: Create a new transaction
       operationId: createTransaction
       security:
