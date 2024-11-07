@@ -52,7 +52,7 @@ const TransactionsTable = ({
           <Tr>
             <Td
               padding="0.6rem"
-              colSpan={6}
+              colSpan={8}
               textAlign="center"
               color="gray.500"
             >

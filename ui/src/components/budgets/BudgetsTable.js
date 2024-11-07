@@ -180,7 +180,7 @@ const BudgetsTable = ({
                                       openDelay={500}
                                       label={category.categoryNotes || ''}
                                     >
-                                      <Text cursor="pointer">
+                                      <Text cursor="pointer" mt={1}>
                                         {category.categoryName || (
                                           <Button
                                             size="xs"
