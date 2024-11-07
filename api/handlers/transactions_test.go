@@ -170,35 +170,35 @@ func TestGetTransactions(t *testing.T) {
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error getting transactions from db", http.MethodGet, "/v1/accounts/" + testAccountID.String() + "/transactions", true, nil,
+			"error getting transactions from db", http.MethodGet, "/v1/accounts/" + testAccountID.String() + "/transactions?q=query&page=1&limit=10", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WithArgs(testAccountID).WillReturnError(pgx.ErrNoRows)
+				mock.ExpectQuery("SELECT *").WithArgs(testAccountID, "query", 0, 10).WillReturnError(pgx.ErrNoRows)
 			},
 			http.StatusInternalServerError, "no rows",
 		},
 		{
-			"error scanning transactions rows from db", http.MethodGet, "/v1/accounts/" + testAccountID.String() + "/transactions", true, nil,
+			"error scanning transactions rows from db", http.MethodGet, "/v1/accounts/" + testAccountID.String() + "/transactions?q=query&page=1&limit=10", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WithArgs(testAccountID).WillReturnRows(pgxmock.NewRows(transactionRowCols).AddRow("invalid", "invalid", "invalid",
+				mock.ExpectQuery("SELECT *").WithArgs(testAccountID, "query", 0, 10).WillReturnRows(pgxmock.NewRows(transactionRowCols).AddRow("invalid", "invalid", "invalid",
 					"invalid", "invalid", "invalid", "invalid", "invalid", "invalid", "invalid", "invalid", "invalid", "invalid"))
 			},
 			http.StatusInternalServerError, "Scanning value error",
 		},
 		{
-			"error reading transactions rows from db", http.MethodGet, "/v1/accounts/" + testAccountID.String() + "/transactions", true, nil,
+			"error reading transactions rows from db", http.MethodGet, "/v1/accounts/" + testAccountID.String() + "/transactions?q=query&page=1&limit=10", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WithArgs(testAccountID).WillReturnRows(pgxmock.NewRows(transactionRowCols).RowError(0, errors.New("some error in db")))
+				mock.ExpectQuery("SELECT *").WithArgs(testAccountID, "query", 0, 10).WillReturnRows(pgxmock.NewRows(transactionRowCols).RowError(0, errors.New("some error in db")))
 			},
 			http.StatusInternalServerError, "some error in db",
 		},
 		{
-			"success", http.MethodGet, "/v1/accounts/" + testAccountID.String() + "/transactions", true, nil,
+			"success", http.MethodGet, "/v1/accounts/" + testAccountID.String() + "/transactions?q=query&page=1&limit=10", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WithArgs(testAccountID).WillReturnRows(pgxmock.NewRows(transactionRowCols).AddRow(testTransactionID,
+				mock.ExpectQuery("SELECT *").WithArgs(testAccountID, "query", 0, 10).WillReturnRows(pgxmock.NewRows(transactionRowCols).AddRow(testTransactionID,
 					testAccountID, &testCategoryID, &testPayeeID, "Some transaction", 4.20, 4.20, "Some notes",
 					&testAccountTime, testAccountTime, testAccountTime, &testCategoryName, &testPayeeName))
 			},
