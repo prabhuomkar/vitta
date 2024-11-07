@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"mime/multipart"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 	"vitta/adapters"
@@ -50,7 +51,8 @@ const (
 	queryDeleteTransaction = `DELETE FROM transactions WHERE account_id=$1 AND id=$2`
 	queryGetTransactions   = `SELECT t.*, c.name as category_name, p.name as payee_name FROM transactions AS t` +
 		` LEFT JOIN categories AS c ON t.category_id = c.id LEFT JOIN payees AS p ON t.payee_id = p.id` +
-		` WHERE t.account_id=$1 ORDER BY t.created_at DESC`
+		` WHERE t.account_id=$1 AND (name ILIKE '%' || COALESCE(NULLIF($2, ''), '') || '%') ORDER BY t.created_at DESC` +
+		` LIMIT $3 OFFSET $4`
 )
 
 func (h *Handler) CreateTransaction(w http.ResponseWriter, r *http.Request) {
@@ -185,8 +187,20 @@ func (h *Handler) DeleteTransaction(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (h *Handler) GetTransactions(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetTransactions(w http.ResponseWriter, r *http.Request) { //nolint: funlen
 	id := r.PathValue("id")
+	searchQuery := r.URL.Query().Get("q")
+
+	page := 0
+	limit := 50
+
+	if p, err := strconv.Atoi(r.URL.Query().Get("page")); err == nil {
+		page = p - 1
+	}
+
+	if l, err := strconv.Atoi(r.URL.Query().Get("limit")); err == nil {
+		limit = l
+	}
 
 	accountID, err := uuid.Parse(id)
 	if err != nil {
@@ -196,7 +210,7 @@ func (h *Handler) GetTransactions(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rows, err := h.db.Query(r.Context(), queryGetTransactions, accountID)
+	rows, err := h.db.Query(r.Context(), queryGetTransactions, accountID, searchQuery, page, limit)
 	if err != nil {
 		slog.Error("error getting transactions from database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
