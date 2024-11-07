@@ -53,7 +53,7 @@ const Payees = () => {
     toast({
       title: 'Payee deleted.',
       description: `Payee has been successfully deleted.`,
-      status: 'info',
+      status: 'success',
       duration: 1500,
       isClosable: true
     });

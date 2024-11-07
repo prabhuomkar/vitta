@@ -79,6 +79,7 @@ const YearMonthSelector = ({
                   color="black"
                   _selected={{ color: 'white', bg: `${primaryColor}` }}
                   p="0.4rem 0.8rem"
+                  ml={1}
                 >
                   {name}
                 </Tab>

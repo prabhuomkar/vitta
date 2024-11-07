@@ -73,7 +73,7 @@ const Account = () => {
     toast({
       title: 'Transaction deleted.',
       description: `Transaction has been successfully deleted.`,
-      status: 'info',
+      status: 'success',
       duration: 1500,
       isClosable: true
     });
