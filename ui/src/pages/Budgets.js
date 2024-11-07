@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, useTheme } from '@chakra-ui/react';
+import { Box, useTheme, useToast } from '@chakra-ui/react';
 import { useBugdets, useGroups, useCategories } from '../context';
 import {
   AddGroupModal,
@@ -10,10 +10,11 @@ import {
   YearMonthSelector,
   BudgetsTable
 } from '../components/budgets';
-import { Loading, Error } from '../components';
+import { Error } from '../components';
 
 const Budgets = () => {
   const theme = useTheme();
+  const toast = useToast();
   const primaryColor = theme.colors.primary;
 
   const { budgets, loading, error, getBudgets, createBudget } = useBugdets();
@@ -142,6 +143,13 @@ const Budgets = () => {
       setIsAddGroupOpen(false);
       setFormData({ name: '', notes: '' });
       await getBudgets(selectedYear, selectedMonth);
+      toast({
+        title: 'Group added.',
+        description: 'The group was added successfully.',
+        status: 'success',
+        duration: 1500,
+        isClosable: true
+      });
     } else {
       // eslint-disable-next-line no-console
       console.error('Error creating group:', result.error);
@@ -163,18 +171,33 @@ const Budgets = () => {
       setIsEditGroupOpen(false);
       setEditFormData({ name: '', notes: '' });
       await getBudgets(selectedYear, selectedMonth);
+      toast({
+        title: 'Group Updated.',
+        description: 'The group was updated successfully.',
+        status: 'success',
+        duration: 1500,
+        isClosable: true
+      });
     } else {
       // eslint-disable-next-line no-console
       console.error('Error updating group:', result.error);
     }
   };
 
-  const handleDeleteGroup = async () => {
-    const result = await deleteGroup(selectedGroupId);
+  const handleDeleteGroup = async groupId => {
+    const result = await deleteGroup(groupId);
+
     if (result.success) {
       setIsEditGroupOpen(false);
       setEditFormData({ name: '' });
       await getBudgets(selectedYear, selectedMonth);
+      toast({
+        title: 'Group Deleted.',
+        description: 'The group was deleted successfully.',
+        status: 'success',
+        duration: 1500,
+        isClosable: true
+      });
     } else {
       // eslint-disable-next-line no-console
       console.error('Error deleting group:', result.error);
@@ -199,6 +222,13 @@ const Budgets = () => {
       setIsAddCategoryOpen(false);
       setCategoryFormData({ name: '', notes: '' });
       await getBudgets(selectedYear, selectedMonth);
+      toast({
+        title: 'Category added.',
+        description: 'The category was added successfully.',
+        status: 'success',
+        duration: 1500,
+        isClosable: true
+      });
     } else {
       // eslint-disable-next-line no-console
       console.error('Error creating category:', result.error);
@@ -222,20 +252,35 @@ const Budgets = () => {
       setIsEditCategoryOpen(false);
       setEditCategoryFormData({ name: '', notes: '' });
       await getBudgets(selectedYear, selectedMonth);
+      toast({
+        title: 'Category updated.',
+        description: 'The category was updated successfully.',
+        status: 'success',
+        duration: 1500,
+        isClosable: true
+      });
     } else {
       // eslint-disable-next-line no-console
       console.error('Error updating category:', result.error);
     }
   };
 
-  const handleDeleteCategory = async () => {
-    const result = await deleteCategory(selectedCategoryId);
+  const handleDeleteCategory = async categoryId => {
+    const result = await deleteCategory(categoryId);
+
     if (result.success) {
       setIsEditCategoryOpen(false);
       setEditCategoryFormData({ name: '', notes: '', groupId: '' });
       setSelectedCategoryId('');
       setSelectedGroupId('');
       await getBudgets(selectedYear, selectedMonth);
+      toast({
+        title: 'Category deleted.',
+        description: 'The category was deleted successfully.',
+        status: 'success',
+        duration: 1500,
+        isClosable: true
+      });
     } else {
       // eslint-disable-next-line no-console
       console.error('Error deleting category:', result.error);
@@ -280,13 +325,19 @@ const Budgets = () => {
       setBudgetFormData({ budgeted: 0 });
       setSelectedCategoryId('');
       await getBudgets(selectedYear, selectedMonth);
+      toast({
+        title: 'Budget Set Successfully',
+        description: 'The budget for the category has been updated.',
+        status: 'success',
+        duration: 1500,
+        isClosable: true
+      });
     } else {
       // eslint-disable-next-line no-console
       console.error('Error setting budget:', result.error);
     }
   };
 
-  if (loading) return <Loading />;
   if (error) return <Error message={error.message} />;
 
   return (
@@ -322,7 +373,6 @@ const Budgets = () => {
         groupNameError={groupNameError}
         handleEditChange={handleEditChange}
         handleEditGroupSubmit={handleEditGroupSubmit}
-        handleDeleteGroup={handleDeleteGroup}
         primaryColor={primaryColor}
       />
 
@@ -345,7 +395,6 @@ const Budgets = () => {
         categoryNameError={categoryNameError}
         handleEditCategoryChange={handleEditCategoryChange}
         handleEditCategorySubmit={handleEditCategorySubmit}
-        handleDeleteCategory={handleDeleteCategory}
         primaryColor={primaryColor}
       />
 
@@ -360,7 +409,7 @@ const Budgets = () => {
       />
 
       {/* Budgets Table */}
-      {!loading && !error && (
+      {!error && (
         <BudgetsTable
           groupedBudgetsArray={groupedBudgetsArray}
           openGroups={openGroups}
@@ -378,7 +427,9 @@ const Budgets = () => {
           setIsSetBudgetOpen={setIsSetBudgetOpen}
           setSelectedCategoryId={setSelectedCategoryId}
           setBudgetFormData={setBudgetFormData}
-          primaryColor={primaryColor}
+          handleDeleteGroup={handleDeleteGroup}
+          handleDeleteCategory={handleDeleteCategory}
+          loading={loading}
         />
       )}
     </Box>

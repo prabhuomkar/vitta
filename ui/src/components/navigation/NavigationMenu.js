@@ -200,7 +200,12 @@ const NavigationMenu = ({ onClose }) => {
             <Text fontSize="sm" padding="0.4rem 0.8rem" color="gray.500">
               No accounts available
             </Text>
-            <Button onClick={() => setIsPopoverOpen(true)} size="xs">
+            <Button
+              onClick={() => setIsPopoverOpen(true)}
+              colorScheme={primaryColor}
+              bg={primaryColor}
+              size="xs"
+            >
               Add account
             </Button>
           </Flex>
@@ -228,17 +233,19 @@ const NavigationMenu = ({ onClose }) => {
           ))
         )}
         <Divider />
-        <Button
-          width="100%"
-          colorScheme={primaryColor}
-          bgColor={primaryColor}
-          onClick={() => {
-            navigate('/accounts');
-            onClose();
-          }}
-        >
-          Manage Accounts
-        </Button>
+        {accounts.length > 0 && (
+          <Button
+            width="100%"
+            colorScheme={primaryColor}
+            bgColor={primaryColor}
+            onClick={() => {
+              navigate('/accounts');
+              onClose();
+            }}
+          >
+            Manage Accounts
+          </Button>
+        )}
       </>
     </VStack>
   );

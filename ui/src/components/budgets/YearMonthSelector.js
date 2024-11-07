@@ -59,7 +59,6 @@ const YearMonthSelector = ({
           alignItems="center"
           flexDirection={{ base: 'column', md: 'row' }}
           width="100%"
-          padding="0.4rem"
           overflow="scroll"
         >
           <Tabs

@@ -12,13 +12,16 @@ import {
   IconButton,
   Tooltip,
   Text,
-  Button
+  Button,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Portal
 } from '@chakra-ui/react';
-import {
-  ChevronDownIcon,
-  ChevronUpIcon,
-  HamburgerIcon
-} from '@chakra-ui/icons';
+import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
+import { GoKebabHorizontal } from 'react-icons/go';
+import Loading from '../Loading';
 import { formatCurrency } from '../../utils/formatCurrency';
 
 const BudgetsTable = ({
@@ -38,8 +41,12 @@ const BudgetsTable = ({
   setIsSetBudgetOpen,
   setSelectedCategoryId,
   setBudgetFormData,
-  primaryColor
+  handleDeleteGroup,
+  handleDeleteCategory,
+  loading
 }) => {
+  if (loading) return <Loading />;
+
   return (
     <Box overflowX="auto">
       <Table
@@ -98,32 +105,49 @@ const BudgetsTable = ({
                         openDelay={500}
                         label={group.groupNotes}
                       >
-                        <Text
-                          cursor="pointer"
-                          onClick={() => {
-                            setEditFormData({
-                              name: group.groupName,
-                              notes: group.groupNotes
-                            });
-                            setSelectedGroupId(group.groupId);
-                            setIsEditGroupOpen(true);
-                          }}
-                        >
-                          {group.groupName}
-                        </Text>
+                        <Text cursor="pointer">{group.groupName}</Text>
                       </Tooltip>
                       {hoveredRow === group.groupId && (
-                        <IconButton
-                          size="xs"
-                          variant="outline"
-                          icon={<HamburgerIcon />}
-                          onClick={() => {
-                            setIsAddCategoryOpen(true);
-                            setSelectedGroupId(group.groupId);
-                            setCategoryFormData({ name: '', notes: '' });
-                          }}
-                          ml={2}
-                        />
+                        <Menu>
+                          <MenuButton
+                            as={IconButton}
+                            size="xs"
+                            ml={2}
+                            aria-label="Options"
+                            icon={<GoKebabHorizontal fontSize="14px" />}
+                            variant="outline"
+                          />
+                          <Portal>
+                            <MenuList fontSize="sm">
+                              <MenuItem
+                                onClick={() => {
+                                  setIsAddCategoryOpen(true);
+                                  setSelectedGroupId(group.groupId);
+                                  setCategoryFormData({ name: '', notes: '' });
+                                }}
+                              >
+                                Add Category
+                              </MenuItem>
+                              <MenuItem
+                                onClick={() => {
+                                  setEditFormData({
+                                    name: group.groupName,
+                                    notes: group.groupNotes
+                                  });
+                                  setSelectedGroupId(group.groupId);
+                                  setIsEditGroupOpen(true);
+                                }}
+                              >
+                                Edit Group
+                              </MenuItem>
+                              <MenuItem
+                                onClick={() => handleDeleteGroup(group.groupId)}
+                              >
+                                Delete Group
+                              </MenuItem>
+                            </MenuList>
+                          </Portal>
+                        </Menu>
                       )}
                     </Flex>
                   </Td>
@@ -168,38 +192,69 @@ const BudgetsTable = ({
                                         }
                                       >
                                         {category.categoryName || (
-                                          <Button
-                                            colorScheme={primaryColor}
-                                            bg={primaryColor}
-                                            size="xs"
-                                          >
+                                          <Button size="xs">
                                             Add Category
                                           </Button>
                                         )}
                                       </Text>
                                     </Tooltip>
                                     {category.categoryId && (
-                                      <IconButton
-                                        size="xs"
-                                        variant="outline"
-                                        icon={<HamburgerIcon />}
-                                        onClick={() => {
-                                          setIsSetBudgetOpen(true);
-                                          setSelectedCategoryId(
+                                      <Menu>
+                                        <MenuButton
+                                          as={IconButton}
+                                          size="xs"
+                                          ml={2}
+                                          aria-label="Options"
+                                          icon={
+                                            <GoKebabHorizontal fontSize="14px" />
+                                          }
+                                          variant="outline"
+                                          visibility={
+                                            hoveredCategory ===
                                             category.categoryId
-                                          );
-                                          setBudgetFormData({
-                                            budgeted: category.budgeted
-                                          });
-                                        }}
-                                        ml={2}
-                                        visibility={
-                                          hoveredCategory ===
-                                          category.categoryId
-                                            ? 'visible'
-                                            : 'hidden'
-                                        }
-                                      />
+                                              ? 'visible'
+                                              : 'hidden'
+                                          }
+                                        />
+                                        <Portal>
+                                          <MenuList fontSize="sm">
+                                            <MenuItem
+                                              onClick={() => {
+                                                setIsSetBudgetOpen(true);
+                                                setSelectedCategoryId(
+                                                  category.categoryId
+                                                );
+                                                setBudgetFormData({
+                                                  budgeted: category.budgeted
+                                                });
+                                              }}
+                                            >
+                                              Set Budget
+                                            </MenuItem>
+                                            <MenuItem
+                                              onClick={() =>
+                                                openEditCategoryModal(
+                                                  group.groupId,
+                                                  category.categoryId,
+                                                  category.categoryName,
+                                                  category.categoryNotes
+                                                )
+                                              }
+                                            >
+                                              Edit Category
+                                            </MenuItem>
+                                            <MenuItem
+                                              onClick={() =>
+                                                handleDeleteCategory(
+                                                  category.categoryId
+                                                )
+                                              }
+                                            >
+                                              Delete Category
+                                            </MenuItem>
+                                          </MenuList>
+                                        </Portal>
+                                      </Menu>
                                     )}
                                   </Flex>
                                 </Td>

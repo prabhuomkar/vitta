@@ -22,7 +22,6 @@ const EditGroupModal = ({
   groupNameError,
   handleEditChange,
   handleEditGroupSubmit,
-  handleDeleteGroup,
   primaryColor
 }) => {
   return (
@@ -60,11 +59,9 @@ const EditGroupModal = ({
                 colorScheme={primaryColor}
                 bg={primaryColor}
                 type="submit"
-                mr={3}
               >
                 Update
               </Button>
-              <Button onClick={handleDeleteGroup}>Delete</Button>
             </ModalFooter>
           </form>
         </ModalBody>

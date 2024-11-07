@@ -61,11 +61,9 @@ const EditCategoryModal = ({
                 colorScheme={primaryColor}
                 bg={primaryColor}
                 type="submit"
-                mr={3}
               >
                 Update
               </Button>
-              <Button onClick={handleDeleteCategory}>Delete</Button>
             </ModalFooter>
           </form>
         </ModalBody>

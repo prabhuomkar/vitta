@@ -55,8 +55,7 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
         description: 'The transaction was added successfully.',
         status: 'success',
         duration: 1500,
-        isClosable: true,
-        position: 'bottom'
+        isClosable: true
       });
 
       setName('');
@@ -72,8 +71,7 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
           'There was an error while adding the transaction. Please try again.',
         status: 'error',
         duration: 1500,
-        isClosable: true,
-        position: 'top'
+        isClosable: true
       });
     }
   };
