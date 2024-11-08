@@ -76,7 +76,8 @@ const (
 		` g.notes as group_notes FROM groups AS g LEFT JOIN categories AS cg` +
 		` ON cg.group_id = g.id LEFT JOIN budgets ON budgets.category_id = cg.id AND budgets.year = $1 AND` +
 		` budgets.month = $2 LEFT JOIN(SELECT category_id, SUM(credit) AS total_credit, SUM(debit) AS total_debit,` +
-		` SUM(credit - debit) AS spent FROM transactions GROUP BY category_id) AS t ON cg.id = t.category_id` +
+		` SUM(credit - debit) AS spent FROM transactions WHERE EXTRACT(YEAR FROM created_at) = $1 AND` +
+		` EXTRACT(MONTH FROM created_at) = $2 GROUP BY category_id) AS t ON cg.id = t.category_id` +
 		` ORDER BY g.created_at ASC`
 )
 

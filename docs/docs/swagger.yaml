@@ -402,6 +402,25 @@ paths:
           description: Not Found
         '500':
           description: Internal Error
+  /v1/adapters:
+    get:
+      tags:
+        - Accounts
+      summary: Get all supported adapters
+      operationId: getAdapters
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Adapters'
+        '401':
+          description: Unauthenticated
+        '500':
+          description: Internal Error
   /v1/accounts:
     post:
       tags:
@@ -811,6 +830,19 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Payee'
+    Adapter:
+      type: object
+      properties:
+        name:
+          type: string
+          example: icici
+        category:
+          type: string
+          enum: ["CASH/CHECK IN", "CC", "FD/RD", "EPF", "NPS", "SSY"]
+    Adapters:
+      type: array
+      items:
+        $ref: '#/components/schemas/Adapter'
     Transaction:
       type: object
       properties:

@@ -183,3 +183,20 @@ func TestGetAccounts(t *testing.T) {
 	}
 	executeTests(t, tests)
 }
+
+func TestGetAdapters(t *testing.T) {
+	tests := []testCase{
+		{
+			"error due to auth", http.MethodGet, "/v1/adapters", false, nil,
+			nil, nil,
+			http.StatusUnauthorized, "Unauthorized",
+		},
+		{
+			"success", http.MethodGet, "/v1/adapters", true, nil,
+			nil,
+			nil,
+			http.StatusOK, "icici",
+		},
+	}
+	executeTests(t, tests)
+}
