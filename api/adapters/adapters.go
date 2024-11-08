@@ -50,7 +50,14 @@ func New(filePath string) (map[string]Config, error) {
 
 	adapters := map[string]Config{}
 
+	headerRead := false
+
 	for _, row := range rows {
+		if !headerRead {
+			headerRead = true
+			continue
+		}
+
 		adapters[row[0]+"-"+row[1]] = Config{
 			DateName:        row[2],
 			DateFormats:     strings.Split(row[3], ";"),

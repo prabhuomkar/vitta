@@ -1,0 +1,176 @@
+---
+id: get-adapters
+title: "Get all supported adapters"
+description: "Get all supported adapters"
+sidebar_label: "Get all supported adapters"
+hide_title: true
+hide_table_of_contents: true
+api: eJyFU8tu2zAQ/BVhz4xkB+1FpxqOkxgtAqNqChSGDmtqbTGRSJaknBoG/71YWXGUB9oTieVwdjkzPELAnYd8DTMpTaeDh1KAseQwKKOXFeSwozCr0AZyHgR4kp1T4QD5+ggb9ErOulBDvi5jKcCRt0Z78pAf4XIy4aUiL52yzAc5FJ2U5JlJGh1IB4agtY2SfcvswTPuCF7W1CLvwsES5IDO4QEEqECtH9XN5oFkAAHW8eBBnbprbGmE8sEpvQMB9Adb23BJSSUVRAESA+2MO3wI113L+sxnxW02v13MvybLOxAwn4OA66vs+xUIWKyuQcDdqgABRfELyhgFBBX6NoN48L7kIUZGfppM3wt1r7ELNenAwlDF1z9/JOhSB3Iam2ThnHHAfK8BNxQSbJrEd9YaF6hK8MXOlkJtBpdZQmQvIdtPMxx77va8Y8s710AOdQjW51m2VyHgRUWtSbfNIVUGOAXPGSnYwpMbo6ScNWYSZu9RkJ8w/QOU3poeOOj1k9sks9US3j5utlomhSWptkN+kq1xSY8fIoayjxi1qHhy63BTd6Z9RPfFtmlLLGyjJGlPL7GBmUVZU3KZTkCM3pxn2dPTU4r9aWrcLhuu+uzbcr64KxYXl+kkrUPbMC+rdppzmk7SCZes8aFFPWr1T39evfasXKA/IbMNKs2U/XjHwbs17Kcg4ExRCqiND3xwPG7Q071rYuTy74448utSwB6dwg1LvS6jgJqwItfb/UgHVkNKspyPPTZd/xfffli2/Zylm8UPHuG12yd3xbAy9/O/1ocRcz/kKSr3noPdUowghkG6oQRR/P/+Cr1/Mq4a3bdDCWIZY/wLJjSt0Q==
+sidebar_class_name: "get api-method"
+info_path: docs/swagger/vitta-api
+custom_edit_url: null
+---
+
+import ApiTabs from "@theme/ApiTabs";
+import DiscriminatorTabs from "@theme/DiscriminatorTabs";
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import SecuritySchemes from "@theme/ApiExplorer/SecuritySchemes";
+import MimeTabs from "@theme/MimeTabs";
+import ParamsItem from "@theme/ParamsItem";
+import ResponseSamples from "@theme/ResponseSamples";
+import SchemaItem from "@theme/SchemaItem";
+import SchemaTabs from "@theme/SchemaTabs";
+import Heading from "@theme/Heading";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Get all supported adapters"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/v1/adapters"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Get all supported adapters
+
+<div>
+  <div>
+    <ApiTabs
+      label={undefined}
+      id={undefined}
+    >
+      <TabItem
+        label={"200"}
+        value={"200"}
+      >
+        <div>
+          
+          
+          Success
+          
+          
+        </div><div>
+          <MimeTabs
+            className={"openapi-tabs__mime"}
+            schemaType={"response"}
+          >
+            <TabItem
+              label={"application/json"}
+              value={"application/json"}
+            >
+              <SchemaTabs
+                className={"openapi-tabs__schema"}
+              >
+                <TabItem
+                  label={"Schema"}
+                  value={"Schema"}
+                >
+                  <details
+                    style={{}}
+                    className={"openapi-markdown__details response"}
+                    data-collapsed={false}
+                    open={true}
+                  >
+                    <summary
+                      style={{}}
+                      className={"openapi-markdown__details-summary-response"}
+                    >
+                      <strong>
+                        Schema
+                      </strong>
+                    </summary><div
+                      style={{"textAlign":"left","marginLeft":"1rem"}}
+                    >
+                      
+                    </div><ul
+                      style={{"marginLeft":"1rem"}}
+                    >
+                      <li>
+                        <div
+                          style={{"fontSize":"var(--ifm-code-font-size)","opacity":"0.6","marginLeft":"-.5rem","paddingBottom":".5rem"}}
+                        >
+                          Array [
+                        </div>
+                      </li><SchemaItem
+                        collapsible={false}
+                        name={"name"}
+                        required={false}
+                        schemaName={"string"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"string","example":"icici"}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={false}
+                        name={"category"}
+                        required={false}
+                        schemaName={"string"}
+                        qualifierMessage={"**Possible values:** [`CASH/CHECK IN`, `CC`, `FD/RD`, `EPF`, `NPS`, `SSY`]"}
+                        schema={{"type":"string","enum":["CASH/CHECK IN","CC","FD/RD","EPF","NPS","SSY"]}}
+                      >
+                        
+                      </SchemaItem><li>
+                        <div
+                          style={{"fontSize":"var(--ifm-code-font-size)","opacity":"0.6","marginLeft":"-.5rem"}}
+                        >
+                          ]
+                        </div>
+                      </li>
+                    </ul>
+                  </details>
+                </TabItem><TabItem
+                  label={"Example (from schema)"}
+                  value={"Example (from schema)"}
+                >
+                  <ResponseSamples
+                    responseExample={"[\n  {\n    \"name\": \"icici\",\n    \"category\": \"CASH/CHECK IN\"\n  }\n]"}
+                    language={"json"}
+                  >
+                    
+                  </ResponseSamples>
+                </TabItem>
+              </SchemaTabs>
+            </TabItem>
+          </MimeTabs>
+        </div>
+      </TabItem><TabItem
+        label={"401"}
+        value={"401"}
+      >
+        <div>
+          
+          
+          Unauthenticated
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem><TabItem
+        label={"500"}
+        value={"500"}
+      >
+        <div>
+          
+          
+          Internal Error
+          
+          
+        </div><div>
+          
+        </div>
+      </TabItem>
+    </ApiTabs>
+  </div>
+</div>
+      

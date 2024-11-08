@@ -4,21 +4,30 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 
 	uuid "github.com/google/uuid"
 )
 
-// Account model.
-type Account struct {
-	ID        uuid.UUID `json:"id"`
-	Name      string    `json:"name"`
-	OffBudget *bool     `json:"offBudget"`
-	Category  string    `json:"category"`
-	Adapter   string    `json:"adapter"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
-}
+type (
+	// Account model.
+	Account struct {
+		ID        uuid.UUID `json:"id"`
+		Name      string    `json:"name"`
+		OffBudget *bool     `json:"offBudget"`
+		Category  string    `json:"category"`
+		Adapter   string    `json:"adapter"`
+		CreatedAt time.Time `json:"createdAt"`
+		UpdatedAt time.Time `json:"updatedAt"`
+	}
+
+	// Adapter model.
+	Adapter struct {
+		Name     string `json:"name"`
+		Category string `json:"category"`
+	}
+)
 
 const (
 	queryCreateAccount = `INSERT INTO accounts (id, name, off_budget, category, adapter, created_at, updated_at)` +
@@ -168,5 +177,26 @@ func (h *Handler) GetAccounts(w http.ResponseWriter, r *http.Request) {
 	err = json.NewEncoder(w).Encode(accounts)
 	if err != nil {
 		slog.Error("error encoding accounts response", "error", err)
+	}
+}
+
+func (h *Handler) GetAdapters(w http.ResponseWriter, r *http.Request) {
+	adapters := []Adapter{}
+
+	for key := range h.adapters {
+		splits := strings.Split(key, "-")
+
+		adapters = append(adapters, Adapter{
+			Name:     splits[0],
+			Category: splits[1],
+		})
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	err := json.NewEncoder(w).Encode(adapters)
+	if err != nil {
+		slog.Error("error encoding adapters response", "error", err)
 	}
 }
