@@ -108,6 +108,12 @@ const sidebar: SidebarsConfig = {
       items: [
         {
           type: "doc",
+          id: "swagger/get-adapters",
+          label: "Get all supported adapters",
+          className: "api-method get",
+        },
+        {
+          type: "doc",
           id: "swagger/create-account",
           label: "Create a new account",
           className: "api-method post",
