@@ -180,7 +180,7 @@ func (h *Handler) GetAccounts(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Handler) GetAdapters(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetAdapters(w http.ResponseWriter, _ *http.Request) {
 	adapters := []Adapter{}
 
 	for key := range h.adapters {

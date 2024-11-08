@@ -55,6 +55,7 @@ func New(filePath string) (map[string]Config, error) {
 	for _, row := range rows {
 		if !headerRead {
 			headerRead = true
+
 			continue
 		}
 
