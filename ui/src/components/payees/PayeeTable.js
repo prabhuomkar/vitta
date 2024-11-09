@@ -14,7 +14,13 @@ const PayeeTable = ({
   errors
 }) => {
   return (
-    <Table variant="simple" bg="white" border="gray.300" borderRadius="md">
+    <Table
+      size="sm"
+      variant="simple"
+      bg="white"
+      border="gray.300"
+      borderRadius="md"
+    >
       <Thead>
         <Tr>
           <Th padding="0.6rem">Payee Name</Th>

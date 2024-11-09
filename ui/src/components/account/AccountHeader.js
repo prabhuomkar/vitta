@@ -38,13 +38,14 @@ const AccountHeader = ({
           flex={[null, '2']}
           mx={[0, 4]}
           width={['100%', 'auto']}
+          maxLength={255}
         />
         <Button
           leftIcon={<AddIcon boxSize={3} />}
           width={['100%', 'auto']}
           onClick={() => setModalOpen(true)}
         >
-          Add Transaction
+          Add
         </Button>
         <Button
           leftIcon={<ArrowDownIcon />}
@@ -53,7 +54,7 @@ const AccountHeader = ({
           bgColor={primaryColor}
           onClick={openFileDialog}
         >
-          Import Transactions
+          Import
         </Button>
         <Input
           type="file"
@@ -62,6 +63,7 @@ const AccountHeader = ({
           accept=".csv, .xls, .xlsx"
           width={['100%', 'auto']}
           display="none"
+          maxLength={255}
         />
       </Flex>
     </CardBody>

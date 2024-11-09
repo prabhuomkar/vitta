@@ -53,7 +53,7 @@ const Payees = () => {
     toast({
       title: 'Payee deleted.',
       description: `Payee has been successfully deleted.`,
-      status: 'info',
+      status: 'success',
       duration: 1500,
       isClosable: true
     });
@@ -75,6 +75,11 @@ const Payees = () => {
   };
 
   const handleSaveChanges = async (id, updatedPayee) => {
+    const originalPayee = payees.find(payee => payee.id === id);
+    if (!originalPayee || originalPayee.name === updatedPayee.name.trim()) {
+      return;
+    }
+
     if (!updatedPayee.name.trim()) return;
 
     try {

@@ -6,7 +6,6 @@ import {
   deleteTransaction
 } from '../api/transactionsApi';
 
-// Fetch all transactions for a specific account
 export const fetchTransactions = async accountId => {
   try {
     const response = await getTransactions(accountId);
@@ -18,7 +17,6 @@ export const fetchTransactions = async accountId => {
   }
 };
 
-// Create a new transaction for a specific account
 export const addTransaction = async (accountId, transactionData) => {
   try {
     const response = await createTransaction(accountId, transactionData);
@@ -30,34 +28,23 @@ export const addTransaction = async (accountId, transactionData) => {
   }
 };
 
-// export const uploadTransactions = async (accountId, file) => {
-//   try {
-//     const response = await importTransactions(accountId, file);
-//     return response.data;
-//   } catch (error) {
-//     // eslint-disable-next-line no-console
-//     console.log('Error importing transaction:', error);
-//     throw error;
-//   }
-// };
-
 export const uploadTransactions = async (accountId, file) => {
+  // eslint-disable-next-line no-useless-catch
   try {
     const response = await importTransactions(accountId, file);
-    console.log('API Response:', response); // Log the entire response for debugging
+    // console.log('API Response:', response);
 
     if (response.status !== 200) {
       throw new Error(`Unexpected status code: ${response.status}`);
     }
 
-    return response.data; // Return the data from the response if status is 200
+    return response.data;
   } catch (error) {
-    console.log('Error importing transaction:', error);
-    throw error; // Rethrow the error to be caught in importTransactions
+    // console.log('Error importing transaction:', error);
+    throw error;
   }
 };
 
-// Update a transaction for a specific account
 export const editTransaction = async (
   accountId,
   transactionId,
@@ -77,7 +64,6 @@ export const editTransaction = async (
   }
 };
 
-// Delete a transaction for a specific account
 export const removeTransaction = async (accountId, transactionId) => {
   try {
     const response = await deleteTransaction(accountId, transactionId);

@@ -14,14 +14,15 @@ const PayeeRow = ({
       <Td padding="0.6rem">
         <Input
           value={payee.name || ''}
-          maxLength={50}
           onChange={e => handleFieldChange(payee.id, 'name', e.target.value)}
           onBlur={() =>
             handleSaveChanges(payee.id, { ...payee, name: payee.name })
           }
           placeholder="Payee Name"
           isInvalid={isFieldInvalid}
-          errorBorderColor="red.300"
+          errorBorderColor="red.500"
+          size="sm"
+          maxLength={255}
         />
       </Td>
       <Td padding="0.6rem">
@@ -30,6 +31,7 @@ const PayeeRow = ({
           icon={<DeleteIcon />}
           variant="outline"
           onClick={() => handleDelete(payee.id)}
+          size="sm"
         />
       </Td>
     </Tr>

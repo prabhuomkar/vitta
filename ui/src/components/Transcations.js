@@ -13,6 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { useParams } from 'react-router-dom';
 import { useTransactions } from '../context';
+import Error from './Error';
 
 const Transactions = () => {
   const { accountId } = useParams();
@@ -46,10 +47,10 @@ const Transactions = () => {
       title: 'Error loading transactions.',
       description: error.message,
       status: 'error',
-      duration: 3000,
+      duration: 1500,
       isClosable: true
     });
-    return <Box>Error loading transactions: {error.message}</Box>;
+    return <Error message={error.message} />;
   }
 
   return (
