@@ -27,7 +27,7 @@ const Accounts = () => {
     toast({
       title: 'Account deleted.',
       description: 'Account has been successfully deleted.',
-      status: 'info',
+      status: 'success',
       duration: 1500,
       isClosable: true
     });

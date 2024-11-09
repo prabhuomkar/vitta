@@ -122,6 +122,7 @@ const NavigationMenu = ({ onClose }) => {
                 aria-label="Add account"
                 size="sm"
                 icon={<PlusSquareIcon />}
+                fontSize="16px"
                 variant="outline"
                 onClick={() => setIsPopoverOpen(true)}
               />

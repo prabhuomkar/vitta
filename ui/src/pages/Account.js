@@ -198,6 +198,7 @@ const Account = () => {
         fileInputRef={fileInputRef}
         handleSearch={handleSearch}
         searchQuery={searchQuery}
+        transactionsCount={localTransactions}
       />
       <Box my="4" />
       <TransactionsTable

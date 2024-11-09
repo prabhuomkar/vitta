@@ -7,15 +7,11 @@ export const importTransactions = (id, file) => {
   const formData = new FormData();
   formData.append('file', file);
 
-  return axiosInstance.put(
-    `/accounts/${id}/transactions?adapter=icici`,
-    formData,
-    {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
+  return axiosInstance.put(`/accounts/${id}/transactions`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
     }
-  );
+  });
 };
 
 export const createTransaction = (id, data) =>

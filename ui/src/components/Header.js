@@ -43,7 +43,7 @@ const Header = ({ onOpen, logoSrc }) => {
         variant="unstyled"
         aria-label="Open Menu"
       />
-      <Flex align="center">
+      <Flex align="center" cursor="pointer">
         <Image
           src={logoSrc}
           alt="Logo"

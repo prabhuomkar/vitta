@@ -8,7 +8,9 @@ import {
   StatNumber,
   StatHelpText,
   Input,
-  Button
+  Button,
+  Text,
+  Box
 } from '@chakra-ui/react';
 import { AddIcon, ArrowDownIcon } from '@chakra-ui/icons';
 
@@ -23,14 +25,17 @@ const AccountHeader = ({
   handleFileChange,
   fileInputRef,
   handleSearch,
-  searchQuery
+  searchQuery,
+  transactionsCount
 }) => {
   const [inputValue, setInputValue] = useState(searchQuery);
   const debounceTimeoutRef = useRef(null);
+  const [searchComplete, setSearchComplete] = useState(false);
 
   const onInputChange = e => {
     const query = e.target.value;
     setInputValue(query);
+    setSearchComplete(false);
 
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current);
@@ -38,7 +43,8 @@ const AccountHeader = ({
 
     debounceTimeoutRef.current = setTimeout(() => {
       handleSearch(query);
-    }, 800);
+      setSearchComplete(true);
+    }, 600);
   };
 
   return (
@@ -53,7 +59,7 @@ const AccountHeader = ({
             <StatHelpText>CASH/CHECK IN</StatHelpText>
           </Stat>
           <Input
-            placeholder="Search"
+            placeholder="Search Transactions"
             flex={[null, '2']}
             mx={[0, 4]}
             width={['100%', 'auto']}
@@ -87,6 +93,14 @@ const AccountHeader = ({
             maxLength={255}
           />
         </Flex>
+        <Box>
+          {inputValue && searchComplete && (
+            <Text color="gray.500" fontSize="xs">
+              Showing {transactionsCount.length} transaction
+              {transactionsCount.length !== 1 ? 's' : ''}
+            </Text>
+          )}
+        </Box>
       </CardBody>
     </Card>
   );
