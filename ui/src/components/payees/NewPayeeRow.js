@@ -10,8 +10,8 @@ const NewPayeeRow = ({ newPayee, setNewPayee, handleAddPayee }) => {
           value={newPayee}
           onChange={e => setNewPayee(e.target.value)}
           placeholder="New Payee Name"
-          maxLength={50}
           size="sm"
+          maxLength={255}
         />
       </Td>
       <Td padding="0.6rem">

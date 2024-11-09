@@ -29,7 +29,6 @@ export const addCategory = async categoryData => {
 
 export const editCategory = async (id, categoryData) => {
   try {
-    console.log(id, categoryData);
     const response = await updateCatrgory(id, categoryData);
     return response.data;
   } catch (error) {

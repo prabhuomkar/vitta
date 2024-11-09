@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Tr, Td, Input, Select, Checkbox, IconButton } from '@chakra-ui/react';
 import { DeleteIcon } from '@chakra-ui/icons';
-import { ACCOUNT_CATEGORIES } from '../common/constants';
+import { ACCOUNT_CATEGORIES, ADAPTERS } from '../common/constants';
 
 const AccountRow = ({ account, onDelete, onSave }) => {
   const [localAccount, setLocalAccount] = useState(account);
@@ -23,6 +23,7 @@ const AccountRow = ({ account, onDelete, onSave }) => {
           onBlur={handleBlur}
           placeholder="Account Name"
           size="sm"
+          maxLength={255}
         />
       </Td>
       <Td padding="0.6rem">
@@ -36,6 +37,21 @@ const AccountRow = ({ account, onDelete, onSave }) => {
           {ACCOUNT_CATEGORIES.map(cat => (
             <option key={cat} value={cat}>
               {cat}
+            </option>
+          ))}
+        </Select>
+      </Td>
+      <Td padding="0.6rem">
+        <Select
+          value={localAccount.adapter || ''}
+          onChange={e => handleFieldChange('adapter', e.target.value)}
+          onBlur={handleBlur}
+          placeholder="Select Adapter"
+          size="sm"
+        >
+          {ADAPTERS.map(adapter => (
+            <option key={adapter} value={adapter}>
+              {adapter}
             </option>
           ))}
         </Select>

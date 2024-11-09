@@ -14,7 +14,6 @@ const PayeeRow = ({
       <Td padding="0.6rem">
         <Input
           value={payee.name || ''}
-          maxLength={50}
           onChange={e => handleFieldChange(payee.id, 'name', e.target.value)}
           onBlur={() =>
             handleSaveChanges(payee.id, { ...payee, name: payee.name })
@@ -23,6 +22,7 @@ const PayeeRow = ({
           isInvalid={isFieldInvalid}
           errorBorderColor="red.500"
           size="sm"
+          maxLength={255}
         />
       </Td>
       <Td padding="0.6rem">

@@ -33,10 +33,12 @@ const SetBudgetModal = ({
               <FormLabel>Budget</FormLabel>
               <Input
                 type="number"
+                step="0.01"
                 name="budgeted"
-                value={budgetFormData.budgeted}
+                value={budgetFormData.budgeted || 0}
                 onChange={e => setBudgetFormData({ budgeted: e.target.value })}
                 placeholder="Enter Budget Amount"
+                maxLength={255}
               />
             </FormControl>
             <ModalFooter margin="auto" mb={2} p={0}>

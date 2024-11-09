@@ -34,6 +34,14 @@ const Accounts = () => {
   };
 
   const handleSaveChanges = async (id, updatedAccount) => {
+    const originalAccount = accounts.find(account => account.id === id);
+
+    const hasChanges = Object.keys(updatedAccount).some(
+      key => updatedAccount[key] !== originalAccount[key]
+    );
+
+    if (!hasChanges) return;
+
     try {
       await updateAccount(id, updatedAccount);
     } catch (err) {
@@ -52,45 +60,48 @@ const Accounts = () => {
 
   return (
     <Box overflowX="auto" borderRadius="md">
-      <Table
-        size="sm"
-        variant="simple"
-        bg="white"
-        border="gray.300"
-        borderRadius="md"
-      >
-        <Thead>
-          <Tr>
-            <Th padding="0.6rem">Account Name</Th>
-            <Th padding="0.6rem">Account Category</Th>
-            <Th padding="0.6rem">Off Budget</Th>
-            <Th padding="0.6rem">Actions</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {localAccounts.length > 0 ? (
-            localAccounts.map(account => (
-              <AccountRow
-                key={account.id}
-                account={account}
-                onDelete={handleDelete}
-                onSave={handleSaveChanges}
-              />
-            ))
-          ) : (
+      {!loading && !error && (
+        <Table
+          size="sm"
+          variant="simple"
+          bg="white"
+          border="gray.300"
+          borderRadius="md"
+        >
+          <Thead>
             <Tr>
-              <Td
-                padding="0.6rem"
-                colSpan={4}
-                textAlign="center"
-                color="gray.500"
-              >
-                No accounts available
-              </Td>
+              <Th padding="0.6rem">Account Name</Th>
+              <Th padding="0.6rem">Account Category</Th>
+              <Th padding="0.6rem">Adapter</Th>
+              <Th padding="0.6rem">Off Budget</Th>
+              <Th padding="0.6rem">Actions</Th>
             </Tr>
-          )}
-        </Tbody>
-      </Table>
+          </Thead>
+          <Tbody>
+            {localAccounts.length > 0 ? (
+              localAccounts.map(account => (
+                <AccountRow
+                  key={account.id}
+                  account={account}
+                  onDelete={handleDelete}
+                  onSave={handleSaveChanges}
+                />
+              ))
+            ) : (
+              <Tr>
+                <Td
+                  padding="0.6rem"
+                  colSpan={4}
+                  textAlign="center"
+                  color="gray.500"
+                >
+                  No accounts available
+                </Td>
+              </Tr>
+            )}
+          </Tbody>
+        </Table>
+      )}
     </Box>
   );
 };

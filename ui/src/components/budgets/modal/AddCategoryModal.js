@@ -40,6 +40,7 @@ const AddCategoryModal = ({
                 value={categoryFormData.name}
                 onChange={handleCategoryChange}
                 placeholder="Enter Category Name"
+                maxLength={255}
               />
               {categoryNameError && (
                 <FormErrorMessage>{categoryNameError}</FormErrorMessage>
@@ -53,6 +54,7 @@ const AddCategoryModal = ({
                 value={categoryFormData.notes}
                 onChange={handleCategoryChange}
                 placeholder="Enter Notes"
+                maxLength={512}
               />
             </FormControl>
             <ModalFooter margin="auto" mb={2} p={0}>

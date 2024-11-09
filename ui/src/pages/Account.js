@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Box, useTheme, useToast } from '@chakra-ui/react';
+import isEqual from 'lodash.isequal';
 import { useParams } from 'react-router-dom';
 import {
   useAccounts,
@@ -35,6 +36,8 @@ const Account = () => {
   const { categories } = useCategories();
   const [isModalOpen, setModalOpen] = useState(false);
   const [localTransactions, setLocalTransactions] = useState(transactions);
+  const [originalTransactions, setOriginalTransactions] =
+    useState(transactions);
   const [validationErrors, setValidationErrors] = useState({});
   const [, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
@@ -42,6 +45,8 @@ const Account = () => {
   useEffect(() => {
     const fetchTransactions = async () => {
       if (accountId) {
+        setLocalTransactions([]);
+        setOriginalTransactions([]);
         await getTransactions(accountId);
       }
     };
@@ -51,6 +56,7 @@ const Account = () => {
 
   useEffect(() => {
     setLocalTransactions(transactions);
+    setOriginalTransactions(JSON.parse(JSON.stringify(transactions)));
   }, [transactions]);
 
   const totalClearedCredit = useMemo(() => {
@@ -100,6 +106,7 @@ const Account = () => {
 
   const handleSaveChanges = async index => {
     const transaction = localTransactions[index];
+    const originalTransaction = originalTransactions[index];
 
     const errors = {};
     if (!transaction.name) {
@@ -117,10 +124,13 @@ const Account = () => {
       transaction.payeeId = null;
     }
 
-    await updateTransaction(transaction.id, {
-      ...transaction,
-      clearedAt: transaction.clearedAt
-    });
+    const hasChanges = !isEqual(transaction, originalTransaction);
+    if (hasChanges) {
+      await updateTransaction(transaction.id, {
+        ...transaction,
+        clearedAt: transaction.clearedAt
+      });
+    }
   };
 
   const handleFileUpload = async file => {
@@ -137,7 +147,6 @@ const Account = () => {
 
     try {
       const response = await importTransactions(file);
-      // eslint-disable-next-line no-console
       await getTransactions(accountId);
 
       if (response?.success) {
@@ -169,12 +178,12 @@ const Account = () => {
     fileInputRef.current.click();
   };
 
-  const accountName = accounts.filter(account => account.id === accountId);
+  const accountName = accounts.find(account => account.id === accountId)?.name;
 
   return (
     <Box>
       <AccountHeader
-        accountName={accountName[0]?.name}
+        accountName={accountName}
         totalClearedCredit={totalClearedCredit}
         totalClearedDebit={totalClearedDebit}
         formatCurrency={formatCurrency}
@@ -198,6 +207,7 @@ const Account = () => {
       <AddTransactionModal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
+        getTransactions={() => getTransactions(accountId)}
       />
     </Box>
   );

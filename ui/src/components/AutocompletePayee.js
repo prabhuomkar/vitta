@@ -68,7 +68,7 @@ const AutocompletePayee = () => {
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
           placeholder="Search Payee"
-          maxLength={50}
+          maxLength={255}
         />
         {filteredPayees.length > 0 && (
           <List

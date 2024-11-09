@@ -38,6 +38,7 @@ const AccountHeader = ({
           flex={[null, '2']}
           mx={[0, 4]}
           width={['100%', 'auto']}
+          maxLength={255}
         />
         <Button
           leftIcon={<AddIcon boxSize={3} />}
@@ -62,6 +63,7 @@ const AccountHeader = ({
           accept=".csv, .xls, .xlsx"
           width={['100%', 'auto']}
           display="none"
+          maxLength={255}
         />
       </Flex>
     </CardBody>

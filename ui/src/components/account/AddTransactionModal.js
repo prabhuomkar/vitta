@@ -18,7 +18,7 @@ import {
 } from '@chakra-ui/react';
 import { useTransactions } from '../../context';
 
-const AddTransactionModal = ({ isOpen, onClose }) => {
+const AddTransactionModal = ({ isOpen, onClose, getTransactions }) => {
   const theme = useTheme();
   const primaryColor = theme.colors.primary;
   const [name, setName] = useState('');
@@ -33,8 +33,6 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
   const handleSubmit = async () => {
     const newErrors = {};
     if (!name) newErrors.name = 'Name is required';
-    if (!credit) newErrors.credit = 'Credit is required';
-    if (!debit) newErrors.debit = 'Debit is required';
 
     setErrors(newErrors);
 
@@ -49,6 +47,7 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
 
     try {
       await createTransaction(transactionData);
+      await getTransactions();
 
       toast({
         title: 'Transaction added.',
@@ -89,13 +88,14 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder="Transaction Name"
+              maxLength={255}
             />
             {errors.name && <Box color="red.500">{errors.name}</Box>}
           </FormControl>
           <FormControl mt={4} isInvalid={errors.credit}>
             <FormLabel>Credit</FormLabel>
             <Input
-              value={credit}
+              value={credit || 0}
               onChange={e => setCredit(e.target.value)}
               placeholder="Credit Amount"
               type="number"
@@ -106,7 +106,7 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
           <FormControl mt={4} isInvalid={errors.debit}>
             <FormLabel>Debit</FormLabel>
             <Input
-              value={debit}
+              value={debit || 0}
               onChange={e => setDebit(e.target.value)}
               placeholder="Debit Amount"
               type="number"
@@ -120,6 +120,7 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
               value={notes}
               onChange={e => setNotes(e.target.value)}
               placeholder="Additional Notes"
+              maxLength={512}
             />
           </FormControl>
         </ModalBody>

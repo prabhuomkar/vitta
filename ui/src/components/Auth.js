@@ -96,6 +96,7 @@ const Auth = () => {
               borderColor={errors.username ? 'red.500' : 'gray.300'}
               borderWidth={errors.username ? '2px' : '1px'}
               focusBorderColor={primaryColor}
+              maxLength={255}
             />
             {errors.username && <Box color="red.500">{errors.username}</Box>}
           </FormControl>
@@ -109,6 +110,7 @@ const Auth = () => {
               borderColor={errors.password ? 'red.500' : 'gray.300'}
               borderWidth={errors.password ? '2px' : '1px'}
               focusBorderColor={primaryColor}
+              maxLength={255}
             />
             {errors.password && <Box color="red.500">{errors.password}</Box>}
           </FormControl>

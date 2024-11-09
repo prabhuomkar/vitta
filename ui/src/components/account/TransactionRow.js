@@ -21,6 +21,7 @@ const TransactionRow = ({
         onBlur={() => handleSaveChanges(index)}
         borderColor={validationErrors[index]?.name ? 'red.500' : undefined}
         size="sm"
+        maxLength={255}
       />
     </Td>
     <Td padding="0.6rem">
@@ -85,6 +86,7 @@ const TransactionRow = ({
         onChange={e => handleInputChange(index, 'notes', e.target.value)}
         onBlur={() => handleSaveChanges(index)}
         size="sm"
+        maxLength={512}
       />
     </Td>
     <Td padding="0.6rem">

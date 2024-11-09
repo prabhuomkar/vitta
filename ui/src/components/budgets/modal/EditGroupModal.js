@@ -40,6 +40,7 @@ const EditGroupModal = ({
                 value={editFormData.name}
                 onChange={handleEditChange}
                 placeholder="Enter Group Name"
+                maxLength={255}
               />
               {groupNameError && (
                 <FormErrorMessage>{groupNameError}</FormErrorMessage>
@@ -52,6 +53,7 @@ const EditGroupModal = ({
                 value={editFormData.notes}
                 onChange={handleEditChange}
                 placeholder="Enter Notes"
+                maxLength={512}
               />
             </FormControl>
             <ModalFooter margin="auto" mb={2} p={0}>

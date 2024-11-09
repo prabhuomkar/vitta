@@ -75,6 +75,11 @@ const Payees = () => {
   };
 
   const handleSaveChanges = async (id, updatedPayee) => {
+    const originalPayee = payees.find(payee => payee.id === id);
+    if (!originalPayee || originalPayee.name === updatedPayee.name.trim()) {
+      return;
+    }
+
     if (!updatedPayee.name.trim()) return;
 
     try {

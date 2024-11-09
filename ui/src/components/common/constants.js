@@ -8,3 +8,5 @@ export const ACCOUNT_CATEGORIES = [
   'NPS',
   'SSY'
 ];
+
+export const ADAPTERS = ['icici'];

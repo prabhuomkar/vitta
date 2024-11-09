@@ -28,7 +28,7 @@ import {
 } from '@chakra-ui/react';
 import { PlusSquareIcon } from '@chakra-ui/icons';
 import { useAccounts } from '../../context';
-import { NAV_ITEMS, ACCOUNT_CATEGORIES } from '../common/constants';
+import { NAV_ITEMS, ACCOUNT_CATEGORIES, ADAPTERS } from '../common/constants';
 
 const NavigationMenu = ({ onClose }) => {
   const location = useLocation();
@@ -43,13 +43,14 @@ const NavigationMenu = ({ onClose }) => {
   // Form state
   const [accountName, setAccountName] = useState('');
   const [accountCategory, setAccountCategory] = useState('');
+  const [accountAdapter, setAccountAdapter] = useState('');
   const [offBudget, setOffBudget] = useState(false);
   const [formError, setFormError] = useState('');
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const handleCreateAccount = async () => {
-    if (!accountName || !accountCategory) {
-      setFormError('Account name and category are required.');
+    if (!accountName || !accountCategory || !accountAdapter) {
+      setFormError('Account name, category and adapter are required.');
       return;
     }
 
@@ -57,6 +58,7 @@ const NavigationMenu = ({ onClose }) => {
       await createAccount({
         name: accountName,
         category: accountCategory,
+        adapter: accountAdapter,
         offBudget
       });
 
@@ -70,6 +72,7 @@ const NavigationMenu = ({ onClose }) => {
 
       setAccountName('');
       setAccountCategory('');
+      setAccountAdapter('');
       setOffBudget(false);
       setFormError('');
       setIsPopoverOpen(false);
@@ -117,6 +120,7 @@ const NavigationMenu = ({ onClose }) => {
             <PopoverTrigger>
               <IconButton
                 aria-label="Add account"
+                size="sm"
                 icon={<PlusSquareIcon />}
                 variant="outline"
                 onClick={() => setIsPopoverOpen(true)}
@@ -138,6 +142,7 @@ const NavigationMenu = ({ onClose }) => {
                       placeholder="Enter account name"
                       value={accountName}
                       onChange={e => setAccountName(e.target.value)}
+                      maxLength={255}
                     />
                   </FormControl>
                   <FormControl
@@ -147,13 +152,31 @@ const NavigationMenu = ({ onClose }) => {
                   >
                     <FormLabel>Account Category</FormLabel>
                     <Select
-                      placeholder="Select category"
+                      placeholder="Select Category"
                       value={accountCategory}
                       onChange={e => setAccountCategory(e.target.value)}
                     >
                       {ACCOUNT_CATEGORIES.map(category => (
                         <option key={category} value={category}>
                           {category}
+                        </option>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <FormControl
+                    id="account-adapter"
+                    mb={4}
+                    isInvalid={formError && !accountAdapter}
+                  >
+                    <FormLabel>Adapter</FormLabel>
+                    <Select
+                      placeholder="Select Adapter"
+                      value={accountAdapter}
+                      onChange={e => setAccountAdapter(e.target.value)}
+                    >
+                      {ADAPTERS.map(adapter => (
+                        <option key={adapter} value={adapter}>
+                          {adapter}
                         </option>
                       ))}
                     </Select>

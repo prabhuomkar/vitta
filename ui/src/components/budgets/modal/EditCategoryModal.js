@@ -22,7 +22,6 @@ const EditCategoryModal = ({
   categoryNameError,
   handleEditCategoryChange,
   handleEditCategorySubmit,
-  handleDeleteCategory,
   primaryColor
 }) => {
   return (
@@ -41,6 +40,7 @@ const EditCategoryModal = ({
                 value={editCategoryFormData.name}
                 onChange={handleEditCategoryChange}
                 placeholder="Enter Category Name"
+                maxLength={255}
               />
               {categoryNameError && (
                 <FormErrorMessage>{categoryNameError}</FormErrorMessage>
@@ -54,6 +54,7 @@ const EditCategoryModal = ({
                 value={editCategoryFormData.notes}
                 onChange={handleEditCategoryChange}
                 placeholder="Enter Notes"
+                maxLength={512}
               />
             </FormControl>
             <ModalFooter margin="auto" mb={2} p={0}>
