@@ -6,9 +6,9 @@ import {
   deleteTransaction
 } from '../api/transactionsApi';
 
-export const fetchTransactions = async accountId => {
+export const fetchTransactions = async (accountId, query) => {
   try {
-    const response = await getTransactions(accountId);
+    const response = await getTransactions(accountId, query);
     return response.data;
   } catch (error) {
     // eslint-disable-next-line no-console

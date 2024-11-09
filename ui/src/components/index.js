@@ -10,6 +10,7 @@ import {
 } from './account';
 import Error from './Error';
 import Loading from './Loading';
+import LoadingTransactions from './LoadingTransactions';
 
 export {
   MainLayout,
@@ -21,5 +22,6 @@ export {
   AddTransactionModal,
   TransactionsTable,
   Error,
-  Loading
+  Loading,
+  LoadingTransactions
 };

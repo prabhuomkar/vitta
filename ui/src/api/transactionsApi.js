@@ -1,7 +1,7 @@
 import axiosInstance from './axiosInstance';
 
-export const getTransactions = id =>
-  axiosInstance.get(`/accounts/${id}/transactions`);
+export const getTransactions = (id, query) =>
+  axiosInstance.get(`/accounts/${id}/transactions?q=${query}`);
 
 export const importTransactions = (id, file) => {
   const formData = new FormData();

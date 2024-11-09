@@ -14,22 +14,31 @@ export const TransactionsProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [accountId, setAccountId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const getTransactions = useCallback(async id => {
-    setLoading(true);
-    try {
-      const data = await fetchTransactions(id);
-      setTransactions(data);
-      setAccountId(id);
-      setError(null);
-      return { success: true };
-    } catch (err) {
-      setError('Failed to load transactions');
-      return { success: false, error: err };
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const getTransactions = useCallback(
+    async (id, query = searchQuery) => {
+      setLoading(true);
+      try {
+        const data = await fetchTransactions(id, query);
+        setTransactions(data);
+        setAccountId(id);
+        setError(null);
+        return { success: true };
+      } catch (err) {
+        setError('Failed to load transactions');
+        return { success: false, error: err };
+      } finally {
+        setLoading(false);
+      }
+    },
+    [searchQuery]
+  );
+
+  const updateSearchQuery = query => {
+    setSearchQuery(query);
+    getTransactions(accountId, query);
+  };
 
   const createTransaction = async transactionData => {
     if (!accountId) {
@@ -121,7 +130,9 @@ export const TransactionsProvider = ({ children }) => {
         createTransaction,
         importTransactions,
         updateTransaction,
-        deleteTransaction
+        deleteTransaction,
+        searchQuery,
+        updateSearchQuery
       }}
     >
       {children}
