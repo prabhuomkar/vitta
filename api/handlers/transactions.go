@@ -48,8 +48,10 @@ const (
 		` debit, name, notes, cleared_at, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
 	queryUpdateTransaction = `UPDATE transactions SET category_id=$2, payee_id=$3,` +
 		` credit=$4, debit=$5, name=$6, notes=$7, cleared_at=$8, updated_at=$9 WHERE account_id=$1 AND id=$10`
-	queryDeleteTransaction = `DELETE FROM transactions WHERE account_id=$1 AND id=$2`
-	queryGetTransactions   = `SELECT t.*, c.name as category_name, p.name as payee_name FROM transactions AS t` +
+	queryDeleteTransaction    = `DELETE FROM transactions WHERE account_id=$1 AND id=$2`
+	queryGetTotalTransactions = `SELECT COUNT(*) as total FROM transactions WHERE account_id=$1 AND (name ILIKE '%' ||` +
+		` COALESCE(NULLIF($2, ''), '') || '%')`
+	queryGetTransactions = `SELECT t.*, c.name as category_name, p.name as payee_name FROM transactions AS t` +
 		` LEFT JOIN categories AS c ON t.category_id = c.id LEFT JOIN payees AS p ON t.payee_id = p.id` +
 		` WHERE t.account_id=$1 AND (t.name ILIKE '%' || COALESCE(NULLIF($2, ''), '') || '%') ORDER BY t.created_at DESC` +
 		` OFFSET $3 LIMIT $4`
@@ -187,7 +189,7 @@ func (h *Handler) DeleteTransaction(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (h *Handler) GetTransactions(w http.ResponseWriter, r *http.Request) { //nolint: funlen
+func (h *Handler) GetTransactions(w http.ResponseWriter, r *http.Request) { //nolint: funlen,cyclop
 	id := r.PathValue("id")
 	searchQuery := r.URL.Query().Get("q")
 
@@ -210,7 +212,28 @@ func (h *Handler) GetTransactions(w http.ResponseWriter, r *http.Request) { //no
 		return
 	}
 
-	rows, err := h.db.Query(r.Context(), queryGetTransactions, accountID, searchQuery, page*limit, limit)
+	rows, err := h.db.Query(r.Context(), queryGetTotalTransactions, accountID, searchQuery)
+	if err != nil {
+		slog.Error("error getting total transactions from database", "error", err)
+		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
+
+		return
+	}
+	defer rows.Close()
+
+	var total int
+
+	for rows.Next() {
+		err = rows.Scan(&total)
+		if err != nil {
+			slog.Error("error scanning total transactions row from database", "error", err)
+			buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
+
+			return
+		}
+	}
+
+	rows, err = h.db.Query(r.Context(), queryGetTransactions, accountID, searchQuery, page*limit, limit)
 	if err != nil {
 		slog.Error("error getting transactions from database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
@@ -247,7 +270,7 @@ func (h *Handler) GetTransactions(w http.ResponseWriter, r *http.Request) { //no
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	err = json.NewEncoder(w).Encode(transactions)
+	err = json.NewEncoder(w).Encode(map[string]interface{}{"total": total, "transactions": transactions})
 	if err != nil {
 		slog.Error("error encoding transactions response", "error", err)
 	}
