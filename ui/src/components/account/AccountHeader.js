@@ -26,7 +26,7 @@ const AccountHeader = ({
   fileInputRef,
   handleSearch,
   searchQuery,
-  transactionsCount
+  total
 }) => {
   const [inputValue, setInputValue] = useState(searchQuery);
   const debounceTimeoutRef = useRef(null);
@@ -96,8 +96,8 @@ const AccountHeader = ({
         <Box>
           {inputValue && searchComplete && (
             <Text color="gray.500" fontSize="xs">
-              Showing {transactionsCount.length} transaction
-              {transactionsCount.length !== 1 ? 's' : ''}
+              Found {total} transaction
+              {total !== 1 ? 's' : ''}
             </Text>
           )}
         </Box>

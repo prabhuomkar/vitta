@@ -1,4 +1,10 @@
-import React, { createContext, useState, useCallback, useContext } from 'react';
+import React, {
+  createContext,
+  useState,
+  useCallback,
+  useContext,
+  useEffect
+} from 'react';
 import {
   fetchTransactions,
   addTransaction,
@@ -11,19 +17,33 @@ export const TransactionsContext = createContext();
 
 export const TransactionsProvider = ({ children }) => {
   const [transactions, setTransactions] = useState([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [accountId, setAccountId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [limit] = useState(6);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const totalPages = Math.ceil(total / limit);
 
   const getTransactions = useCallback(
-    async (id, query = searchQuery) => {
+    async (id, query = searchQuery, pageNum = page, pageLimit = limit) => {
       setLoading(true);
       try {
-        const data = await fetchTransactions(id, query);
-        setTransactions(data);
+        const data = await fetchTransactions(id, {
+          query,
+          page: pageNum,
+          limit: pageLimit
+        });
+        setTransactions(data.transactions || []);
+        setTotal(data.total || 0);
         setAccountId(id);
         setError(null);
+
+        const totalPageCount = Math.ceil(data.total / pageLimit);
+        setHasNextPage(pageNum < totalPageCount);
+
         return { success: true };
       } catch (err) {
         setError('Failed to load transactions');
@@ -32,13 +52,28 @@ export const TransactionsProvider = ({ children }) => {
         setLoading(false);
       }
     },
-    [searchQuery]
+    [searchQuery, page, limit]
   );
 
   const updateSearchQuery = query => {
     setSearchQuery(query);
-    getTransactions(accountId, query);
+    setPage(1);
+    getTransactions(accountId, query, page, limit);
   };
+
+  const goToNextPage = () => {
+    if (hasNextPage) setPage(prev => prev + 1);
+  };
+
+  const goToPreviousPage = () => {
+    setPage(prev => (prev > 1 ? prev - 1 : 1));
+  };
+
+  useEffect(() => {
+    if (accountId) {
+      getTransactions(accountId, searchQuery, page);
+    }
+  }, [accountId, page, searchQuery, getTransactions]);
 
   const createTransaction = async transactionData => {
     if (!accountId) {
@@ -55,13 +90,13 @@ export const TransactionsProvider = ({ children }) => {
     }
   };
 
-  const importTransactions = async file => {
-    if (!accountId) {
+  const importTransactions = async (accId, file) => {
+    if (!accId) {
       return { success: false, error: new Error('Account ID is missing') };
     }
 
     try {
-      const importedTransactions = await uploadTransactions(accountId, file);
+      const importedTransactions = await uploadTransactions(accId, file);
 
       if (Array.isArray(importedTransactions)) {
         setTransactions([...transactions, ...importedTransactions]);
@@ -124,6 +159,8 @@ export const TransactionsProvider = ({ children }) => {
       // eslint-disable-next-line react/jsx-no-constructed-context-values
       value={{
         transactions,
+        total,
+        totalPages,
         loading,
         error,
         getTransactions,
@@ -132,7 +169,11 @@ export const TransactionsProvider = ({ children }) => {
         updateTransaction,
         deleteTransaction,
         searchQuery,
-        updateSearchQuery
+        updateSearchQuery,
+        goToNextPage,
+        goToPreviousPage,
+        page,
+        hasNextPage
       }}
     >
       {children}

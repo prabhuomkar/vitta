@@ -36,7 +36,7 @@ const LoadingTransactions = () => (
         </Tr>
       </Thead>
       <Tbody>
-        {Array.from({ length: 4 }).map((x, rowIndex) => (
+        {Array.from({ length: 6 }).map((x, rowIndex) => (
           // eslint-disable-next-line react/no-array-index-key
           <Tr key={rowIndex}>
             {Array.from({ length: 8 }).map((y, colIndex) => (

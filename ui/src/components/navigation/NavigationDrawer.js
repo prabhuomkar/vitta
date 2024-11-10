@@ -1,5 +1,7 @@
 import React from 'react';
 import {
+  Box,
+  Text,
   Drawer,
   DrawerBody,
   DrawerHeader,
@@ -20,6 +22,9 @@ const NavigationDrawer = ({ isOpen, onClose }) => {
             <NavigationMenu onClose={onClose} />
           </DrawerBody>
         </DrawerContent>
+        <Box as="footer" width="100%" color="gray.400" textAlign="center">
+          <Text fontSize="xs">&copy; {new Date().getFullYear()} Vitta</Text>
+        </Box>
       </DrawerOverlay>
     </Drawer>
   );

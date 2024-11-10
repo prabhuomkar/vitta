@@ -12,6 +12,7 @@ import {
   AccountHeader,
   AddTransactionModal,
   TransactionsTable,
+  Pagination,
   Error
 } from '../components';
 import { formatCurrency } from '../utils';
@@ -23,6 +24,8 @@ const Account = () => {
   const primaryColor = theme.colors.primary;
   const {
     transactions,
+    total,
+    totalPages,
     loading,
     error,
     getTransactions,
@@ -30,7 +33,11 @@ const Account = () => {
     updateTransaction,
     deleteTransaction,
     searchQuery,
-    updateSearchQuery
+    updateSearchQuery,
+    goToNextPage,
+    goToPreviousPage,
+    page,
+    hasNextPage
   } = useTransactions();
   const { accounts } = useAccounts();
   const { payees } = usePayees();
@@ -150,7 +157,7 @@ const Account = () => {
     }
 
     try {
-      const response = await importTransactions(file);
+      const response = await importTransactions(accountId, file);
       await getTransactions(accountId);
 
       if (response?.success) {
@@ -198,7 +205,7 @@ const Account = () => {
         fileInputRef={fileInputRef}
         handleSearch={handleSearch}
         searchQuery={searchQuery}
-        transactionsCount={localTransactions}
+        total={total}
       />
       <Box my="4" />
       <TransactionsTable
@@ -210,6 +217,14 @@ const Account = () => {
         categories={categories}
         handleCheckboxChange={handleCheckboxChange}
         handleDelete={handleDelete}
+        loading={loading}
+      />
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        goToNextPage={goToNextPage}
+        goToPreviousPage={goToPreviousPage}
+        hasNextPage={hasNextPage}
         loading={loading}
       />
       <AddTransactionModal

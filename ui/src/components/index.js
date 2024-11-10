@@ -6,7 +6,8 @@ import { AccountRow } from './accounts';
 import {
   AccountHeader,
   AddTransactionModal,
-  TransactionsTable
+  TransactionsTable,
+  Pagination
 } from './account';
 import Error from './Error';
 import Loading from './Loading';
@@ -21,6 +22,7 @@ export {
   AccountHeader,
   AddTransactionModal,
   TransactionsTable,
+  Pagination,
   Error,
   Loading,
   LoadingTransactions

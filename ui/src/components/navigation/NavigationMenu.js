@@ -23,6 +23,7 @@ import {
   Portal,
   Skeleton,
   FormLabel,
+  Box,
   useTheme,
   useToast
 } from '@chakra-ui/react';
@@ -271,6 +272,9 @@ const NavigationMenu = ({ onClose }) => {
           </Button>
         )}
       </>
+      <Box as="footer" width="100%" color="gray.400" textAlign="center">
+        <Text fontSize="xs">&copy; {new Date().getFullYear()} Vitta</Text>
+      </Box>
     </VStack>
   );
 };

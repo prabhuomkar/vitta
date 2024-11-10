@@ -38,7 +38,7 @@ const TransactionsTable = ({
           </Tr>
         </Thead>
         <Tbody>
-          {localTransactions.length > 0 ? (
+          {!loading && localTransactions.length > 0 ? (
             localTransactions.map((transaction, index) => (
               <TransactionRow
                 key={transaction.id}
