@@ -903,9 +903,18 @@ components:
           example: 2024-10-07T01:02:03Z
           readOnly: true
     Transactions:
-      type: array
-      items:
-        $ref: '#/components/schemas/Transaction'
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int64
+          example: 10
+          readOnly: true
+        accountId:
+          readOnly: true
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
     TransactionsResult:
       type: object
       properties:
@@ -913,10 +922,12 @@ components:
           type: integer
           format: int64
           example: 10
+          readOnly: true
         imported:
           type: integer
           format: int64
           example: 6
+          readOnly: true
     Budget:
       type: object
       properties:
