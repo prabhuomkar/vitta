@@ -20,6 +20,7 @@ type (
 		Adapter   string    `json:"adapter"`
 		CreatedAt time.Time `json:"createdAt"`
 		UpdatedAt time.Time `json:"updatedAt"`
+		Balance   float64   `json:"balance"`
 	}
 
 	// Adapter model.
@@ -34,8 +35,9 @@ const (
 		` VALUES ($1, $2, $3, $4, $5, $6, $7)`
 	queryUpdateAccount = `UPDATE accounts SET name=$1, off_budget=$2, category=$3, adapter=$4, updated_at=$5 WHERE id=$6`
 	queryDeleteAccount = `DELETE FROM accounts WHERE id=$1`
-	queryGetAccount    = "SELECT * FROM accounts WHERE id=$1"
-	queryGetAccounts   = `SELECT * FROM accounts ORDER BY created_at DESC`
+	queryGetAccount    = `SELECT * FROM accounts WHERE id=$1`
+	queryGetAccounts   = `SELECT a.*, COALESCE(SUM(t.credit)-SUM(t.debit), 0) as balance FROM accounts a LEFT JOIN` +
+		` transactions t ON a.id = t.account_id GROUP BY a.id ORDER BY a.created_at DESC`
 )
 
 func (h *Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {
@@ -153,7 +155,8 @@ func (h *Handler) GetAccounts(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var acc Account
 
-		err := rows.Scan(&acc.ID, &acc.Name, &acc.OffBudget, &acc.Category, &acc.Adapter, &acc.CreatedAt, &acc.UpdatedAt)
+		err := rows.Scan(&acc.ID, &acc.Name, &acc.OffBudget, &acc.Category, &acc.Adapter,
+			&acc.CreatedAt, &acc.UpdatedAt, &acc.Balance)
 		if err != nil {
 			slog.Error("error scanning accounts row from database", "error", err)
 			buildErrorResponse(w, err.Error(), http.StatusInternalServerError)

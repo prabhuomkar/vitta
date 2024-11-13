@@ -19,6 +19,7 @@ var (
 	testAdapter     = "icici"
 	testAccountTime = time.Now()
 	accountRowCols  = []string{"id", "name", "off_budget", "category", "adapter", "created_at", "updated_at"}
+	accountsRowCols = []string{"id", "name", "off_budget", "category", "adapter", "created_at", "updated_at", "balance"}
 )
 
 func TestCreateAccount(t *testing.T) {
@@ -159,7 +160,7 @@ func TestGetAccounts(t *testing.T) {
 			"error scanning accounts rows from db", http.MethodGet, "/v1/accounts", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(accountRowCols).AddRow("invalid", "ok", "false", "category", "adapter", "bad-time", "bad-time"))
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(accountsRowCols).AddRow("invalid", "ok", "false", "category", "adapter", "bad-time", "bad-time", "bad-value"))
 			},
 			http.StatusInternalServerError, "Scanning value error",
 		},
@@ -167,7 +168,7 @@ func TestGetAccounts(t *testing.T) {
 			"error reading accounts rows from db", http.MethodGet, "/v1/accounts", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(accountRowCols).RowError(0, errors.New("some error in db")))
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(accountsRowCols).RowError(0, errors.New("some error in db")))
 			},
 			http.StatusInternalServerError, "some error in db",
 		},
@@ -175,8 +176,8 @@ func TestGetAccounts(t *testing.T) {
 			"success", http.MethodGet, "/v1/accounts", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(accountRowCols).AddRow(testAccountID.String(), testAccountName, &testOffBudget, testCategory,
-					testAdapter, testAccountTime, testAccountTime))
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(accountsRowCols).AddRow(testAccountID.String(), testAccountName, &testOffBudget, testCategory,
+					testAdapter, testAccountTime, testAccountTime, testAmount))
 			},
 			http.StatusOK, testAccountID.String(),
 		},
