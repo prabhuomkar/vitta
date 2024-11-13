@@ -809,6 +809,11 @@ components:
         adapter:
           type: string
           example: "icici"
+        balance:
+          type: number
+          format: float
+          multipleOf: 0.2
+          example: 12.25
         createdAt:
           type: string
           format: date-time
