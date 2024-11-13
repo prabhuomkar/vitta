@@ -144,34 +144,54 @@ func TestGetGroups(t *testing.T) {
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
-			"error getting groups from db", http.MethodGet, "/v1/groups", true, nil,
+			"error getting total groups from db", http.MethodGet, "/v1/groups?q=some", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WillReturnError(pgx.ErrNoRows)
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnError(pgx.ErrNoRows)
 			},
 			http.StatusInternalServerError, "no rows",
 		},
 		{
-			"error scanning groups rows from db", http.MethodGet, "/v1/groups", true, nil,
+			"error scanning total groups rows from db", http.MethodGet, "/v1/groups?q=some", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(groupRowCols).AddRow("invalid", "ok", "no", "bad-time", "bad-time"))
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows([]string{"total"}).AddRow(""))
+			},
+			http.StatusInternalServerError, "not supported",
+		},
+		{
+			"error getting groups from db", http.MethodGet, "/v1/groups?q=some", true, nil,
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows([]string{"total"}).AddRow(1))
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnError(pgx.ErrNoRows)
+			},
+			http.StatusInternalServerError, "no rows",
+		},
+		{
+			"error scanning groups rows from db", http.MethodGet, "/v1/groups?q=some", true, nil,
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows([]string{"total"}).AddRow(1))
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows(groupRowCols).AddRow("invalid", "ok", "no", "bad-time", "bad-time"))
 			},
 			http.StatusInternalServerError, "Scanning value error",
 		},
 		{
-			"error reading groups rows from db", http.MethodGet, "/v1/groups", true, nil,
+			"error reading groups rows from db", http.MethodGet, "/v1/groups?q=some", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(groupRowCols).RowError(0, errors.New("some error in db")))
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows([]string{"total"}).AddRow(1))
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows(groupRowCols).RowError(0, errors.New("some error in db")))
 			},
 			http.StatusInternalServerError, "some error in db",
 		},
 		{
-			"success", http.MethodGet, "/v1/groups", true, nil,
+			"success", http.MethodGet, "/v1/groups?q=some", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
-				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(groupRowCols).AddRow(testGroupID.String(), testGroupName,
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows([]string{"total"}).AddRow(1))
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows(groupRowCols).AddRow(testGroupID.String(), testGroupName,
 					"notes", testAccountTime, testAccountTime))
 			},
 			http.StatusOK, testGroupID.String(),
@@ -303,9 +323,26 @@ func TestGetCategories(t *testing.T) {
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
+			"error getting total categories from db", http.MethodGet, "/v1/categories?q=some", true, nil,
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnError(pgx.ErrNoRows)
+			},
+			http.StatusInternalServerError, "no rows",
+		},
+		{
+			"error scanning total categories rows from db", http.MethodGet, "/v1/categories?q=some", true, nil,
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows([]string{"total"}).AddRow(""))
+			},
+			http.StatusInternalServerError, "not supported",
+		},
+		{
 			"error getting categories from db", http.MethodGet, "/v1/categories?q=some", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows([]string{"total"}).AddRow(1))
 				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnError(pgx.ErrNoRows)
 			},
 			http.StatusInternalServerError, "no rows",
@@ -314,6 +351,7 @@ func TestGetCategories(t *testing.T) {
 			"error scanning categories rows from db", http.MethodGet, "/v1/categories?q=some", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows([]string{"total"}).AddRow(1))
 				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows(categoryRowCols).
 					AddRow("invalid", "invalid", "ok", "ok", "bad-time", "bad-time"))
 			},
@@ -323,6 +361,7 @@ func TestGetCategories(t *testing.T) {
 			"error reading categories rows from db", http.MethodGet, "/v1/categories?q=some", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows([]string{"total"}).AddRow(1))
 				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows(categoryRowCols).
 					RowError(0, errors.New("some error in db")))
 			},
@@ -332,6 +371,7 @@ func TestGetCategories(t *testing.T) {
 			"success", http.MethodGet, "/v1/categories?q=some", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows([]string{"total"}).AddRow(1))
 				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(
 					pgxmock.NewRows(categoryRowCols).AddRow(testCategoryID.String(), testGroupID.String(),
 						testCategoryName, "notes", testAccountTime, testAccountTime))

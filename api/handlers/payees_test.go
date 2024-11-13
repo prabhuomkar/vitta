@@ -136,9 +136,26 @@ func TestGetPayees(t *testing.T) {
 			http.StatusUnauthorized, "Unauthorized",
 		},
 		{
+			"error getting total payees from db", http.MethodGet, "/v1/payees?q=some", true, nil,
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnError(pgx.ErrNoRows)
+			},
+			http.StatusInternalServerError, "no rows",
+		},
+		{
+			"error scanning total payees rows from db", http.MethodGet, "/v1/payees?q=some", true, nil,
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows([]string{"total"}).AddRow(""))
+			},
+			http.StatusInternalServerError, "not supported",
+		},
+		{
 			"error getting payees from db", http.MethodGet, "/v1/payees?q=some", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows([]string{"total"}).AddRow(1))
 				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnError(pgx.ErrNoRows)
 			},
 			http.StatusInternalServerError, "no rows",
@@ -147,6 +164,7 @@ func TestGetPayees(t *testing.T) {
 			"error scanning payees rows from db", http.MethodGet, "/v1/payees?q=some", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows([]string{"total"}).AddRow(1))
 				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows(payeeRowCols).
 					AddRow("invalid", "ok", "bad-time", "bad-time"))
 			},
@@ -156,6 +174,7 @@ func TestGetPayees(t *testing.T) {
 			"error reading payees rows from db", http.MethodGet, "/v1/payees?q=some", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows([]string{"total"}).AddRow(1))
 				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows(payeeRowCols).
 					RowError(0, errors.New("some error in db")))
 			},
@@ -165,6 +184,7 @@ func TestGetPayees(t *testing.T) {
 			"success", http.MethodGet, "/v1/payees?q=some", true, nil,
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows([]string{"total"}).AddRow(1))
 				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows(payeeRowCols).
 					AddRow(testPayeeID.String(), testPayeeName, testAccountTime, testAccountTime))
 			},

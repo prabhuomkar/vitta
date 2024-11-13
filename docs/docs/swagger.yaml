@@ -736,9 +736,18 @@ components:
           example: 2024-10-07T01:02:03Z
           readOnly: true
     Groups:
-      type: array
-      items:
-        $ref: '#/components/schemas/Group'
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int64
+          example: 10
+          readOnly: true
+        groups:
+          readOnly: true
+          type: array
+          items:
+            $ref: '#/components/schemas/Group'
     Category:
       type: object
       properties:
@@ -768,9 +777,18 @@ components:
           example: 2024-10-07T01:02:03Z
           readOnly: true
     Categories:
-      type: array
-      items:
-        $ref: '#/components/schemas/Category'
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int64
+          example: 10
+          readOnly: true
+        categories:
+          readOnly: true
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
     Account:
       type: object
       properties:
@@ -827,9 +845,18 @@ components:
           example: 2024-10-07T01:02:03Z
           readOnly: true
     Payees:
-      type: array
-      items:
-        $ref: '#/components/schemas/Payee'
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int64
+          example: 10
+          readOnly: true
+        groups:
+          readOnly: true
+          type: array
+          items:
+            $ref: '#/components/schemas/Payee'
     Adapter:
       type: object
       properties:
@@ -910,7 +937,7 @@ components:
           format: int64
           example: 10
           readOnly: true
-        accountId:
+        transactions:
           readOnly: true
           type: array
           items:

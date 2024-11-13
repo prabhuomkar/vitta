@@ -61,12 +61,17 @@ const (
 		` VALUES ($1, $2, $3, $4, $5)`
 	queryUpdateGroup    = `UPDATE groups SET name=$1, notes=$2, updated_at=$3 WHERE id=$4`
 	queryDeleteGroup    = `DELETE FROM groups WHERE id=$1`
-	queryGetGroups      = `SELECT * FROM groups ORDER BY created_at DESC`
+	queryGetTotalGroups = `SELECT COUNT(*) as total FROM groups WHERE (name ILIKE '%' ||` +
+		` COALESCE(NULLIF($1, ''), '') || '%')`
+	queryGetGroups = `SELECT * FROM groups WHERE (name ILIKE '%' || COALESCE(NULLIF($1, ''), '')` +
+		` || '%') ORDER BY created_at DESC`
 	queryCreateCategory = `INSERT INTO categories (id, group_id, name, notes, created_at, updated_at)` +
 		` VALUES ($1, $2, $3, $4, $5, $6)`
-	queryUpdateCategory = `UPDATE categories SET name=$1, notes=$2, group_id=$3, updated_at=$4 WHERE id=$5`
-	queryDeleteCategory = `DELETE FROM categories WHERE id=$1`
-	queryGetCategories  = `SELECT * FROM categories WHERE (name ILIKE '%' || COALESCE(NULLIF($1, ''), '')` +
+	queryUpdateCategory     = `UPDATE categories SET name=$1, notes=$2, group_id=$3, updated_at=$4 WHERE id=$5`
+	queryDeleteCategory     = `DELETE FROM categories WHERE id=$1`
+	queryGetTotalCategories = `SELECT COUNT(*) as total FROM categories WHERE (name ILIKE '%' ||` +
+		` COALESCE(NULLIF($1, ''), '') || '%')`
+	queryGetCategories = `SELECT * FROM categories WHERE (name ILIKE '%' || COALESCE(NULLIF($1, ''), '')` +
 		` || '%') ORDER BY created_at DESC`
 	querySetBudget = `INSERT INTO budgets (id, category_id, year, month, budgeted, created_at,` +
 		` updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (year, month, category_id) DO UPDATE SET budgeted=$5`
@@ -180,8 +185,31 @@ func (h *Handler) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (h *Handler) GetGroups(w http.ResponseWriter, r *http.Request) {
-	rows, err := h.db.Query(r.Context(), queryGetGroups)
+func (h *Handler) GetGroups(w http.ResponseWriter, r *http.Request) { //nolint: funlen
+	searchQuery := r.URL.Query().Get("q")
+
+	rows, err := h.db.Query(r.Context(), queryGetTotalGroups, searchQuery)
+	if err != nil {
+		slog.Error("error getting total groups from database", "error", err)
+		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
+
+		return
+	}
+	defer rows.Close()
+
+	var total int
+
+	for rows.Next() {
+		err = rows.Scan(&total)
+		if err != nil {
+			slog.Error("error scanning total groups row from database", "error", err)
+			buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
+
+			return
+		}
+	}
+
+	rows, err = h.db.Query(r.Context(), queryGetGroups, searchQuery)
 	if err != nil {
 		slog.Error("error getting groups from database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
@@ -216,7 +244,7 @@ func (h *Handler) GetGroups(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	err = json.NewEncoder(w).Encode(groups)
+	err = json.NewEncoder(w).Encode(map[string]interface{}{"total": total, "groups": groups})
 	if err != nil {
 		slog.Error("error encoding groups response", "error", err)
 	}
@@ -321,10 +349,31 @@ func (h *Handler) DeleteCategory(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (h *Handler) GetCategories(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetCategories(w http.ResponseWriter, r *http.Request) { //nolint: funlen
 	searchQuery := r.URL.Query().Get("q")
 
-	rows, err := h.db.Query(r.Context(), queryGetCategories, searchQuery)
+	rows, err := h.db.Query(r.Context(), queryGetTotalCategories, searchQuery)
+	if err != nil {
+		slog.Error("error getting total categories from database", "error", err)
+		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
+
+		return
+	}
+	defer rows.Close()
+
+	var total int
+
+	for rows.Next() {
+		err = rows.Scan(&total)
+		if err != nil {
+			slog.Error("error scanning total categories row from database", "error", err)
+			buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
+
+			return
+		}
+	}
+
+	rows, err = h.db.Query(r.Context(), queryGetCategories, searchQuery)
 	if err != nil {
 		slog.Error("error getting categories from database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
@@ -360,7 +409,7 @@ func (h *Handler) GetCategories(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	err = json.NewEncoder(w).Encode(categories)
+	err = json.NewEncoder(w).Encode(map[string]interface{}{"total": total, "categories": categories})
 	if err != nil {
 		slog.Error("error encoding categories response", "error", err)
 	}

@@ -5,7 +5,7 @@ description: "Get all existing payees"
 sidebar_label: "Get all existing payees"
 hide_title: true
 hide_table_of_contents: true
-api: eJy1VE1v20gM/SsCz6MPu3az0WmNRVAYWOwGcLOHDXKgRrQ1rT5mZyg7gqH/XnAsp06ctqc9SaJIvkfykUdg3HnIH+EeByIPTwosOmyIyYn9CC02BDn8BwpMKy89uQEUeF1Rg5AfgQcrHp6daXcwKijJa2csm04CNoROV1GIi7adi+wJanxS0FlyKH7rEnLYEU80FHjSvTM8BA4FeqNXPVeQPz5JnCNvu9aTF/x5lsnjDWqvNXnJpLuWqWVxQWtrowNg+sWL3/G6DnQOpUDD1PgLe1d8Ic2gwDqhzeaEbsrrHijYdq5Bhhz63pSggJ6xsbW4ZLPb+cfit0V8+0EX8c2yuI2LxWIZ4xJvFovtDS5vtyAVYvl3Ww+Qs+tpVNMcrpG+Z94czG43yAC0I2QqV/xTaiUyxWwaepVlns0X8SyLs5vP2SzP5nn24d/3+PS2/J8xRgVsOAQEWcBbg4dxFK9FNrsWwEOLPVfUsgycSglevieUdcvkWqyjO+c6B+OVfj8RR1jXET0bz6bdnfWroCGuukm4ogsUgUK6n6X2u4zd/rxJvashh4rZ+jxN94YZ45KaLtnWQ2K6sBBn2W9ElSeBXYj/pdGS5LyD8h18AnfTbrvgODXqH4GJVvdreFvX6n4dbSxps51WIixn8J+2BnUYLjVohLl1WFR913xF97ttkiYMpDaaWh+UOV2KlUVdUTRPMlAXNedpejgcEgx/k87t0inUp3+u/7j7a3MXz5MsqbipJa907cRzlmRJJibbeW6wvYD68WhelfrSNqZnTm2NppV8gdtxGtsj7GdhhuczWHWexXw8FujpwdXjKObT+ZNxlsZjUVMJ+RZrT1eYL3fnhxdQvc/rKw3Twd1j3cv/II09OiOA4QYqqAhLcoHJKWClNVm+iLq6dpLlRbOf7j6DAnytq5OO1PSU3Oej2A4XmUNPTqJ88LI9DY0jnJn3kwlG9ev4e/T+0LnyIt5OJhifxnH8BnPdN0g=
+api: eJy1VE1v20gM/SsGz6MPu3bT6LTGIigMLLYB3PSwQQ60RFvTSprZGcqOYOi/FxzJqVKn29OeZHPIxzec93gGxoOH7BHusSPy8KTAosOamJzEz9BgTZDBv6BAN/KjJdeBAp+XVCNkZ+DOSoZnp5sD9AoK8rnTlrWRgi2hy8tZqJvtjZvZoVX/pMBYcih5mwIyOBCPNBR4ylunuQscduh1vm65hOzxSeoceWsaT176L9JUPj91bfOcvCDlpmFqWFLQ2krnoWHy1Uve+foeZveVcgYF1gk91kMXNozVJE03TAdyoGBvXI08hN4vQQE9Y20rgmyeClUsPjVVBxm7lnoFB2daGyBfH6kLMjqHMmHNVPvfE9PF9SNMSLWtLqacIJ3fLt7vPiyj23f5LrpZ7W6j3XK5inCFN8vl/gZXt3t4g/cghOtOP5C3J304dKKA3BEyFWv+T2oFMkWsa3qFskgXy2ieRunN53SepYssfffPW3xaW/zPPXoFrDkUBF1CfxXyEusVLNP5tQYfGmy5pIZFc1TIYFZvaXXTMLkGq9mdc8ZBf2Whj8QzrKoZPWvPujlcLKSgJi7N6B1RBopHIDnOE/vDSe54MXPrKsigZLY+S5KjZsaooNrE+6qLtQmevDhvK8YYJDbx38uoBeSyBuR/yAncdbM3IXEc1BdpM1vfb+Dne63vN7OtpVzvR1eG/RDyR+NiHp6XatTC3Drcla2pv6H7w9ZxTTLTSufU+KDNcVmtLeYlzRZxCmpy5yxJTqdTjOE0Nu6QjKU++Wvz593f27toEadxyXUluDK1gec8TuNUQtZ4rrGZtPr107y66svYmJ45sRXqRvACt/P4bI9wnIc3vGzi0niW8Pm8Q08Prup7CQ8bWJ6z0B53FRWQ7bHydNXzZfX9cgmrt3l9o27c+UesWjkP0jii09IwrGEFJWFBLjAZCtZ5TpYnVVcLV1BeNPvx7jMowNe6GnSkxq9gX9Zi002Qw0wGUT54cU9NfQ8X5u0Ygl79vv4evT8ZV0zq7RiC/qnv++9O6GPz
 sidebar_class_name: "get api-method"
 info_path: docs/swagger/vitta-api
 custom_edit_url: null
@@ -127,55 +127,94 @@ Get all existing payees
                     </div><ul
                       style={{"marginLeft":"1rem"}}
                     >
-                      <li>
-                        <div
-                          style={{"fontSize":"var(--ifm-code-font-size)","opacity":"0.6","marginLeft":"-.5rem","paddingBottom":".5rem"}}
+                      <SchemaItem
+                        collapsible={false}
+                        name={"total"}
+                        required={false}
+                        schemaName={"int64"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"integer","format":"int64","example":10,"readOnly":true}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={true}
+                        className={"schemaItem"}
+                      >
+                        <details
+                          style={{}}
+                          className={"openapi-markdown__details"}
                         >
-                          Array [
-                        </div>
-                      </li><SchemaItem
-                        collapsible={false}
-                        name={"id"}
-                        required={false}
-                        schemaName={"uuid"}
-                        qualifierMessage={undefined}
-                        schema={{"type":"string","format":"uuid","example":"01926b84-93cb-75b9-b445-a5a744f7a59f","readOnly":true}}
-                      >
-                        
-                      </SchemaItem><SchemaItem
-                        collapsible={false}
-                        name={"name"}
-                        required={false}
-                        schemaName={"string"}
-                        qualifierMessage={undefined}
-                        schema={{"type":"string","example":"Swiggy"}}
-                      >
-                        
-                      </SchemaItem><SchemaItem
-                        collapsible={false}
-                        name={"createdAt"}
-                        required={false}
-                        schemaName={"date-time"}
-                        qualifierMessage={undefined}
-                        schema={{"type":"string","format":"date-time","example":"2024-10-07T01:02:03Z","readOnly":true}}
-                      >
-                        
-                      </SchemaItem><SchemaItem
-                        collapsible={false}
-                        name={"updatedAt"}
-                        required={false}
-                        schemaName={"date-time"}
-                        qualifierMessage={undefined}
-                        schema={{"type":"string","format":"date-time","example":"2024-10-07T01:02:03Z","readOnly":true}}
-                      >
-                        
-                      </SchemaItem><li>
-                        <div
-                          style={{"fontSize":"var(--ifm-code-font-size)","opacity":"0.6","marginLeft":"-.5rem"}}
-                        >
-                          ]
-                        </div>
-                      </li>
+                          <summary
+                            style={{}}
+                          >
+                            <span
+                              className={"openapi-schema__container"}
+                            >
+                              <strong
+                                className={"openapi-schema__property"}
+                              >
+                                groups
+                              </strong><span
+                                className={"openapi-schema__name"}
+                              >
+                                 object[]
+                              </span>
+                            </span>
+                          </summary><div
+                            style={{"marginLeft":"1rem"}}
+                          >
+                            <li>
+                              <div
+                                style={{"fontSize":"var(--ifm-code-font-size)","opacity":"0.6","marginLeft":"-.5rem","paddingBottom":".5rem"}}
+                              >
+                                Array [
+                              </div>
+                            </li><SchemaItem
+                              collapsible={false}
+                              name={"id"}
+                              required={false}
+                              schemaName={"uuid"}
+                              qualifierMessage={undefined}
+                              schema={{"type":"string","format":"uuid","example":"01926b84-93cb-75b9-b445-a5a744f7a59f","readOnly":true}}
+                            >
+                              
+                            </SchemaItem><SchemaItem
+                              collapsible={false}
+                              name={"name"}
+                              required={false}
+                              schemaName={"string"}
+                              qualifierMessage={undefined}
+                              schema={{"type":"string","example":"Swiggy"}}
+                            >
+                              
+                            </SchemaItem><SchemaItem
+                              collapsible={false}
+                              name={"createdAt"}
+                              required={false}
+                              schemaName={"date-time"}
+                              qualifierMessage={undefined}
+                              schema={{"type":"string","format":"date-time","example":"2024-10-07T01:02:03Z","readOnly":true}}
+                            >
+                              
+                            </SchemaItem><SchemaItem
+                              collapsible={false}
+                              name={"updatedAt"}
+                              required={false}
+                              schemaName={"date-time"}
+                              qualifierMessage={undefined}
+                              schema={{"type":"string","format":"date-time","example":"2024-10-07T01:02:03Z","readOnly":true}}
+                            >
+                              
+                            </SchemaItem><li>
+                              <div
+                                style={{"fontSize":"var(--ifm-code-font-size)","opacity":"0.6","marginLeft":"-.5rem"}}
+                              >
+                                ]
+                              </div>
+                            </li>
+                          </div>
+                        </details>
+                      </SchemaItem>
                     </ul>
                   </details>
                 </TabItem><TabItem
@@ -183,7 +222,7 @@ Get all existing payees
                   value={"Example (from schema)"}
                 >
                   <ResponseSamples
-                    responseExample={"[\n  {\n    \"id\": \"01926b84-93cb-75b9-b445-a5a744f7a59f\",\n    \"name\": \"Swiggy\",\n    \"createdAt\": \"2024-10-07T01:02:03Z\",\n    \"updatedAt\": \"2024-10-07T01:02:03Z\"\n  }\n]"}
+                    responseExample={"{\n  \"total\": 10,\n  \"groups\": [\n    {\n      \"id\": \"01926b84-93cb-75b9-b445-a5a744f7a59f\",\n      \"name\": \"Swiggy\",\n      \"createdAt\": \"2024-10-07T01:02:03Z\",\n      \"updatedAt\": \"2024-10-07T01:02:03Z\"\n    }\n  ]\n}"}
                     language={"json"}
                   >
                     
