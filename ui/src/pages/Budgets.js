@@ -105,6 +105,25 @@ const Budgets = () => {
 
   const groupedBudgetsArray = Object.values(groupedBudgets);
 
+  // function to check duplicate group name
+  const isDuplicateGroup = (groupName, groupId = null) => {
+    return budgets.some(
+      budget =>
+        budget.groupName === groupName.trim() &&
+        (groupId === null || budget.groupId !== groupId) // Exclude the current group if editing
+    );
+  };
+
+  // function to check duplicate category name within a group
+  const isDuplicateCategory = (categoryName, groupId, categoryId = null) => {
+    return budgets.some(
+      budget =>
+        budget.groupId === groupId &&
+        budget.categoryName === categoryName.trim() &&
+        (categoryId === null || budget.id !== categoryId) // Exclude the current category if editing
+    );
+  };
+
   // Handlers for form changes and submissions
   const handleChange = e => {
     const { name, value } = e.target;
@@ -135,6 +154,17 @@ const Budgets = () => {
       return;
     }
 
+    if (isDuplicateGroup(formData.name)) {
+      toast({
+        title: 'Duplicate Group',
+        description: `A group with the name "${formData.name}" already exists.`,
+        status: 'warning',
+        duration: 1500,
+        isClosable: true
+      });
+      return;
+    }
+
     const result = await createGroup({
       name: formData.name,
       notes: formData.notes || null
@@ -160,6 +190,17 @@ const Budgets = () => {
     e.preventDefault();
     if (!editFormData.name.trim()) {
       setGroupNameError('Group name is required');
+      return;
+    }
+
+    if (isDuplicateGroup(editFormData.name, selectedGroupId)) {
+      toast({
+        title: 'Duplicate Group',
+        description: `A group with the name "${editFormData.name}" already exists.`,
+        status: 'warning',
+        duration: 1500,
+        isClosable: true
+      });
       return;
     }
 
@@ -212,6 +253,17 @@ const Budgets = () => {
       return;
     }
 
+    if (isDuplicateCategory(categoryFormData.name, selectedGroupId)) {
+      toast({
+        title: 'Duplicate Category',
+        description: `A category with the name "${categoryFormData.name}" already exists in this group.`,
+        status: 'warning',
+        duration: 1500,
+        isClosable: true
+      });
+      return;
+    }
+
     const result = await createCategory({
       name: categoryFormData.name,
       notes: categoryFormData.notes,
@@ -239,6 +291,23 @@ const Budgets = () => {
     e.preventDefault();
     if (!editCategoryFormData.name.trim()) {
       setCategoryNameError('Category name is required');
+      return;
+    }
+
+    if (
+      isDuplicateCategory(
+        editCategoryFormData.name,
+        selectedGroupId,
+        selectedCategoryId
+      )
+    ) {
+      toast({
+        title: 'Duplicate Category',
+        description: `A category with the name "${editCategoryFormData.name}" already exists in this group.`,
+        status: 'warning',
+        duration: 1500,
+        isClosable: true
+      });
       return;
     }
 

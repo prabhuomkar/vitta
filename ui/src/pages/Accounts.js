@@ -36,6 +36,22 @@ const Accounts = () => {
   const handleSaveChanges = async (id, updatedAccount) => {
     const originalAccount = accounts.find(account => account.id === id);
 
+    // function to check duplicate account name
+    const duplicateAccount = accounts.some(
+      account => account.name === updatedAccount.name && account.id !== id
+    );
+
+    if (duplicateAccount) {
+      toast({
+        title: 'Duplicate Account',
+        description: `An account with the name "${updatedAccount.name}" already exists.`,
+        status: 'warning',
+        duration: 1500,
+        isClosable: true
+      });
+      return;
+    }
+
     const hasChanges = Object.keys(updatedAccount).some(
       key => updatedAccount[key] !== originalAccount[key]
     );
