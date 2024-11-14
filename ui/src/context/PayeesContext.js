@@ -17,7 +17,7 @@ export const PayeesProvider = ({ children }) => {
     try {
       setLoading(true);
       const data = await fetchPayees();
-      setPayees(data);
+      setPayees(data.payees || []);
       return { success: true };
     } catch (err) {
       setError(err);

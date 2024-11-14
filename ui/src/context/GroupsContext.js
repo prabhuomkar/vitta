@@ -17,7 +17,7 @@ export const GroupsProvider = ({ children }) => {
   //   try {
   //     setLoading(true);
   //     const data = await fetchGroups();
-  //     setGroups(data);
+  //     setGroups(data.groups || []);
   //     return { success: true };
   //   } catch (err) {
   //     setError(err);
