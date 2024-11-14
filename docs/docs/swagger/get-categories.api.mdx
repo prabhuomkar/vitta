@@ -5,7 +5,7 @@ description: "Get all existing categories"
 sidebar_label: "Get all existing categories"
 hide_title: true
 hide_table_of_contents: true
-api: eJy1VE1v2zgQ/SvCnKkPu3az0aluEQQGim0AN3tYw4cRNbbYSCKXHNkxDP33xchqardBeupJwvDxzdd7PAHjLkC+ho9duSMOsFFgHXlkY9tlCTnsiD8h0856QwEUBNKdN3yEfH2CAoPRi44ryNebfqPAU3C2DRQgP8E0y+RTUtDeOGGEHFad1hSESduWqWWBoHO10UPS9FsQ3AmCrqhB+eOjI8gBvccjKDBMTbiI2+IbaQYFzkvpbM7ZTXmBCexNuwMFW+sbZMih60wJCugZG1cLJJvcTt8Xf83i23e6iG/mxW1czGbzGOd4M5ttb3B+uwXpEMsvbX2EnH1HvYKdt51b/olkvYIWG3qN+QfTvbeaht0I3DKFt/Er21DUoH8q7aGNzhd6BdoTMpULfrOPEpliNg1dUU6z6SyeZHF28zWb5Nk0z979+9qkOlf+4Ry9AjY8XBhFe4RfY8OwegHPssmvCn1sseOKWhZFUikE89eUvGyZfIt1dOe99SB814B74gjrOqJnE9i0u0hfGqkhruzoMBEviosg3U9Sfe03vycfBrt1voYcKmYX8jTdG2aMS2pssq2PibEgDvzuz5XY5yyGC5e+zF1IhH1AQX7GDD2YdmsH4Di0fyRNtHhYws/9LR6W0cqRNtvRu9HW+mjAj/ZGPeyaGjRSufNYVJ1tntB/cE3SkMy2NpraMKj8rHZYONQVRdMkA3XRc56mh8MhweE0sX6XjldD+nn56e7v1V08TbKk4qYWXpnauc5JkiWZhJwN3GB7kertFV21+zI6pmdOXY2mFc6hvtO4vjXsJ9L6D5KNgsoGlqPTqcBAj77uewn/15GXV3SjYI/eYCHTXm96BRVhSX7Y+BMdZSBakxOR7LHuhqfw5/dSNv8iqPu7r6AArxd+XrAav8L9/VltjxfMQ5FntTwGkXdDfQ9qLKQbQ9Cr399/wBAO1pcX990Ygn7T9/3/byUpBg==
+api: eJy1VE1v2zgQ/SvCnKkPu3bT6LTeIggMLHYDuOmhhg9jaiyxkUguObJjGPrvBWUllVMjPfUkYfjmzZvPEzCWHvI1/N0WJbGHjQBjySEro5cF5FASf0am0jhFHgR4kq1TfIR8fYIteiUXLVeQrzfdRoAjb4325CE/wTTLwqcgL52ygRFyWLVSkg9M0mgmzQGC1tZK9kHT7z7gTuBlRQ2GPz5aghzM9jtJBgHWBYmszlHYMNYjmNJMJTkQsDOuQT6bPs5AAD1jY2uCfJIFqVj8p+sj5Oxa6gTIn2nmpzfP4oUdncMjCFBMjf+9OFWMMJ6d0uVYWNuqYqwLssnt9OP20yy+/SC38c18extvZ7N5jHO8mc12Nzi/3cEV7aUzrV3+iWCdAI0NXWP+yXTvjKS+cgFumPz7+JVpKGrQPRXmoKOzQ+iAI2QqFvxuHgUyxawauqCcZtNZPMni7OZLNsmzaZ59+HatUq0t/nCMTgAr7h2GzTlCd8Xal6t/mGWTXxflUWPLFWkOi0FFqM/82kItNZPTWEd3zhkHge8ScE8cYV1H9Kw8K11GcrzPDXFlhkUP44thmSHdT1J5ufZuT873W9+6GnKomK3P03SvmDEuqDHJrj4mykA4BC9nYhW2+DwOo2PxWvlAEth7FORnTJ+D0jvTA4eifQ1hosXDEt7mt3hYRitLUu2GExLtjIt6/HBlUPbdpgZVUG4dbqvWNE/o/rJN0lCoba0kad/P+XneYWFRVhRNkwzEKOc8TQ+HQ4L9a2JcmQ6uPv1n+fnu39VdPE2ypOKmDryhamedkyRLsmCyxnODehTq/RZdpPtaOqZnTm2NSgfOXt9paN8a9hO4OGgbAZXxHJ5Opy16enR11wXz/y25cMw3AvboFG5DtdebTkBFWJDrO/5Ex1AQKcmGIdlj3fbH8O3ZDp1/Haj7uy8gAC8bfm6wGL6B++Ww6uOIuRd5npZHH8a7oa4DMQhpBxN04vf+D+j9wbhi5G8HE3Sbrut+AE94Vzc=
 sidebar_class_name: "get api-method"
 info_path: docs/swagger/vitta-api
 custom_edit_url: null
@@ -95,73 +95,112 @@ Get all existing categories
                     </div><ul
                       style={{"marginLeft":"1rem"}}
                     >
-                      <li>
-                        <div
-                          style={{"fontSize":"var(--ifm-code-font-size)","opacity":"0.6","marginLeft":"-.5rem","paddingBottom":".5rem"}}
+                      <SchemaItem
+                        collapsible={false}
+                        name={"total"}
+                        required={false}
+                        schemaName={"int64"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"integer","format":"int64","example":10,"readOnly":true}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={true}
+                        className={"schemaItem"}
+                      >
+                        <details
+                          style={{}}
+                          className={"openapi-markdown__details"}
                         >
-                          Array [
-                        </div>
-                      </li><SchemaItem
-                        collapsible={false}
-                        name={"id"}
-                        required={false}
-                        schemaName={"uuid"}
-                        qualifierMessage={undefined}
-                        schema={{"type":"string","format":"uuid","example":"01926b84-93cb-75b9-b445-a5a744f7a59f","readOnly":true}}
-                      >
-                        
-                      </SchemaItem><SchemaItem
-                        collapsible={false}
-                        name={"groupId"}
-                        required={false}
-                        schemaName={"uuid"}
-                        qualifierMessage={undefined}
-                        schema={{"type":"string","format":"uuid","example":"01926b84-93cb-75b9-b445-a5a744f7a59f"}}
-                      >
-                        
-                      </SchemaItem><SchemaItem
-                        collapsible={false}
-                        name={"name"}
-                        required={false}
-                        schemaName={"string"}
-                        qualifierMessage={undefined}
-                        schema={{"type":"string","example":"Groceries"}}
-                      >
-                        
-                      </SchemaItem><SchemaItem
-                        collapsible={false}
-                        name={"notes"}
-                        required={false}
-                        schemaName={"string"}
-                        qualifierMessage={undefined}
-                        schema={{"type":"string","example":"Some markdown notes"}}
-                      >
-                        
-                      </SchemaItem><SchemaItem
-                        collapsible={false}
-                        name={"createdAt"}
-                        required={false}
-                        schemaName={"date-time"}
-                        qualifierMessage={undefined}
-                        schema={{"type":"string","format":"date-time","example":"2024-10-07T01:02:03Z","readOnly":true}}
-                      >
-                        
-                      </SchemaItem><SchemaItem
-                        collapsible={false}
-                        name={"updatedAt"}
-                        required={false}
-                        schemaName={"date-time"}
-                        qualifierMessage={undefined}
-                        schema={{"type":"string","format":"date-time","example":"2024-10-07T01:02:03Z","readOnly":true}}
-                      >
-                        
-                      </SchemaItem><li>
-                        <div
-                          style={{"fontSize":"var(--ifm-code-font-size)","opacity":"0.6","marginLeft":"-.5rem"}}
-                        >
-                          ]
-                        </div>
-                      </li>
+                          <summary
+                            style={{}}
+                          >
+                            <span
+                              className={"openapi-schema__container"}
+                            >
+                              <strong
+                                className={"openapi-schema__property"}
+                              >
+                                categories
+                              </strong><span
+                                className={"openapi-schema__name"}
+                              >
+                                 object[]
+                              </span>
+                            </span>
+                          </summary><div
+                            style={{"marginLeft":"1rem"}}
+                          >
+                            <li>
+                              <div
+                                style={{"fontSize":"var(--ifm-code-font-size)","opacity":"0.6","marginLeft":"-.5rem","paddingBottom":".5rem"}}
+                              >
+                                Array [
+                              </div>
+                            </li><SchemaItem
+                              collapsible={false}
+                              name={"id"}
+                              required={false}
+                              schemaName={"uuid"}
+                              qualifierMessage={undefined}
+                              schema={{"type":"string","format":"uuid","example":"01926b84-93cb-75b9-b445-a5a744f7a59f","readOnly":true}}
+                            >
+                              
+                            </SchemaItem><SchemaItem
+                              collapsible={false}
+                              name={"groupId"}
+                              required={false}
+                              schemaName={"uuid"}
+                              qualifierMessage={undefined}
+                              schema={{"type":"string","format":"uuid","example":"01926b84-93cb-75b9-b445-a5a744f7a59f"}}
+                            >
+                              
+                            </SchemaItem><SchemaItem
+                              collapsible={false}
+                              name={"name"}
+                              required={false}
+                              schemaName={"string"}
+                              qualifierMessage={undefined}
+                              schema={{"type":"string","example":"Groceries"}}
+                            >
+                              
+                            </SchemaItem><SchemaItem
+                              collapsible={false}
+                              name={"notes"}
+                              required={false}
+                              schemaName={"string"}
+                              qualifierMessage={undefined}
+                              schema={{"type":"string","example":"Some markdown notes"}}
+                            >
+                              
+                            </SchemaItem><SchemaItem
+                              collapsible={false}
+                              name={"createdAt"}
+                              required={false}
+                              schemaName={"date-time"}
+                              qualifierMessage={undefined}
+                              schema={{"type":"string","format":"date-time","example":"2024-10-07T01:02:03Z","readOnly":true}}
+                            >
+                              
+                            </SchemaItem><SchemaItem
+                              collapsible={false}
+                              name={"updatedAt"}
+                              required={false}
+                              schemaName={"date-time"}
+                              qualifierMessage={undefined}
+                              schema={{"type":"string","format":"date-time","example":"2024-10-07T01:02:03Z","readOnly":true}}
+                            >
+                              
+                            </SchemaItem><li>
+                              <div
+                                style={{"fontSize":"var(--ifm-code-font-size)","opacity":"0.6","marginLeft":"-.5rem"}}
+                              >
+                                ]
+                              </div>
+                            </li>
+                          </div>
+                        </details>
+                      </SchemaItem>
                     </ul>
                   </details>
                 </TabItem><TabItem
@@ -169,7 +208,7 @@ Get all existing categories
                   value={"Example (from schema)"}
                 >
                   <ResponseSamples
-                    responseExample={"[\n  {\n    \"id\": \"01926b84-93cb-75b9-b445-a5a744f7a59f\",\n    \"groupId\": \"01926b84-93cb-75b9-b445-a5a744f7a59f\",\n    \"name\": \"Groceries\",\n    \"notes\": \"Some markdown notes\",\n    \"createdAt\": \"2024-10-07T01:02:03Z\",\n    \"updatedAt\": \"2024-10-07T01:02:03Z\"\n  }\n]"}
+                    responseExample={"{\n  \"total\": 10,\n  \"categories\": [\n    {\n      \"id\": \"01926b84-93cb-75b9-b445-a5a744f7a59f\",\n      \"groupId\": \"01926b84-93cb-75b9-b445-a5a744f7a59f\",\n      \"name\": \"Groceries\",\n      \"notes\": \"Some markdown notes\",\n      \"createdAt\": \"2024-10-07T01:02:03Z\",\n      \"updatedAt\": \"2024-10-07T01:02:03Z\"\n    }\n  ]\n}"}
                     language={"json"}
                   >
                     

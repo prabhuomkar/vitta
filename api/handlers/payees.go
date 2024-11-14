@@ -18,10 +18,12 @@ type Payee struct {
 }
 
 const (
-	queryCreatePayee = `INSERT INTO payees (id, name, created_at, updated_at) VALUES ($1, $2, $3, $4)`
-	queryUpdatePayee = `UPDATE payees SET name=$1, updated_at=$2 WHERE id=$3`
-	queryDeletePayee = `DELETE FROM payees WHERE id=$1`
-	queryGetPayees   = `SELECT * FROM payees WHERE (name ILIKE '%' || COALESCE(NULLIF($1, ''), '')` +
+	queryCreatePayee    = `INSERT INTO payees (id, name, created_at, updated_at) VALUES ($1, $2, $3, $4)`
+	queryUpdatePayee    = `UPDATE payees SET name=$1, updated_at=$2 WHERE id=$3`
+	queryDeletePayee    = `DELETE FROM payees WHERE id=$1`
+	queryGetTotalPayees = `SELECT COUNT(*) as total FROM payees WHERE (name ILIKE '%' ||` +
+		` COALESCE(NULLIF($1, ''), '') || '%')`
+	queryGetPayees = `SELECT * FROM payees WHERE (name ILIKE '%' || COALESCE(NULLIF($1, ''), '')` +
 		` || '%') ORDER BY created_at DESC`
 )
 
@@ -124,10 +126,31 @@ func (h *Handler) DeletePayee(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (h *Handler) GetPayees(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetPayees(w http.ResponseWriter, r *http.Request) { //nolint: funlen
 	searchQuery := r.URL.Query().Get("q")
 
-	rows, err := h.db.Query(r.Context(), queryGetPayees, searchQuery)
+	rows, err := h.db.Query(r.Context(), queryGetTotalPayees, searchQuery)
+	if err != nil {
+		slog.Error("error getting total payees from database", "error", err)
+		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
+
+		return
+	}
+	defer rows.Close()
+
+	var total int
+
+	for rows.Next() {
+		err = rows.Scan(&total)
+		if err != nil {
+			slog.Error("error scanning total payees row from database", "error", err)
+			buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
+
+			return
+		}
+	}
+
+	rows, err = h.db.Query(r.Context(), queryGetPayees, searchQuery)
 	if err != nil {
 		slog.Error("error getting payees from database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
@@ -162,7 +185,7 @@ func (h *Handler) GetPayees(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	err = json.NewEncoder(w).Encode(payees)
+	err = json.NewEncoder(w).Encode(map[string]interface{}{"total": total, "payees": payees})
 	if err != nil {
 		slog.Error("error encoding payees response", "error", err)
 	}

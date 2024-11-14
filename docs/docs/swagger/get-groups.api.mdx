@@ -5,7 +5,7 @@ description: "Get all existing groups"
 sidebar_label: "Get all existing groups"
 hide_title: true
 hide_table_of_contents: true
-api: eJy1VE1v20YQ/SvEnJcfUqS45qlqIBgCgsao4h4q6DBcjsSNSe52dyhZEPjfg6FoR3bd9NQThdGbNx/vzZ6BcR8g38BvXbknDrBVYB15ZGPbVQk57InvvO1cAAWBdOcNnyDfnKHAYPSi4wryzbbfKvAUnG0DBcjPMM0y+ZQUtDdO2CCHdac1BWHStmVqWSDoXG30UDD9FgR3hqAralB+8ckR5IDe4wkUGKYmXMVt8Y00gwLnpW02l+qmvMIE9qbdg4Kd9Q0y5NB1pgQF9ISNqwWSTW6nH4tfZvHtB13EN/PiNi5ms3mMc7yZzXY3OL/dgUyI5Ze2PkHOvqNeQYsNvVfpB/MfsjKJRssnR8N2JM8yhZ8nrm1DUYP+sbTHNrok9Aq0J2QqF/zTAUtkitk09Ipymk1n8SSLs5uv2STPpnn24a/3pupc+T/X6BWw4SFhMBe8DQToe0HNssk/bfTQYscVtSy2oVKS5+/ZbdUy+RbraOm99SB8rwF3xBHWdURPJrBotH92ekNc2dH+4i4Um0N6mKT7H8fgD+TDcAudryGHitmFPE0Phhnjkhqb7OpTYizIeTwfz1q8fVH/6oReFi0kwj6gIL9ght5Nu7MDcFzUn1ImWtyv4O1ci/tVtHakzW48rGhnfTTgx9tDPYhLDRrp3Hksqs42j+h/dU3SkOy0NloMK7iLz2HhUFcUTZMM1NXMeZoej8cEh38T6/fpmBrSz6tPy9/Xy3iaZEnFTS28srVLn5MkSzIJORu4wfaq1L9L82rUl7UxPXHqajSt8A29nUfZNnCYgIKRYKugsoElfD4XGOjB130v4b878vK0bRUc0BssZMubba+gIizJD0o/0kkWoTU5McYB6254n94+YqL4i4null9BAb4W+iKsGr/C/fzWtacr5qHJi0segti5ob4HNTbSjSHo1X/n32MIR+vLq3w3hqDf9n3/HaEXBmg=
+api: eJy1VE1v40YM/SsCz6MPe+1No1PdwggMFG1Qb3qo4QMt0dJsJM10hrJjGPrvBSUlq2Szu6c92aDIx0c+vrkCY+Eh3cFvbV4Qe9grMJYcsjbNJocUCuI7Z1rrQYGnrHWaL5DurnBAr7NVyyWku323V+DIW9N48pBeYZ4k8pOTz5y2ggYpbNssIy9ImWmYGpYUtLbSWd8w/uwl7wo+K6lG+ccXS5CCOXymjEGBdUKP9dCFDWM1SdMNU0EOFByNq5GH0McFKKAnrG1FkM4SoYr5X011gZRdS52CYhgxvb75pJ6R0Tm8gALNVPsfE9P5JMez000xJdW2Op9ygmR2O/94+GUR3n7IDuHN8nAbHhaLZYhLvFksjje4vD3CO7wbrOm9Tl+Q/xbNJBqsnyz18kidYfLfL9yamoIa3WNuzk0wFHQKMkfIlK/4uwPmyBSyrukV5DyZL8JZEiY3n5JZmszT5MO/703V2vwn9+gUsOa+oL9u6L4KeYl1ChbJ7OtLfmiw5ZIalsulXBazfO/iNw2Ta7AK1s4ZB4L3OuGOOMCqCuhJexaVimez1cSlGR0o94XiNIhPs7j44kd3Iud7O7aughRKZuvTOD5pZgxzqk10rC6RNiAOffbvVuw16D9x8cuqBUTQ+yxIh5yeu26Opk8cF/WPtAlW9xt4O9fqfhNsLWX6OHo7OBoX9Pmj/THr5aUatTC3Dg9la+pHdL/aOqpJdlrpTE5W8oZLh5XFrKRgHiWgJjOncXw+nyPsv0bGFfFY6uM/Nr+v/9yuw3mURCXXleDK1gaesyiJEglZ47nGZtLq29K8GvVlbUxPHNsKdSN4PbfrKNsOTjN4eWX2CkrjWcLX6wE9Pbiq6yT8X0tOXte9ghM6jQfZ8m7fKSgJc3K90o90kUVkGVk5jBNWbf9CvX1HRfGXI7pbfwIF+FroQVg1/gr282vXXCbIPcnhSh68nHNNXQdqJNKOIejUj+vv0fuzcfmk3o4h6PZd1/0PqA4zEw==
 sidebar_class_name: "get api-method"
 info_path: docs/swagger/vitta-api
 custom_edit_url: null
@@ -95,64 +95,103 @@ Get all existing groups
                     </div><ul
                       style={{"marginLeft":"1rem"}}
                     >
-                      <li>
-                        <div
-                          style={{"fontSize":"var(--ifm-code-font-size)","opacity":"0.6","marginLeft":"-.5rem","paddingBottom":".5rem"}}
+                      <SchemaItem
+                        collapsible={false}
+                        name={"total"}
+                        required={false}
+                        schemaName={"int64"}
+                        qualifierMessage={undefined}
+                        schema={{"type":"integer","format":"int64","example":10,"readOnly":true}}
+                      >
+                        
+                      </SchemaItem><SchemaItem
+                        collapsible={true}
+                        className={"schemaItem"}
+                      >
+                        <details
+                          style={{}}
+                          className={"openapi-markdown__details"}
                         >
-                          Array [
-                        </div>
-                      </li><SchemaItem
-                        collapsible={false}
-                        name={"id"}
-                        required={false}
-                        schemaName={"uuid"}
-                        qualifierMessage={undefined}
-                        schema={{"type":"string","format":"uuid","example":"01926b84-93cb-75b9-b445-a5a744f7a59f","readOnly":true}}
-                      >
-                        
-                      </SchemaItem><SchemaItem
-                        collapsible={false}
-                        name={"name"}
-                        required={false}
-                        schemaName={"string"}
-                        qualifierMessage={undefined}
-                        schema={{"type":"string","example":"Recurring Expenses"}}
-                      >
-                        
-                      </SchemaItem><SchemaItem
-                        collapsible={false}
-                        name={"notes"}
-                        required={false}
-                        schemaName={"string"}
-                        qualifierMessage={undefined}
-                        schema={{"type":"string","example":"Some markdown notes"}}
-                      >
-                        
-                      </SchemaItem><SchemaItem
-                        collapsible={false}
-                        name={"createdAt"}
-                        required={false}
-                        schemaName={"date-time"}
-                        qualifierMessage={undefined}
-                        schema={{"type":"string","format":"date-time","example":"2024-10-07T01:02:03Z","readOnly":true}}
-                      >
-                        
-                      </SchemaItem><SchemaItem
-                        collapsible={false}
-                        name={"updatedAt"}
-                        required={false}
-                        schemaName={"date-time"}
-                        qualifierMessage={undefined}
-                        schema={{"type":"string","format":"date-time","example":"2024-10-07T01:02:03Z","readOnly":true}}
-                      >
-                        
-                      </SchemaItem><li>
-                        <div
-                          style={{"fontSize":"var(--ifm-code-font-size)","opacity":"0.6","marginLeft":"-.5rem"}}
-                        >
-                          ]
-                        </div>
-                      </li>
+                          <summary
+                            style={{}}
+                          >
+                            <span
+                              className={"openapi-schema__container"}
+                            >
+                              <strong
+                                className={"openapi-schema__property"}
+                              >
+                                groups
+                              </strong><span
+                                className={"openapi-schema__name"}
+                              >
+                                 object[]
+                              </span>
+                            </span>
+                          </summary><div
+                            style={{"marginLeft":"1rem"}}
+                          >
+                            <li>
+                              <div
+                                style={{"fontSize":"var(--ifm-code-font-size)","opacity":"0.6","marginLeft":"-.5rem","paddingBottom":".5rem"}}
+                              >
+                                Array [
+                              </div>
+                            </li><SchemaItem
+                              collapsible={false}
+                              name={"id"}
+                              required={false}
+                              schemaName={"uuid"}
+                              qualifierMessage={undefined}
+                              schema={{"type":"string","format":"uuid","example":"01926b84-93cb-75b9-b445-a5a744f7a59f","readOnly":true}}
+                            >
+                              
+                            </SchemaItem><SchemaItem
+                              collapsible={false}
+                              name={"name"}
+                              required={false}
+                              schemaName={"string"}
+                              qualifierMessage={undefined}
+                              schema={{"type":"string","example":"Recurring Expenses"}}
+                            >
+                              
+                            </SchemaItem><SchemaItem
+                              collapsible={false}
+                              name={"notes"}
+                              required={false}
+                              schemaName={"string"}
+                              qualifierMessage={undefined}
+                              schema={{"type":"string","example":"Some markdown notes"}}
+                            >
+                              
+                            </SchemaItem><SchemaItem
+                              collapsible={false}
+                              name={"createdAt"}
+                              required={false}
+                              schemaName={"date-time"}
+                              qualifierMessage={undefined}
+                              schema={{"type":"string","format":"date-time","example":"2024-10-07T01:02:03Z","readOnly":true}}
+                            >
+                              
+                            </SchemaItem><SchemaItem
+                              collapsible={false}
+                              name={"updatedAt"}
+                              required={false}
+                              schemaName={"date-time"}
+                              qualifierMessage={undefined}
+                              schema={{"type":"string","format":"date-time","example":"2024-10-07T01:02:03Z","readOnly":true}}
+                            >
+                              
+                            </SchemaItem><li>
+                              <div
+                                style={{"fontSize":"var(--ifm-code-font-size)","opacity":"0.6","marginLeft":"-.5rem"}}
+                              >
+                                ]
+                              </div>
+                            </li>
+                          </div>
+                        </details>
+                      </SchemaItem>
                     </ul>
                   </details>
                 </TabItem><TabItem
@@ -160,7 +199,7 @@ Get all existing groups
                   value={"Example (from schema)"}
                 >
                   <ResponseSamples
-                    responseExample={"[\n  {\n    \"id\": \"01926b84-93cb-75b9-b445-a5a744f7a59f\",\n    \"name\": \"Recurring Expenses\",\n    \"notes\": \"Some markdown notes\",\n    \"createdAt\": \"2024-10-07T01:02:03Z\",\n    \"updatedAt\": \"2024-10-07T01:02:03Z\"\n  }\n]"}
+                    responseExample={"{\n  \"total\": 10,\n  \"groups\": [\n    {\n      \"id\": \"01926b84-93cb-75b9-b445-a5a744f7a59f\",\n      \"name\": \"Recurring Expenses\",\n      \"notes\": \"Some markdown notes\",\n      \"createdAt\": \"2024-10-07T01:02:03Z\",\n      \"updatedAt\": \"2024-10-07T01:02:03Z\"\n    }\n  ]\n}"}
                     language={"json"}
                   >
                     
