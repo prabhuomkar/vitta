@@ -12,7 +12,7 @@ import {
   AccountHeader,
   AddTransactionModal,
   TransactionsTable,
-  Loading,
+  Pagination,
   Error
 } from '../components';
 import { formatCurrency } from '../utils';
@@ -24,12 +24,20 @@ const Account = () => {
   const primaryColor = theme.colors.primary;
   const {
     transactions,
+    total,
+    totalPages,
     loading,
     error,
     getTransactions,
     importTransactions,
     updateTransaction,
-    deleteTransaction
+    deleteTransaction,
+    searchQuery,
+    updateSearchQuery,
+    goToNextPage,
+    goToPreviousPage,
+    page,
+    hasNextPage
   } = useTransactions();
   const { accounts } = useAccounts();
   const { payees } = usePayees();
@@ -71,7 +79,10 @@ const Account = () => {
       .reduce((acc, transaction) => acc + (transaction.debit || 0), 0);
   }, [localTransactions]);
 
-  if (loading) return <Loading />;
+  const handleSearch = query => {
+    updateSearchQuery(query);
+  };
+
   if (error) return <Error message={error.message} />;
 
   const handleDelete = async id => {
@@ -146,7 +157,7 @@ const Account = () => {
     }
 
     try {
-      const response = await importTransactions(file);
+      const response = await importTransactions(accountId, file);
       await getTransactions(accountId);
 
       if (response?.success) {
@@ -192,6 +203,9 @@ const Account = () => {
         openFileDialog={openFileDialog}
         handleFileChange={handleFileChange}
         fileInputRef={fileInputRef}
+        handleSearch={handleSearch}
+        searchQuery={searchQuery}
+        total={total}
       />
       <Box my="4" />
       <TransactionsTable
@@ -203,6 +217,15 @@ const Account = () => {
         categories={categories}
         handleCheckboxChange={handleCheckboxChange}
         handleDelete={handleDelete}
+        loading={loading}
+      />
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        goToNextPage={goToNextPage}
+        goToPreviousPage={goToPreviousPage}
+        hasNextPage={hasNextPage}
+        loading={loading}
       />
       <AddTransactionModal
         isOpen={isModalOpen}

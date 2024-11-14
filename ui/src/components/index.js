@@ -6,10 +6,12 @@ import { AccountRow } from './accounts';
 import {
   AccountHeader,
   AddTransactionModal,
-  TransactionsTable
+  TransactionsTable,
+  Pagination
 } from './account';
 import Error from './Error';
 import Loading from './Loading';
+import LoadingTransactions from './LoadingTransactions';
 
 export {
   MainLayout,
@@ -20,6 +22,8 @@ export {
   AccountHeader,
   AddTransactionModal,
   TransactionsTable,
+  Pagination,
   Error,
-  Loading
+  Loading,
+  LoadingTransactions
 };
