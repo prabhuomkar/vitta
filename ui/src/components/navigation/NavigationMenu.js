@@ -55,6 +55,22 @@ const NavigationMenu = ({ onClose }) => {
       return;
     }
 
+    // function to check duplicate account name
+    const duplicateAccount = accounts.some(
+      account => account.name === accountName.trim()
+    );
+
+    if (duplicateAccount) {
+      toast({
+        title: 'Duplicate Account',
+        description: `An account with the name "${accountName}" already exists.`,
+        status: 'warning',
+        duration: 1500,
+        isClosable: true
+      });
+      return;
+    }
+
     try {
       await createAccount({
         name: accountName,

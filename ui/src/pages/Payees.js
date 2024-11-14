@@ -15,8 +15,27 @@ const Payees = () => {
     setLocalPayees(payees);
   }, [payees]);
 
+  // function to check duplicate payee name
+  const isDuplicatePayee = (name, id = null) => {
+    return localPayees.some(
+      payee => payee.name === name.trim() && payee.id !== id
+    );
+  };
+
   const handleAddPayee = async () => {
     if (newPayee.trim()) {
+      if (isDuplicatePayee(newPayee)) {
+        toast({
+          title: 'Duplicate Payee',
+          description: `A payee with the name "${newPayee}" already exists.`,
+          status: 'warning',
+          duration: 1500,
+          isClosable: true
+        });
+        setNewPayee('');
+        return;
+      }
+
       try {
         const newPayeeObj = { name: newPayee.trim() };
         await createPayee(newPayeeObj);
@@ -77,6 +96,17 @@ const Payees = () => {
   const handleSaveChanges = async (id, updatedPayee) => {
     const originalPayee = payees.find(payee => payee.id === id);
     if (!originalPayee || originalPayee.name === updatedPayee.name.trim()) {
+      return;
+    }
+
+    if (isDuplicatePayee(updatedPayee.name, id)) {
+      toast({
+        title: 'Duplicate Payee Name',
+        description: `A payee with the name "${updatedPayee.name}" already exists.`,
+        status: 'warning',
+        duration: 1500,
+        isClosable: true
+      });
       return;
     }
 
