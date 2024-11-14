@@ -17,7 +17,7 @@ export const CategoriesProvider = ({ children }) => {
     try {
       setLoading(true);
       const data = await fetchCategories();
-      setCategories(data);
+      setCategories(data.categories || []);
       return { success: true };
     } catch (err) {
       setError(err);
