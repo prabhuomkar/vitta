@@ -34,6 +34,7 @@ func New(cfg *config.Config, db database.DBIface, adapters map[string]adapters.C
 	mux.HandleFunc("POST /v1/accounts", h.CreateAccount)
 	mux.HandleFunc("PATCH /v1/accounts/{id}", h.UpdateAccount)
 	mux.HandleFunc("DELETE /v1/accounts/{id}", h.DeleteAccount)
+	mux.HandleFunc("GET /v1/accounts/{id}", h.GetAccount)
 	mux.HandleFunc("GET /v1/accounts", h.GetAccounts)
 	mux.HandleFunc("GET /v1/adapters", h.GetAdapters)
 	// transactions

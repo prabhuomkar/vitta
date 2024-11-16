@@ -126,6 +126,12 @@ const sidebar: SidebarsConfig = {
         },
         {
           type: "doc",
+          id: "swagger/get-account",
+          label: "Get an existing account",
+          className: "api-method get",
+        },
+        {
+          type: "doc",
           id: "swagger/update-account",
           label: "Update an existing account",
           className: "api-method patch",

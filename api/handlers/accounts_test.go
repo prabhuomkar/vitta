@@ -185,6 +185,41 @@ func TestGetAccounts(t *testing.T) {
 	executeTests(t, tests)
 }
 
+func TestGetAccount(t *testing.T) {
+	tests := []testCase{
+		{
+			"error due to auth", http.MethodGet, "/v1/accounts/invalid-uuid", false, nil,
+			nil, nil,
+			http.StatusUnauthorized, "Unauthorized",
+		},
+		{
+			"error due to bad account id", http.MethodGet, "/v1/accounts/invalid-uuid", true, nil,
+			nil, nil,
+			http.StatusBadRequest, "invalid UUID",
+		},
+		{
+			"error getting account in database", http.MethodGet, "/v1/accounts/" + testAccountID.String(), true,
+			nil,
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectExec("SELECT *").WithArgs(testAccountID).WillReturnError(pgx.ErrTxClosed)
+			},
+			http.StatusInternalServerError, "tx is closed",
+		},
+		{
+			"success getting account", http.MethodGet, "/v1/accounts/" + testAccountID.String(), true,
+			nil,
+			nil,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WithArgs(testAccountID).WillReturnRows(pgxmock.NewRows(accountsRowCols).AddRow(testAccountID.String(), testAccountName, &testOffBudget, testCategory,
+					testAdapter, testAccountTime, testAccountTime, testAmount))
+			},
+			http.StatusOK, testAccountID.String(),
+		},
+	}
+	executeTests(t, tests)
+}
+
 func TestGetAdapters(t *testing.T) {
 	tests := []testCase{
 		{

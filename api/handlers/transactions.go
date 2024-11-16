@@ -289,8 +289,8 @@ func (h *Handler) ImportTransactions(w http.ResponseWriter, r *http.Request) { /
 
 	var account Account
 
-	err = h.db.QueryRow(r.Context(), queryGetAccount, accountID).Scan(&account.ID, &account.Name, &account.OffBudget,
-		&account.Category, &account.Adapter, &account.CreatedAt, &account.UpdatedAt)
+	err = h.db.QueryRow(r.Context(), queryGetAccountForUsage, accountID).Scan(&account.ID, &account.Name,
+		&account.OffBudget, &account.Category, &account.Adapter, &account.CreatedAt, &account.UpdatedAt)
 	if err != nil {
 		slog.Error("error getting account from database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)

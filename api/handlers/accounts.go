@@ -33,11 +33,14 @@ type (
 const (
 	queryCreateAccount = `INSERT INTO accounts (id, name, off_budget, category, adapter, created_at, updated_at)` +
 		` VALUES ($1, $2, $3, $4, $5, $6, $7)`
-	queryUpdateAccount = `UPDATE accounts SET name=$1, off_budget=$2, category=$3, adapter=$4, updated_at=$5 WHERE id=$6`
-	queryDeleteAccount = `DELETE FROM accounts WHERE id=$1`
-	queryGetAccount    = `SELECT * FROM accounts WHERE id=$1`
-	queryGetAccounts   = `SELECT a.*, COALESCE(SUM(t.credit)-SUM(t.debit), 0) as balance FROM accounts a LEFT JOIN` +
-		` transactions t ON a.id = t.account_id GROUP BY a.id ORDER BY a.created_at DESC`
+	queryUpdateAccount = `UPDATE accounts SET name=$1, off_budget=$2, category=$3, adapter=$4, updated_at=$5` +
+		` WHERE id=$6`
+	queryDeleteAccount      = `DELETE FROM accounts WHERE id=$1`
+	queryGetAccountForUsage = `SELECT * FROM accounts WHERE id=$1`
+	queryGetAccount         = `SELECT a.*, COALESCE(SUM(t.credit)-SUM(t.debit), 0) as balance FROM accounts a LEFT JOIN` +
+		` transactions t ON a.id = t.account_id AND t.cleared_at IS NOT NULL WHERE a.id=$1 GROUP BY a.id`
+	queryGetAccounts = `SELECT a.*, COALESCE(SUM(t.credit)-SUM(t.debit), 0) as balance FROM accounts a LEFT JOIN` +
+		` transactions t ON a.id = t.account_id AND t.cleared_at IS NOT NULL GROUP BY a.id ORDER BY a.created_at DESC`
 )
 
 func (h *Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {
@@ -180,6 +183,37 @@ func (h *Handler) GetAccounts(w http.ResponseWriter, r *http.Request) {
 	err = json.NewEncoder(w).Encode(accounts)
 	if err != nil {
 		slog.Error("error encoding accounts response", "error", err)
+	}
+}
+
+func (h *Handler) GetAccount(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+
+	accountID, err := uuid.Parse(id)
+	if err != nil {
+		slog.Error("error parsing account id", "error", err)
+		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
+
+		return
+	}
+
+	var account Account
+
+	err = h.db.QueryRow(r.Context(), queryGetAccount, accountID).Scan(&account.ID, &account.Name, &account.OffBudget,
+		&account.Category, &account.Adapter, &account.CreatedAt, &account.UpdatedAt, &account.Balance)
+	if err != nil {
+		slog.Error("error getting account from database", "error", err)
+		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
+
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	err = json.NewEncoder(w).Encode(account)
+	if err != nil {
+		slog.Error("error encoding account response", "error", err)
 	}
 }
 
