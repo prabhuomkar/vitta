@@ -16,8 +16,6 @@ import { AddIcon, ArrowDownIcon } from '@chakra-ui/icons';
 
 const AccountHeader = ({
   accountName,
-  totalClearedCredit,
-  totalClearedDebit,
   formatCurrency,
   primaryColor,
   setModalOpen,
@@ -53,9 +51,7 @@ const AccountHeader = ({
         <Flex direction={['column', 'row']} alignItems="center" gap={4}>
           <Stat flex={[null]} textAlign={['center', 'left']}>
             <StatLabel>{accountName}</StatLabel>
-            <StatNumber>
-              {formatCurrency(totalClearedCredit - totalClearedDebit)}
-            </StatNumber>
+            <StatNumber>{formatCurrency(0)}</StatNumber>
             <StatHelpText>CASH/CHECK IN</StatHelpText>
           </Stat>
           <Input

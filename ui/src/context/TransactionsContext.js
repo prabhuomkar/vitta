@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useState,
-  useCallback,
-  useContext,
-  useEffect
-} from 'react';
+import React, { createContext, useState, useCallback, useContext } from 'react';
 import {
   fetchTransactions,
   addTransaction,
@@ -23,7 +17,7 @@ export const TransactionsProvider = ({ children }) => {
   const [accountId, setAccountId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
-  const [limit] = useState(6);
+  const [limit] = useState(10);
   const [hasNextPage, setHasNextPage] = useState(false);
   const totalPages = Math.ceil(total / limit);
 
@@ -58,7 +52,6 @@ export const TransactionsProvider = ({ children }) => {
   const updateSearchQuery = query => {
     setSearchQuery(query);
     setPage(1);
-    getTransactions(accountId, query, page, limit);
   };
 
   const goToNextPage = () => {
@@ -68,12 +61,6 @@ export const TransactionsProvider = ({ children }) => {
   const goToPreviousPage = () => {
     setPage(prev => (prev > 1 ? prev - 1 : 1));
   };
-
-  useEffect(() => {
-    if (accountId) {
-      getTransactions(accountId, searchQuery, page);
-    }
-  }, [accountId, page, searchQuery, getTransactions]);
 
   const createTransaction = async transactionData => {
     if (!accountId) {

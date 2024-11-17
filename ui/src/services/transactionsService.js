@@ -32,7 +32,8 @@ export const uploadTransactions = async (accountId, file) => {
   // eslint-disable-next-line no-useless-catch
   try {
     const response = await importTransactions(accountId, file);
-    // console.log('API Response:', response);
+    // eslint-disable-next-line no-console
+    console.log('API Response:', response);
 
     if (response.status !== 200) {
       throw new Error(`Unexpected status code: ${response.status}`);
@@ -40,7 +41,8 @@ export const uploadTransactions = async (accountId, file) => {
 
     return response.data;
   } catch (error) {
-    // console.log('Error importing transaction:', error);
+    // eslint-disable-next-line no-console
+    console.log('Error importing transaction:', error);
     throw error;
   }
 };

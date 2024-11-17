@@ -1,18 +1,28 @@
 import React, { useState } from 'react';
 import { Tr, Td, Input, Select, Checkbox, IconButton } from '@chakra-ui/react';
 import { DeleteIcon } from '@chakra-ui/icons';
-import { ACCOUNT_CATEGORIES, ADAPTERS } from '../common/constants';
 
-const AccountRow = ({ account, onDelete, onSave }) => {
+const AccountRow = ({ account, adapters, onDelete, onSave }) => {
   const [localAccount, setLocalAccount] = useState(account);
+  const [isNameInvalid, setIsNameInvalid] = useState(false);
 
   const handleFieldChange = (field, value) => {
+    if (field === 'name') {
+      setIsNameInvalid(!value.trim());
+    }
     setLocalAccount({ ...localAccount, [field]: value });
   };
 
   const handleBlur = () => {
+    if (!localAccount.name.trim()) {
+      setIsNameInvalid(true);
+      return;
+    }
     onSave(localAccount.id, localAccount);
   };
+
+  const ACCOUNT_ADAPTERS = [...new Set(adapters.map(item => item.name))];
+  const ACCOUNT_CATEGORIES = [...new Set(adapters.map(item => item.category))];
 
   return (
     <Tr>
@@ -24,6 +34,8 @@ const AccountRow = ({ account, onDelete, onSave }) => {
           placeholder="Account Name"
           size="sm"
           maxLength={255}
+          isInvalid={isNameInvalid}
+          errorBorderColor="red.500"
         />
       </Td>
       <Td padding="0.6rem">
@@ -49,7 +61,7 @@ const AccountRow = ({ account, onDelete, onSave }) => {
           placeholder="Select Adapter"
           size="sm"
         >
-          {ADAPTERS.map(adapter => (
+          {ACCOUNT_ADAPTERS.map(adapter => (
             <option key={adapter} value={adapter}>
               {adapter}
             </option>

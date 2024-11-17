@@ -13,7 +13,7 @@ import { useAccounts } from '../context';
 import { AccountRow, Loading, Error } from '../components';
 
 const Accounts = () => {
-  const { accounts, deleteAccount, updateAccount, loading, error } =
+  const { accounts, deleteAccount, updateAccount, adapters, loading, error } =
     useAccounts();
   const [localAccounts, setLocalAccounts] = useState([]);
   const toast = useToast();
@@ -99,6 +99,7 @@ const Accounts = () => {
                 <AccountRow
                   key={account.id}
                   account={account}
+                  adapters={adapters}
                   onDelete={handleDelete}
                   onSave={handleSaveChanges}
                 />

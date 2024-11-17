@@ -1,19 +1,25 @@
 import React from 'react';
-import { Box, Table, Thead, Tbody, Tr, Th, Td } from '@chakra-ui/react';
-import TransactionRow from './TransactionRow';
+import {
+  Box,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  useToast
+} from '@chakra-ui/react';
 import LoadingTransactions from '../LoadingTransactions';
+import TransactionRow from './TransactionRow';
+import { useTransactions, usePayees, useCategories } from '../../context';
 
-const TransactionsTable = ({
-  localTransactions,
-  handleInputChange,
-  handleSaveChanges,
-  validationErrors,
-  payees,
-  categories,
-  handleCheckboxChange,
-  handleDelete,
-  loading
-}) => {
+const TransactionsTable = () => {
+  const toast = useToast();
+  const { transactions, loading, updateTransaction, deleteTransaction } =
+    useTransactions();
+  const { payees } = usePayees();
+  const { categories } = useCategories();
+
   if (loading) return <LoadingTransactions />;
 
   return (
@@ -38,19 +44,16 @@ const TransactionsTable = ({
           </Tr>
         </Thead>
         <Tbody>
-          {!loading && localTransactions.length > 0 ? (
-            localTransactions.map((transaction, index) => (
+          {transactions.length > 0 ? (
+            transactions.map(transaction => (
               <TransactionRow
                 key={transaction.id}
                 transaction={transaction}
-                index={index}
-                handleInputChange={handleInputChange}
-                handleSaveChanges={handleSaveChanges}
-                validationErrors={validationErrors}
                 payees={payees}
                 categories={categories}
-                handleCheckboxChange={handleCheckboxChange}
-                handleDelete={handleDelete}
+                updateTransaction={updateTransaction}
+                deleteTransaction={deleteTransaction}
+                toast={toast}
               />
             ))
           ) : (
