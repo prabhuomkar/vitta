@@ -9,7 +9,8 @@ const TransactionRow = ({
   categories,
   updateTransaction,
   deleteTransaction,
-  toast
+  toast,
+  getAccountById
 }) => {
   const [localTransaction, setLocalTransaction] = useState(transaction);
   const [validationErrors, setValidationErrors] = useState({});
@@ -25,11 +26,27 @@ const TransactionRow = ({
     }
   };
 
-  const handleCheckboxChange = () => {
-    setLocalTransaction(prev => ({
-      ...prev,
-      clearedAt: prev.clearedAt ? null : new Date().toISOString()
-    }));
+  const handleCheckboxChange = async () => {
+    const updatedTransaction = {
+      ...localTransaction,
+      clearedAt: localTransaction.clearedAt ? null : new Date().toISOString()
+    };
+    setLocalTransaction(updatedTransaction);
+
+    await updateTransaction(updatedTransaction.id, updatedTransaction);
+    getAccountById(localTransaction.accountId);
+  };
+
+  const handleDelete = async () => {
+    await deleteTransaction(localTransaction.id);
+    getAccountById(localTransaction.accountId);
+    toast({
+      title: 'Transaction deleted.',
+      description: `Transaction has been successfully deleted.`,
+      status: 'success',
+      duration: 1500,
+      isClosable: true
+    });
   };
 
   const handleSaveChanges = async () => {
@@ -44,20 +61,17 @@ const TransactionRow = ({
     }
 
     const hasChanges = !isEqual(localTransaction, transaction);
+    const creditOrDebitChanged =
+      localTransaction.credit !== transaction.credit ||
+      localTransaction.debit !== transaction.debit;
+
     if (hasChanges) {
       await updateTransaction(localTransaction.id, localTransaction);
-    }
-  };
 
-  const handleDelete = async () => {
-    await deleteTransaction(localTransaction.id);
-    toast({
-      title: 'Transaction deleted.',
-      description: `Transaction has been successfully deleted.`,
-      status: 'success',
-      duration: 1500,
-      isClosable: true
-    });
+      if (creditOrDebitChanged) {
+        getAccountById(localTransaction.accountId);
+      }
+    }
   };
 
   return (

@@ -30,7 +30,7 @@ const Account = () => {
     page,
     hasNextPage
   } = useTransactions();
-  const { accounts } = useAccounts();
+  const { currentAccount, getAccountById } = useAccounts();
   const [isModalOpen, setModalOpen] = useState(false);
   const [, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
@@ -41,9 +41,20 @@ const Account = () => {
         await getTransactions(accountId);
       }
     };
-
     fetchTransactions();
   }, [accountId, getTransactions]);
+
+  useEffect(() => {
+    const fetchAccount = async () => {
+      if (accountId) {
+        await getAccountById(accountId);
+      }
+    };
+    fetchAccount();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountId]);
+
+  const { name, balance } = currentAccount || {};
 
   const handleSearch = query => {
     updateSearchQuery(query);
@@ -66,6 +77,7 @@ const Account = () => {
     try {
       const response = await importTransactions(accountId, file);
       await getTransactions(accountId);
+      await getAccountById(accountId);
 
       if (response?.success) {
         toast({
@@ -84,24 +96,31 @@ const Account = () => {
         duration: 1500,
         isClosable: true
       });
+    } finally {
+      setSelectedFile(null);
+      fileInputRef.current.value = null;
     }
   };
 
-  const handleFileChange = event => {
-    setSelectedFile(event.target.files[0]);
-    handleFileUpload(event.target.files[0]);
+  const handleFileChange = async event => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    await handleFileUpload(file);
+
+    setSelectedFile(null);
+    fileInputRef.current.value = null;
   };
 
   const openFileDialog = () => {
     fileInputRef.current.click();
   };
 
-  const accountName = accounts.find(account => account.id === accountId)?.name;
-
   return (
     <Box>
       <AccountHeader
-        accountName={accountName}
+        accountName={name}
+        accountBalance={balance}
         formatCurrency={formatCurrency}
         primaryColor={primaryColor}
         setModalOpen={setModalOpen}
@@ -113,7 +132,7 @@ const Account = () => {
         total={total}
       />
       <Box my="4" />
-      <TransactionsTable />
+      <TransactionsTable getAccountById={getAccountById} />
       <Pagination
         page={page}
         totalPages={totalPages}

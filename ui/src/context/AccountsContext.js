@@ -12,6 +12,8 @@ export const AccountsContext = createContext();
 
 export const AccountsProvider = ({ children }) => {
   const [accounts, setAccounts] = useState([]);
+  const [currentAccount, setCurrentAccount] = useState([]);
+  const [, setCurrentAccountLoading] = useState(true);
   const [adapters, setAdapters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -32,8 +34,9 @@ export const AccountsProvider = ({ children }) => {
 
   const getAccountById = async id => {
     try {
-      setLoading(true);
+      setCurrentAccountLoading(true);
       const account = await fetchAccountById(id);
+      setCurrentAccount(account);
       return { success: true, account };
     } catch (err) {
       setError(err);
@@ -113,6 +116,7 @@ export const AccountsProvider = ({ children }) => {
       value={{
         accounts,
         getAccounts,
+        currentAccount,
         getAccountById,
         loading,
         error,

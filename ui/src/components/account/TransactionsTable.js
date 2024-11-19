@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Box,
   Table,
@@ -13,12 +13,25 @@ import LoadingTransactions from '../LoadingTransactions';
 import TransactionRow from './TransactionRow';
 import { useTransactions, usePayees, useCategories } from '../../context';
 
-const TransactionsTable = () => {
+const TransactionsTable = ({ getAccountById }) => {
   const toast = useToast();
-  const { transactions, loading, updateTransaction, deleteTransaction } =
-    useTransactions();
+  const {
+    transactions,
+    page,
+    totalPages,
+    goToPreviousPage,
+    loading,
+    updateTransaction,
+    deleteTransaction
+  } = useTransactions();
   const { payees } = usePayees();
   const { categories } = useCategories();
+
+  useEffect(() => {
+    if (transactions.length === 0 && page > 1 && totalPages > 1) {
+      goToPreviousPage();
+    }
+  }, [transactions.length, page, totalPages, goToPreviousPage]);
 
   if (loading) return <LoadingTransactions />;
 
@@ -54,6 +67,7 @@ const TransactionsTable = () => {
                 updateTransaction={updateTransaction}
                 deleteTransaction={deleteTransaction}
                 toast={toast}
+                getAccountById={getAccountById}
               />
             ))
           ) : (
