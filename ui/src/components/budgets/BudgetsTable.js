@@ -84,7 +84,7 @@ const BudgetsTable = ({
                   onMouseEnter={() => setHoveredRow(group.groupId)}
                   onMouseLeave={() => setHoveredRow(null)}
                 >
-                  <Td width="40%">
+                  <Td width="40%" fontWeight="medium">
                     <Flex alignItems="center">
                       <IconButton
                         size="xs"
@@ -151,9 +151,13 @@ const BudgetsTable = ({
                       )}
                     </Flex>
                   </Td>
-                  <Td width="20%">{formatCurrency(group.budgeted)}</Td>
-                  <Td width="20%">{formatCurrency(group.spent)}</Td>
-                  <Td width="20%">
+                  <Td width="20%" fontWeight="medium">
+                    {formatCurrency(group.budgeted)}
+                  </Td>
+                  <Td width="20%" fontWeight="medium">
+                    {formatCurrency(group.spent)}
+                  </Td>
+                  <Td width="20%" fontWeight="medium">
                     {formatCurrency(group.budgeted + group.spent)}
                   </Td>
                 </Tr>
@@ -286,4 +290,4 @@ const BudgetsTable = ({
   );
 };
 
-export default BudgetsTable;
+export default React.memo(BudgetsTable);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Box, useTheme, useToast } from '@chakra-ui/react';
 import { useBugdets, useGroups, useCategories } from '../context';
 import {
@@ -57,6 +57,7 @@ const Budgets = () => {
   });
   const [categoryNameError, setCategoryNameError] = useState('');
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+  const [originalCategoryName, setOriginalCategoryName] = useState('');
 
   // Budget management states
   const [isSetBudgetOpen, setIsSetBudgetOpen] = useState(false);
@@ -80,332 +81,411 @@ const Budgets = () => {
   }, [budgets]);
 
   // Toggle group open/closed state
-  const toggleGroup = groupId => {
+  const toggleGroup = useCallback(groupId => {
     setOpenGroups(prev => ({ ...prev, [groupId]: !prev[groupId] }));
-  };
+  }, []);
 
   // Group and categorize budgets
-  const groupedBudgets = budgets.reduce((acc, item) => {
-    const { groupId, groupName, groupNotes, budgeted, spent } = item;
-    if (!acc[groupId]) {
-      acc[groupId] = {
-        groupName,
-        groupNotes,
-        groupId,
-        categories: [],
-        budgeted: 0,
-        spent: 0
-      };
-    }
-    acc[groupId].categories.push(item);
-    acc[groupId].budgeted += budgeted;
-    acc[groupId].spent += spent;
-    return acc;
-  }, {});
-
-  const groupedBudgetsArray = Object.values(groupedBudgets);
+  const groupedBudgetsArray = useMemo(() => {
+    const grouped = budgets.reduce((acc, item) => {
+      const { groupId, groupName, groupNotes, budgeted, spent } = item;
+      if (!acc[groupId]) {
+        acc[groupId] = {
+          groupName,
+          groupNotes,
+          groupId,
+          categories: [],
+          budgeted: 0,
+          spent: 0
+        };
+      }
+      acc[groupId].categories.push(item);
+      acc[groupId].budgeted += budgeted;
+      acc[groupId].spent += spent;
+      return acc;
+    }, {});
+    return Object.values(grouped);
+  }, [budgets]);
 
   // function to check duplicate group name
-  const isDuplicateGroup = (groupName, groupId = null) => {
-    return budgets.some(
-      budget =>
-        budget.groupName === groupName.trim() &&
-        (groupId === null || budget.groupId !== groupId) // Exclude the current group if editing
-    );
-  };
+  const isDuplicateGroup = useCallback(
+    (groupName, groupId = null) => {
+      return budgets.some(
+        budget =>
+          budget.groupName === groupName.trim() &&
+          (groupId === null || budget.groupId !== groupId) // Exclude the current group if editing
+      );
+    },
+    [budgets]
+  );
 
   // function to check duplicate category name within a group
-  const isDuplicateCategory = (categoryName, groupId, categoryId = null) => {
-    return budgets.some(
-      budget =>
-        budget.groupId === groupId &&
-        budget.categoryName === categoryName.trim() &&
-        (categoryId === null || budget.id !== categoryId) // Exclude the current category if editing
-    );
-  };
+  const isDuplicateCategory = useCallback(
+    (categoryName, groupId, categoryId = null) => {
+      return budgets.some(
+        budget =>
+          budget.groupId === groupId &&
+          budget.categoryName === categoryName.trim() &&
+          (categoryId === null || budget.id !== categoryId) // Exclude the current category if editing
+      );
+    },
+    [budgets]
+  );
 
   // Handlers for form changes and submissions
-  const handleChange = e => {
+  const handleChange = useCallback(e => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     if (name === 'name' && value.trim()) setGroupNameError('');
-  };
+  }, []);
 
-  const handleEditChange = e => {
+  const handleEditChange = useCallback(e => {
     const { name, value } = e.target;
     setEditFormData(prev => ({ ...prev, [name]: value }));
-  };
+  }, []);
 
-  const handleCategoryChange = e => {
+  const handleCategoryChange = useCallback(e => {
     const { name, value } = e.target;
     setCategoryFormData(prev => ({ ...prev, [name]: value }));
-  };
+  }, []);
 
-  const handleEditCategoryChange = e => {
+  const handleEditCategoryChange = useCallback(e => {
     const { name, value } = e.target;
     setEditCategoryFormData(prev => ({ ...prev, [name]: value }));
-  };
+  }, []);
 
   // Group operations
-  const handleAddGroupSubmit = async e => {
-    e.preventDefault();
-    if (!formData.name.trim()) {
-      setGroupNameError('Group name is required');
-      return;
-    }
+  const handleAddGroupSubmit = useCallback(
+    async e => {
+      e.preventDefault();
+      if (!formData.name.trim()) {
+        setGroupNameError('Group name is required');
+        return;
+      }
 
-    if (isDuplicateGroup(formData.name)) {
-      toast({
-        title: 'Duplicate Group',
-        description: `A group with the name "${formData.name}" already exists.`,
-        status: 'warning',
-        duration: 1500,
-        isClosable: true
+      if (isDuplicateGroup(formData.name)) {
+        toast({
+          title: 'Duplicate Group',
+          description: `A group with the name "${formData.name}" already exists.`,
+          status: 'warning',
+          duration: 1500,
+          isClosable: true
+        });
+        return;
+      }
+
+      const result = await createGroup({
+        name: formData.name,
+        notes: formData.notes || null
       });
-      return;
-    }
+      if (result.success) {
+        setIsAddGroupOpen(false);
+        setFormData({ name: '', notes: '' });
+        await getBudgets(selectedYear, selectedMonth);
+        toast({
+          title: 'Group added.',
+          description: 'The group was added successfully.',
+          status: 'success',
+          duration: 1500,
+          isClosable: true
+        });
+      } else {
+        // eslint-disable-next-line no-console
+        console.error('Error creating group:', result.error);
+      }
+    },
+    [
+      createGroup,
+      formData.name,
+      formData.notes,
+      getBudgets,
+      isDuplicateGroup,
+      selectedMonth,
+      selectedYear,
+      toast
+    ]
+  );
 
-    const result = await createGroup({
-      name: formData.name,
-      notes: formData.notes || null
-    });
-    if (result.success) {
-      setIsAddGroupOpen(false);
-      setFormData({ name: '', notes: '' });
-      await getBudgets(selectedYear, selectedMonth);
-      toast({
-        title: 'Group added.',
-        description: 'The group was added successfully.',
-        status: 'success',
-        duration: 1500,
-        isClosable: true
+  const handleEditGroupSubmit = useCallback(
+    async e => {
+      e.preventDefault();
+      if (!editFormData.name.trim()) {
+        setGroupNameError('Group name is required');
+        return;
+      }
+
+      if (isDuplicateGroup(editFormData.name, selectedGroupId)) {
+        toast({
+          title: 'Duplicate Group',
+          description: `A group with the name "${editFormData.name}" already exists.`,
+          status: 'warning',
+          duration: 1500,
+          isClosable: true
+        });
+        return;
+      }
+
+      const result = await updateGroup(selectedGroupId, {
+        name: editFormData.name,
+        notes: editFormData.notes
       });
-    } else {
-      // eslint-disable-next-line no-console
-      console.error('Error creating group:', result.error);
-    }
-  };
+      if (result.success) {
+        setIsEditGroupOpen(false);
+        setEditFormData({ name: '', notes: '' });
+        await getBudgets(selectedYear, selectedMonth);
+        toast({
+          title: 'Group Updated.',
+          description: 'The group was updated successfully.',
+          status: 'success',
+          duration: 1500,
+          isClosable: true
+        });
+      } else {
+        // eslint-disable-next-line no-console
+        console.error('Error updating group:', result.error);
+      }
+    },
+    [
+      editFormData.name,
+      editFormData.notes,
+      getBudgets,
+      isDuplicateGroup,
+      selectedGroupId,
+      selectedMonth,
+      selectedYear,
+      toast,
+      updateGroup
+    ]
+  );
 
-  const handleEditGroupSubmit = async e => {
-    e.preventDefault();
-    if (!editFormData.name.trim()) {
-      setGroupNameError('Group name is required');
-      return;
-    }
+  const handleDeleteGroup = useCallback(
+    async groupId => {
+      const result = await deleteGroup(groupId);
 
-    if (isDuplicateGroup(editFormData.name, selectedGroupId)) {
-      toast({
-        title: 'Duplicate Group',
-        description: `A group with the name "${editFormData.name}" already exists.`,
-        status: 'warning',
-        duration: 1500,
-        isClosable: true
-      });
-      return;
-    }
-
-    const result = await updateGroup(selectedGroupId, {
-      name: editFormData.name,
-      notes: editFormData.notes
-    });
-    if (result.success) {
-      setIsEditGroupOpen(false);
-      setEditFormData({ name: '', notes: '' });
-      await getBudgets(selectedYear, selectedMonth);
-      toast({
-        title: 'Group Updated.',
-        description: 'The group was updated successfully.',
-        status: 'success',
-        duration: 1500,
-        isClosable: true
-      });
-    } else {
-      // eslint-disable-next-line no-console
-      console.error('Error updating group:', result.error);
-    }
-  };
-
-  const handleDeleteGroup = async groupId => {
-    const result = await deleteGroup(groupId);
-
-    if (result.success) {
-      setIsEditGroupOpen(false);
-      setEditFormData({ name: '' });
-      await getBudgets(selectedYear, selectedMonth);
-      toast({
-        title: 'Group Deleted.',
-        description: 'The group was deleted successfully.',
-        status: 'success',
-        duration: 1500,
-        isClosable: true
-      });
-    } else {
-      // eslint-disable-next-line no-console
-      console.error('Error deleting group:', result.error);
-    }
-  };
+      if (result.success) {
+        setIsEditGroupOpen(false);
+        setEditFormData({ name: '' });
+        await getBudgets(selectedYear, selectedMonth);
+        toast({
+          title: 'Group Deleted.',
+          description: 'The group was deleted successfully.',
+          status: 'success',
+          duration: 1500,
+          isClosable: true
+        });
+      } else {
+        // eslint-disable-next-line no-console
+        console.error('Error deleting group:', result.error);
+      }
+    },
+    [deleteGroup, getBudgets, selectedMonth, selectedYear, toast]
+  );
 
   // Category operations
-  const handleAddCategorySubmit = async e => {
-    e.preventDefault();
-    if (!categoryFormData.name.trim()) {
-      setCategoryNameError('Category name is required');
-      return;
-    }
+  const handleAddCategorySubmit = useCallback(
+    async e => {
+      e.preventDefault();
+      if (!categoryFormData.name.trim()) {
+        setCategoryNameError('Category name is required');
+        return;
+      }
 
-    if (isDuplicateCategory(categoryFormData.name, selectedGroupId)) {
-      toast({
-        title: 'Duplicate Category',
-        description: `A category with the name "${categoryFormData.name}" already exists in this group.`,
-        status: 'warning',
-        duration: 1500,
-        isClosable: true
+      if (isDuplicateCategory(categoryFormData.name, selectedGroupId)) {
+        toast({
+          title: 'Duplicate Category',
+          description: `A category with the name "${categoryFormData.name}" already exists in this group.`,
+          status: 'warning',
+          duration: 1500,
+          isClosable: true
+        });
+        return;
+      }
+
+      const result = await createCategory({
+        name: categoryFormData.name,
+        notes: categoryFormData.notes,
+        groupId: selectedGroupId
       });
-      return;
-    }
 
-    const result = await createCategory({
-      name: categoryFormData.name,
-      notes: categoryFormData.notes,
-      groupId: selectedGroupId
-    });
+      if (result.success) {
+        setIsAddCategoryOpen(false);
+        setCategoryFormData({ name: '', notes: '' });
+        await getBudgets(selectedYear, selectedMonth);
+        toast({
+          title: 'Category added.',
+          description: 'The category was added successfully.',
+          status: 'success',
+          duration: 1500,
+          isClosable: true
+        });
+      } else {
+        // eslint-disable-next-line no-console
+        console.error('Error creating category:', result.error);
+      }
+    },
+    [
+      categoryFormData.name,
+      categoryFormData.notes,
+      createCategory,
+      getBudgets,
+      isDuplicateCategory,
+      selectedGroupId,
+      selectedMonth,
+      selectedYear,
+      toast
+    ]
+  );
 
-    if (result.success) {
-      setIsAddCategoryOpen(false);
-      setCategoryFormData({ name: '', notes: '' });
-      await getBudgets(selectedYear, selectedMonth);
-      toast({
-        title: 'Category added.',
-        description: 'The category was added successfully.',
-        status: 'success',
-        duration: 1500,
-        isClosable: true
+  const handleEditCategorySubmit = useCallback(
+    async e => {
+      e.preventDefault();
+      if (!editCategoryFormData.name.trim()) {
+        setCategoryNameError('Category name is required');
+        return;
+      }
+
+      // Only check for duplicate if the name has changed
+      if (
+        editCategoryFormData.name.trim() !== originalCategoryName &&
+        isDuplicateCategory(
+          editCategoryFormData.name,
+          selectedGroupId,
+          selectedCategoryId
+        )
+      ) {
+        toast({
+          title: 'Duplicate Category',
+          description: `A category with the name "${editCategoryFormData.name}" already exists in this group.`,
+          status: 'warning',
+          duration: 1500,
+          isClosable: true
+        });
+        return;
+      }
+
+      const result = await updateCategory(selectedCategoryId, {
+        groupId: selectedGroupId,
+        name: editCategoryFormData.name,
+        notes: editCategoryFormData.notes || null
       });
-    } else {
-      // eslint-disable-next-line no-console
-      console.error('Error creating category:', result.error);
-    }
-  };
 
-  const handleEditCategorySubmit = async e => {
-    e.preventDefault();
-    if (!editCategoryFormData.name.trim()) {
-      setCategoryNameError('Category name is required');
-      return;
-    }
+      if (result.success) {
+        setIsEditCategoryOpen(false);
+        setEditCategoryFormData({ name: '', notes: '' });
+        setOriginalCategoryName('');
+        await getBudgets(selectedYear, selectedMonth);
+        toast({
+          title: 'Category updated.',
+          description: 'The category was updated successfully.',
+          status: 'success',
+          duration: 1500,
+          isClosable: true
+        });
+      } else {
+        // eslint-disable-next-line no-console
+        console.error('Error updating category:', result.error);
+      }
+    },
+    [
+      editCategoryFormData.name,
+      editCategoryFormData.notes,
+      getBudgets,
+      isDuplicateCategory,
+      originalCategoryName,
+      selectedCategoryId,
+      selectedGroupId,
+      selectedMonth,
+      selectedYear,
+      toast,
+      updateCategory
+    ]
+  );
 
-    if (
-      isDuplicateCategory(
-        editCategoryFormData.name,
-        selectedGroupId,
-        selectedCategoryId
-      )
-    ) {
-      toast({
-        title: 'Duplicate Category',
-        description: `A category with the name "${editCategoryFormData.name}" already exists in this group.`,
-        status: 'warning',
-        duration: 1500,
-        isClosable: true
-      });
-      return;
-    }
+  const handleDeleteCategory = useCallback(
+    async categoryId => {
+      const result = await deleteCategory(categoryId);
 
-    const result = await updateCategory(selectedCategoryId, {
-      groupId: selectedGroupId,
-      name: editCategoryFormData.name,
-      notes: editCategoryFormData.notes || null
-    });
-
-    if (result.success) {
-      setIsEditCategoryOpen(false);
-      setEditCategoryFormData({ name: '', notes: '' });
-      await getBudgets(selectedYear, selectedMonth);
-      toast({
-        title: 'Category updated.',
-        description: 'The category was updated successfully.',
-        status: 'success',
-        duration: 1500,
-        isClosable: true
-      });
-    } else {
-      // eslint-disable-next-line no-console
-      console.error('Error updating category:', result.error);
-    }
-  };
-
-  const handleDeleteCategory = async categoryId => {
-    const result = await deleteCategory(categoryId);
-
-    if (result.success) {
-      setIsEditCategoryOpen(false);
-      setEditCategoryFormData({ name: '', notes: '', groupId: '' });
-      setSelectedCategoryId('');
-      setSelectedGroupId('');
-      await getBudgets(selectedYear, selectedMonth);
-      toast({
-        title: 'Category deleted.',
-        description: 'The category was deleted successfully.',
-        status: 'success',
-        duration: 1500,
-        isClosable: true
-      });
-    } else {
-      // eslint-disable-next-line no-console
-      console.error('Error deleting category:', result.error);
-    }
-  };
+      if (result.success) {
+        setIsEditCategoryOpen(false);
+        setEditCategoryFormData({ name: '', notes: '', groupId: '' });
+        setSelectedCategoryId('');
+        setSelectedGroupId('');
+        await getBudgets(selectedYear, selectedMonth);
+        toast({
+          title: 'Category deleted.',
+          description: 'The category was deleted successfully.',
+          status: 'success',
+          duration: 1500,
+          isClosable: true
+        });
+      } else {
+        // eslint-disable-next-line no-console
+        console.error('Error deleting category:', result.error);
+      }
+    },
+    [deleteCategory, getBudgets, selectedMonth, selectedYear, toast]
+  );
 
   // Open edit modal with selected category data
-  const openEditCategoryModal = (
-    groupId,
-    categoryId,
-    categoryName,
-    categoryNotes
-  ) => {
-    if (!categoryId) {
-      setIsAddCategoryOpen(true);
-      setSelectedGroupId(groupId);
-      setCategoryFormData({ name: '', notes: '' });
-    } else {
-      setEditCategoryFormData({
-        groupId,
-        name: categoryName || '',
-        notes: categoryNotes || ''
-      });
-      setSelectedCategoryId(categoryId);
-      setSelectedGroupId(groupId);
-      setIsEditCategoryOpen(true);
-    }
-  };
+  const openEditCategoryModal = useCallback(
+    (groupId, categoryId, categoryName, categoryNotes) => {
+      if (!categoryId) {
+        setIsAddCategoryOpen(true);
+        setSelectedGroupId(groupId);
+        setCategoryFormData({ name: '', notes: '' });
+      } else {
+        setEditCategoryFormData({
+          groupId,
+          name: categoryName || '',
+          notes: categoryNotes || ''
+        });
+        setOriginalCategoryName(categoryName || '');
+        setSelectedCategoryId(categoryId);
+        setSelectedGroupId(groupId);
+        setIsEditCategoryOpen(true);
+      }
+    },
+    []
+  );
 
   // Budget operations
-  const handleSetBudget = async e => {
-    e.preventDefault();
-    const result = await createBudget({
-      month: selectedMonth,
-      year: selectedYear,
-      categoryId: selectedCategoryId,
-      budgeted: parseFloat(budgetFormData.budgeted)
-    });
-
-    if (result.success) {
-      setIsSetBudgetOpen(false);
-      setBudgetFormData({ budgeted: 0 });
-      setSelectedCategoryId('');
-      await getBudgets(selectedYear, selectedMonth);
-      toast({
-        title: 'Budget Set Successfully',
-        description: 'The budget for the category has been updated.',
-        status: 'success',
-        duration: 1500,
-        isClosable: true
+  const handleSetBudget = useCallback(
+    async e => {
+      e.preventDefault();
+      const result = await createBudget({
+        month: selectedMonth,
+        year: selectedYear,
+        categoryId: selectedCategoryId,
+        budgeted: parseFloat(budgetFormData.budgeted)
       });
-    } else {
-      // eslint-disable-next-line no-console
-      console.error('Error setting budget:', result.error);
-    }
-  };
+
+      if (result.success) {
+        setIsSetBudgetOpen(false);
+        setBudgetFormData({ budgeted: 0 });
+        setSelectedCategoryId('');
+        await getBudgets(selectedYear, selectedMonth);
+        toast({
+          title: 'Budget Set Successfully',
+          description: 'The budget for the category has been updated.',
+          status: 'success',
+          duration: 1500,
+          isClosable: true
+        });
+      } else {
+        // eslint-disable-next-line no-console
+        console.error('Error setting budget:', result.error);
+      }
+    },
+    [
+      budgetFormData.budgeted,
+      createBudget,
+      getBudgets,
+      selectedCategoryId,
+      selectedMonth,
+      selectedYear,
+      toast
+    ]
+  );
 
   if (error) return <Error message={error.message} />;
 
