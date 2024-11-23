@@ -143,7 +143,7 @@ func GetTransactions(cfg Config, rows [][]string) []AdapterTransaction {
 
 		debit, credit := 0.0, 0.0
 
-		if debitIdx[1] == creditIdx[1] { //nolint: nestif
+		if debitIdx[1] == creditIdx[1] && len(cfg.TransactionDiff) > 1 { //nolint: nestif
 			amountStr := rows[idx][debitIdx[1]]
 			if strings.Contains(strings.ToLower(amountStr), cfg.TransactionDiff[1]) {
 				debit, err = parseTransactionAmount(amountStr)
