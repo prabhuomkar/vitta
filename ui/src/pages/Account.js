@@ -1,13 +1,7 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Box, useTheme, useToast } from '@chakra-ui/react';
-import isEqual from 'lodash.isequal';
 import { useParams } from 'react-router-dom';
-import {
-  useAccounts,
-  usePayees,
-  useCategories,
-  useTransactions
-} from '../context';
+import { useAccounts, useTransactions } from '../context';
 import {
   AccountHeader,
   AddTransactionModal,
@@ -23,15 +17,12 @@ const Account = () => {
   const theme = useTheme();
   const primaryColor = theme.colors.primary;
   const {
-    transactions,
     total,
     totalPages,
     loading,
     error,
     getTransactions,
     importTransactions,
-    updateTransaction,
-    deleteTransaction,
     searchQuery,
     updateSearchQuery,
     goToNextPage,
@@ -39,110 +30,37 @@ const Account = () => {
     page,
     hasNextPage
   } = useTransactions();
-  const { accounts } = useAccounts();
-  const { payees } = usePayees();
-  const { categories } = useCategories();
+  const { currentAccount, getAccountById } = useAccounts();
   const [isModalOpen, setModalOpen] = useState(false);
-  const [localTransactions, setLocalTransactions] = useState(transactions);
-  const [originalTransactions, setOriginalTransactions] =
-    useState(transactions);
-  const [validationErrors, setValidationErrors] = useState({});
   const [, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
     const fetchTransactions = async () => {
       if (accountId) {
-        setLocalTransactions([]);
-        setOriginalTransactions([]);
         await getTransactions(accountId);
       }
     };
-
     fetchTransactions();
   }, [accountId, getTransactions]);
 
   useEffect(() => {
-    setLocalTransactions(transactions);
-    setOriginalTransactions(JSON.parse(JSON.stringify(transactions)));
-  }, [transactions]);
+    const fetchAccount = async () => {
+      if (accountId) {
+        await getAccountById(accountId);
+      }
+    };
+    fetchAccount();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountId]);
 
-  const totalClearedCredit = useMemo(() => {
-    return localTransactions
-      .filter(transaction => transaction.clearedAt)
-      .reduce((acc, transaction) => acc + (transaction.credit || 0), 0);
-  }, [localTransactions]);
-
-  const totalClearedDebit = useMemo(() => {
-    return localTransactions
-      .filter(transaction => transaction.clearedAt)
-      .reduce((acc, transaction) => acc + (transaction.debit || 0), 0);
-  }, [localTransactions]);
+  const { name, balance } = currentAccount || {};
 
   const handleSearch = query => {
     updateSearchQuery(query);
   };
 
   if (error) return <Error message={error.message} />;
-
-  const handleDelete = async id => {
-    await deleteTransaction(id);
-    toast({
-      title: 'Transaction deleted.',
-      description: `Transaction has been successfully deleted.`,
-      status: 'success',
-      duration: 1500,
-      isClosable: true
-    });
-  };
-
-  const handleInputChange = (index, field, value) => {
-    const updatedTransactions = [...localTransactions];
-    updatedTransactions[index][field] = value;
-    setLocalTransactions(updatedTransactions);
-
-    if (field === 'name' && value) {
-      setValidationErrors(prev => ({ ...prev, [index]: false }));
-    }
-  };
-
-  const handleCheckboxChange = index => {
-    const updatedTransactions = [...localTransactions];
-    const currentDateTime = new Date().toISOString();
-    updatedTransactions[index].clearedAt = updatedTransactions[index].clearedAt
-      ? null
-      : currentDateTime;
-    setLocalTransactions(updatedTransactions);
-  };
-
-  const handleSaveChanges = async index => {
-    const transaction = localTransactions[index];
-    const originalTransaction = originalTransactions[index];
-
-    const errors = {};
-    if (!transaction.name) {
-      errors.name = true;
-    }
-
-    if (Object.keys(errors).length > 0) {
-      setValidationErrors(prev => ({ ...prev, [index]: errors }));
-      return;
-    }
-
-    setValidationErrors(prev => ({ ...prev, [index]: {} }));
-
-    if (transaction.payeeId === '') {
-      transaction.payeeId = null;
-    }
-
-    const hasChanges = !isEqual(transaction, originalTransaction);
-    if (hasChanges) {
-      await updateTransaction(transaction.id, {
-        ...transaction,
-        clearedAt: transaction.clearedAt
-      });
-    }
-  };
 
   const handleFileUpload = async file => {
     if (!file) {
@@ -159,6 +77,7 @@ const Account = () => {
     try {
       const response = await importTransactions(accountId, file);
       await getTransactions(accountId);
+      await getAccountById(accountId);
 
       if (response?.success) {
         toast({
@@ -177,26 +96,31 @@ const Account = () => {
         duration: 1500,
         isClosable: true
       });
+    } finally {
+      setSelectedFile(null);
+      fileInputRef.current.value = null;
     }
   };
 
-  const handleFileChange = event => {
-    setSelectedFile(event.target.files[0]);
-    handleFileUpload(event.target.files[0]);
+  const handleFileChange = async event => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    await handleFileUpload(file);
+
+    setSelectedFile(null);
+    fileInputRef.current.value = null;
   };
 
   const openFileDialog = () => {
     fileInputRef.current.click();
   };
 
-  const accountName = accounts.find(account => account.id === accountId)?.name;
-
   return (
     <Box>
       <AccountHeader
-        accountName={accountName}
-        totalClearedCredit={totalClearedCredit}
-        totalClearedDebit={totalClearedDebit}
+        accountName={name}
+        accountBalance={balance}
         formatCurrency={formatCurrency}
         primaryColor={primaryColor}
         setModalOpen={setModalOpen}
@@ -208,17 +132,7 @@ const Account = () => {
         total={total}
       />
       <Box my="4" />
-      <TransactionsTable
-        localTransactions={localTransactions}
-        handleInputChange={handleInputChange}
-        handleSaveChanges={handleSaveChanges}
-        validationErrors={validationErrors}
-        payees={payees}
-        categories={categories}
-        handleCheckboxChange={handleCheckboxChange}
-        handleDelete={handleDelete}
-        loading={loading}
-      />
+      <TransactionsTable getAccountById={getAccountById} />
       <Pagination
         page={page}
         totalPages={totalPages}

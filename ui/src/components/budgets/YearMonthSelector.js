@@ -77,7 +77,11 @@ const YearMonthSelector = ({
                   // eslint-disable-next-line react/no-array-index-key
                   key={index}
                   color="black"
-                  _selected={{ color: 'white', bg: `${primaryColor}` }}
+                  _selected={{
+                    color: 'white',
+                    bg: `${primaryColor}`,
+                    transition: 'all 0.4s ease-in-out'
+                  }}
                   p="0.4rem 0.8rem"
                   ml={1}
                 >

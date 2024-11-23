@@ -1,8 +1,10 @@
 import {
   getAccounts,
+  getAccountById,
   createAccount,
   updateAccount,
-  deleteAccount
+  deleteAccount,
+  getAdapters
 } from '../api/accountsApi';
 
 export const fetchAccounts = async () => {
@@ -12,6 +14,17 @@ export const fetchAccounts = async () => {
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Error fetching accounts:', error);
+    throw error;
+  }
+};
+
+export const fetchAccountById = async id => {
+  try {
+    const response = await getAccountById(id);
+    return response.data;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Error fetching account:', error);
     throw error;
   }
 };
@@ -45,6 +58,17 @@ export const removeAccount = async id => {
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Error deleting account:', error);
+    throw error;
+  }
+};
+
+export const fetchAdapters = async () => {
+  try {
+    const response = await getAdapters();
+    return response.data;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Error fetching adapters:', error);
     throw error;
   }
 };

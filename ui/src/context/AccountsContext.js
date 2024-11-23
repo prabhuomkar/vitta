@@ -1,15 +1,20 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   fetchAccounts,
+  fetchAccountById,
   addAccount,
   editAccount,
-  removeAccount
+  removeAccount,
+  fetchAdapters
 } from '../services/accountsService';
 
 export const AccountsContext = createContext();
 
 export const AccountsProvider = ({ children }) => {
   const [accounts, setAccounts] = useState([]);
+  const [currentAccount, setCurrentAccount] = useState([]);
+  const [, setCurrentAccountLoading] = useState(true);
+  const [adapters, setAdapters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -27,9 +32,19 @@ export const AccountsProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    getAccounts();
-  }, []);
+  const getAccountById = async id => {
+    try {
+      setCurrentAccountLoading(true);
+      const account = await fetchAccountById(id);
+      setCurrentAccount(account);
+      return { success: true, account };
+    } catch (err) {
+      setError(err);
+      return { success: false, error: err };
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const createAccount = async accountData => {
     try {
@@ -72,17 +87,44 @@ export const AccountsProvider = ({ children }) => {
     }
   };
 
+  const getAdapters = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchAdapters();
+      setAdapters(data);
+      return { success: true, adapters };
+    } catch (err) {
+      setError(err);
+      return { success: false, error: err };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getAccounts();
+  }, []);
+
+  useEffect(() => {
+    getAdapters();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <AccountsContext.Provider
       // eslint-disable-next-line react/jsx-no-constructed-context-values
       value={{
         accounts,
         getAccounts,
+        currentAccount,
+        getAccountById,
         loading,
         error,
         createAccount,
         updateAccount,
-        deleteAccount
+        deleteAccount,
+        adapters,
+        getAdapters
       }}
     >
       {children}

@@ -9,4 +9,4 @@ export const ACCOUNT_CATEGORIES = [
   'SSY'
 ];
 
-export const ADAPTERS = ['icici'];
+export const ACCOUNT_ADAPTERS = ['icici'];

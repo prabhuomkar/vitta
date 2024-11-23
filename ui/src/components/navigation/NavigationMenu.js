@@ -29,13 +29,13 @@ import {
 } from '@chakra-ui/react';
 import { PlusSquareIcon } from '@chakra-ui/icons';
 import { useAccounts } from '../../context';
-import { NAV_ITEMS, ACCOUNT_CATEGORIES, ADAPTERS } from '../common/constants';
+import { NAV_ITEMS } from '../common/constants';
 
 const NavigationMenu = ({ onClose }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const currentPath = location.pathname;
-  const { accounts, createAccount, loading } = useAccounts();
+  const { accounts, createAccount, adapters, loading } = useAccounts();
 
   const theme = useTheme();
   const primaryColor = theme.colors.primary;
@@ -97,6 +97,9 @@ const NavigationMenu = ({ onClose }) => {
       setFormError('Failed to add account. Please try again.');
     }
   };
+
+  const ACCOUNT_ADAPTERS = [...new Set(adapters.map(item => item.name))];
+  const ACCOUNT_CATEGORIES = [...new Set(adapters.map(item => item.category))];
 
   return (
     <VStack spacing={2} align="flex-start" width="100%">
@@ -192,7 +195,7 @@ const NavigationMenu = ({ onClose }) => {
                       value={accountAdapter}
                       onChange={e => setAccountAdapter(e.target.value)}
                     >
-                      {ADAPTERS.map(adapter => (
+                      {ACCOUNT_ADAPTERS.map(adapter => (
                         <option key={adapter} value={adapter}>
                           {adapter}
                         </option>
