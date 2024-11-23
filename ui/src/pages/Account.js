@@ -54,7 +54,7 @@ const Account = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountId]);
 
-  const { name, balance } = currentAccount || {};
+  const { name, balance, category } = currentAccount || {};
 
   const handleSearch = query => {
     updateSearchQuery(query);
@@ -79,7 +79,7 @@ const Account = () => {
       await getTransactions(accountId);
       await getAccountById(accountId);
 
-      if (response?.success) {
+      if (response?.status === 200) {
         toast({
           title: 'Transactions imported successfully',
           description: `The file has been uploaded, and ${response?.transactions?.imported} transactions are imported.`,
@@ -87,6 +87,8 @@ const Account = () => {
           duration: 1500,
           isClosable: true
         });
+      } else {
+        throw new Error(response?.message || 'Failed to upload file');
       }
     } catch (err) {
       toast({
@@ -121,6 +123,7 @@ const Account = () => {
       <AccountHeader
         accountName={name}
         accountBalance={balance}
+        accountCategory={category}
         formatCurrency={formatCurrency}
         primaryColor={primaryColor}
         setModalOpen={setModalOpen}

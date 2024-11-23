@@ -1,4 +1,6 @@
-export const NAV_ITEMS = ['home', 'budgets', 'payees'];
+// export const NAV_ITEMS = ['home', 'budgets', 'payees'];
+
+export const NAV_ITEMS = ['budgets', 'payees'];
 
 export const ACCOUNT_CATEGORIES = [
   'CASH/CHECK IN',

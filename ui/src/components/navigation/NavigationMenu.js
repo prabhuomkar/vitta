@@ -98,8 +98,13 @@ const NavigationMenu = ({ onClose }) => {
     }
   };
 
-  const ACCOUNT_ADAPTERS = [...new Set(adapters.map(item => item.name))];
   const ACCOUNT_CATEGORIES = [...new Set(adapters.map(item => item.category))];
+  // const ACCOUNT_ADAPTERS = [...new Set(adapters.map(item => item.name))];
+  const ACCOUNT_ADAPTERS = accountCategory
+    ? adapters
+        .filter(item => item.category === accountCategory)
+        .map(item => item.name)
+    : [...new Set(adapters.map(item => item.name))];
 
   return (
     <VStack spacing={2} align="flex-start" width="100%">
@@ -194,6 +199,7 @@ const NavigationMenu = ({ onClose }) => {
                       placeholder="Select Adapter"
                       value={accountAdapter}
                       onChange={e => setAccountAdapter(e.target.value)}
+                      disabled={!accountCategory}
                     >
                       {ACCOUNT_ADAPTERS.map(adapter => (
                         <option key={adapter} value={adapter}>

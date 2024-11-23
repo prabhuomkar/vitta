@@ -47,17 +47,22 @@ const Header = ({ onOpen, logoSrc }) => {
         <Image
           src={logoSrc}
           alt="Logo"
-          boxSize="40px"
+          boxSize="34px"
           display={{ base: 'none', md: 'block' }}
         />
-        <Heading size="md" ml="1rem" display={{ base: 'none', md: 'block' }}>
+        <Heading
+          size="md"
+          ml="0.6rem"
+          mt="0.2rem"
+          display={{ base: 'none', md: 'block' }}
+        >
           <span style={{ fontFamily: 'Libre Baskerville, serif' }}>Vitta</span>
         </Heading>
       </Flex>
       <Image
         src={logoSrc}
         alt="Logo"
-        boxSize="40px"
+        boxSize="34px"
         mx="auto"
         display={{ base: 'block', md: 'none' }}
       />
@@ -72,8 +77,8 @@ const Header = ({ onOpen, logoSrc }) => {
           _focus={{ boxShadow: 'none', outline: 'none' }}
         >
           <Box
-            width="40px"
-            height="40px"
+            width="34px"
+            height="34px"
             borderRadius="full"
             bg="gray.300"
             display="flex"

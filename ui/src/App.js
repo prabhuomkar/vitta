@@ -16,7 +16,7 @@ import {
 } from './context';
 import MainLayout from './components/MainLayout';
 import Auth from './components/Auth';
-import { Home, Budgets, Payees, Accounts, Account } from './pages';
+import { Budgets, Payees, Accounts, Account } from './pages';
 import PrivateRoute from './components/common/PrivateRoute';
 import './App.css';
 
@@ -40,8 +40,8 @@ const AppRoutes = () => {
                           <CategoriesProvider>
                             <MainLayout>
                               <Routes>
-                                <Route path="/" element={<Home />} />
-                                <Route path="/home" element={<Home />} />
+                                {/* <Route path="/" element={<Home />} />
+                                <Route path="/home" element={<Home />} /> */}
                                 <Route path="/budgets" element={<Budgets />} />
                                 <Route path="/payees" element={<Payees />} />
                                 <Route

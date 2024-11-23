@@ -5,10 +5,18 @@ import { DeleteIcon } from '@chakra-ui/icons';
 const AccountRow = ({ account, adapters, onDelete, onSave }) => {
   const [localAccount, setLocalAccount] = useState(account);
   const [isNameInvalid, setIsNameInvalid] = useState(false);
+  const [isCategoryInvalid, setIsCategoryInvalid] = useState(false);
+  const [isAdapterInvalid, setIsAdapterInvalid] = useState(false);
 
   const handleFieldChange = (field, value) => {
     if (field === 'name') {
       setIsNameInvalid(!value.trim());
+    }
+    if (field === 'category') {
+      setIsCategoryInvalid(!value.trim());
+    }
+    if (field === 'adapter') {
+      setIsAdapterInvalid(!value.trim());
     }
     setLocalAccount({ ...localAccount, [field]: value });
   };
@@ -18,11 +26,22 @@ const AccountRow = ({ account, adapters, onDelete, onSave }) => {
       setIsNameInvalid(true);
       return;
     }
+    if (!localAccount.category.trim()) {
+      setIsCategoryInvalid(true);
+      return;
+    }
+    if (!localAccount.adapter.trim()) {
+      setIsAdapterInvalid(true);
+      return;
+    }
     onSave(localAccount.id, localAccount);
   };
 
-  const ACCOUNT_ADAPTERS = [...new Set(adapters.map(item => item.name))];
   const ACCOUNT_CATEGORIES = [...new Set(adapters.map(item => item.category))];
+  // const ACCOUNT_ADAPTERS = [...new Set(adapters.map(item => item.name))];
+  const ACCOUNT_ADAPTERS = adapters
+    .filter(item => item.category === localAccount.category)
+    .map(item => item.name);
 
   return (
     <Tr>
@@ -45,6 +64,8 @@ const AccountRow = ({ account, adapters, onDelete, onSave }) => {
           onBlur={handleBlur}
           placeholder="Select Category"
           size="sm"
+          isInvalid={isCategoryInvalid}
+          errorBorderColor="red.500"
         >
           {ACCOUNT_CATEGORIES.map(cat => (
             <option key={cat} value={cat}>
@@ -60,6 +81,8 @@ const AccountRow = ({ account, adapters, onDelete, onSave }) => {
           onBlur={handleBlur}
           placeholder="Select Adapter"
           size="sm"
+          isInvalid={isAdapterInvalid}
+          errorBorderColor="red.500"
         >
           {ACCOUNT_ADAPTERS.map(adapter => (
             <option key={adapter} value={adapter}>

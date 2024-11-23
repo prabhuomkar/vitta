@@ -9,12 +9,14 @@ import {
   useTheme,
   Image
 } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context';
 
 const Auth = () => {
   const theme = useTheme();
   const primaryColor = theme.colors.primary;
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     username: '',
@@ -57,6 +59,7 @@ const Auth = () => {
     if (!hasError) {
       try {
         login(formData.username, formData.password);
+        navigate('/budgets');
       } catch (error) {
         setErrors({
           username: '',
@@ -64,6 +67,12 @@ const Auth = () => {
           login: error.message
         });
       }
+    }
+  };
+
+  const handleKeyPress = e => {
+    if (e.key === 'Enter') {
+      handleSubmit();
     }
   };
 
@@ -83,6 +92,7 @@ const Auth = () => {
         borderRadius="md"
         border="1px solid"
         borderColor="gray.200"
+        onKeyDown={handleKeyPress}
       >
         <Stack spacing={4} align="center">
           <Image src="/logo.png" alt="Logo" boxSize="64px" mb={2} />

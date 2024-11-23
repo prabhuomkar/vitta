@@ -28,6 +28,11 @@ const PayeeTable = ({
         </Tr>
       </Thead>
       <Tbody>
+        <NewPayeeRow
+          newPayee={newPayee}
+          setNewPayee={setNewPayee}
+          handleAddPayee={handleAddPayee}
+        />
         {payees.length > 0 ? (
           payees.map(payee => (
             <PayeeRow
@@ -51,11 +56,6 @@ const PayeeTable = ({
             </Td>
           </Tr>
         )}
-        <NewPayeeRow
-          newPayee={newPayee}
-          setNewPayee={setNewPayee}
-          handleAddPayee={handleAddPayee}
-        />
       </Tbody>
     </Table>
   );

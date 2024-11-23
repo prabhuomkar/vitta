@@ -83,18 +83,18 @@ export const TransactionsProvider = ({ children }) => {
     }
 
     try {
-      const importedTransactions = await uploadTransactions(accId, file);
+      const response = await uploadTransactions(accId, file);
+      const { importedTransactions, status } = response;
 
-      if (Array.isArray(importedTransactions)) {
+      if (status === 200 && Array.isArray(importedTransactions)) {
         setTransactions([...transactions, ...importedTransactions]);
-      } else {
+      } else if (status === 200) {
         setTransactions([...transactions]);
       }
 
       setError(null);
       // eslint-disable-next-line no-console
-      console.log('Imported Transactions:', importedTransactions);
-      return { success: true, transactions: importedTransactions };
+      return { success: true, status, transactions: importedTransactions };
     } catch (err) {
       setError('Failed to import transactions');
       // eslint-disable-next-line no-console
@@ -160,6 +160,7 @@ export const TransactionsProvider = ({ children }) => {
         goToNextPage,
         goToPreviousPage,
         page,
+        setPage,
         hasNextPage
       }}
     >
