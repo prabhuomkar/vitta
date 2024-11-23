@@ -53,8 +53,8 @@ const (
 		` COALESCE(NULLIF($2, ''), '') || '%')`
 	queryGetTransactions = `SELECT t.*, c.name as category_name, p.name as payee_name FROM transactions AS t` +
 		` LEFT JOIN categories AS c ON t.category_id = c.id LEFT JOIN payees AS p ON t.payee_id = p.id` +
-		` WHERE t.account_id=$1 AND (t.name ILIKE '%' || COALESCE(NULLIF($2, ''), '') || '%') ORDER BY t.created_at DESC` +
-		` OFFSET $3 LIMIT $4`
+		` WHERE t.account_id=$1 AND ((t.name ILIKE '%' || COALESCE(NULLIF($2, ''), '') || '%') OR (t.notes ILIKE` +
+		` '%' || COALESCE(NULLIF($2, ''), '') || '%')) ORDER BY t.created_at DESC OFFSET $3 LIMIT $4`
 )
 
 func (h *Handler) CreateTransaction(w http.ResponseWriter, r *http.Request) {
