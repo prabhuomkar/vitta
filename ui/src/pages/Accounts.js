@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+/* eslint-disable no-nested-ternary */
+import React from 'react';
 import {
   Box,
   Table,
@@ -7,6 +8,8 @@ import {
   Tr,
   Th,
   Td,
+  Image,
+  Text,
   useToast
 } from '@chakra-ui/react';
 import { useAccounts } from '../context';
@@ -15,12 +18,7 @@ import { AccountRow, Loading, Error } from '../components';
 const Accounts = () => {
   const { accounts, deleteAccount, updateAccount, adapters, loading, error } =
     useAccounts();
-  const [localAccounts, setLocalAccounts] = useState([]);
   const toast = useToast();
-
-  useEffect(() => {
-    setLocalAccounts(accounts);
-  }, [accounts]);
 
   const handleDelete = async id => {
     await deleteAccount(id);
@@ -71,12 +69,13 @@ const Accounts = () => {
     }
   };
 
-  if (loading) return <Loading />;
-  if (error) return <Error message={error.message} />;
-
   return (
     <Box overflowX="auto" borderRadius="md">
-      {!loading && !error && (
+      {loading ? (
+        <Loading />
+      ) : error ? (
+        <Error message={error.message} />
+      ) : (
         <Table
           size="sm"
           variant="simple"
@@ -94,8 +93,8 @@ const Accounts = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {localAccounts.length > 0 ? (
-              localAccounts.map(account => (
+            {accounts.length > 0 ? (
+              accounts.map(account => (
                 <AccountRow
                   key={account.id}
                   account={account}
@@ -108,11 +107,23 @@ const Accounts = () => {
               <Tr>
                 <Td
                   padding="0.6rem"
-                  colSpan={4}
+                  colSpan={5}
                   textAlign="center"
                   color="gray.500"
                 >
-                  No accounts available
+                  <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                  >
+                    <Image
+                      src={`${process.env.PUBLIC_URL}/assets/account.svg`}
+                      alt="No accounts available"
+                      width="200px"
+                      height="200px"
+                    />
+                    <Text>No accounts available</Text>
+                  </Box>
                 </Td>
               </Tr>
             )}

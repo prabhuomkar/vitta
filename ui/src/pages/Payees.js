@@ -4,15 +4,35 @@ import { usePayees } from '../context';
 import { PayeeTable, Loading, Error } from '../components';
 
 const Payees = () => {
-  const { payees, deletePayee, updatePayee, createPayee, loading, error } =
-    usePayees();
+  const {
+    payees,
+    getPayees,
+    deletePayee,
+    updatePayee,
+    createPayee,
+    loading,
+    error
+  } = usePayees();
   const [localPayees, setLocalPayees] = useState([]);
   const [newPayee, setNewPayee] = useState('');
   const [errors, setErrors] = useState({});
   const toast = useToast();
 
   useEffect(() => {
-    setLocalPayees(payees);
+    const fetchData = async () => {
+      await getPayees();
+    };
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    setLocalPayees(prevPayees => {
+      const newPayees = payees.filter(
+        payee => !prevPayees.some(localPayee => localPayee.id === payee.id)
+      );
+      return [...newPayees, ...prevPayees];
+    });
   }, [payees]);
 
   // function to check duplicate payee name
@@ -69,6 +89,7 @@ const Payees = () => {
 
   const handleDelete = async id => {
     await deletePayee(id);
+    setLocalPayees(prevPayees => prevPayees.filter(payee => payee.id !== id));
     toast({
       title: 'Payee deleted.',
       description: `Payee has been successfully deleted.`,

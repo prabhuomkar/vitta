@@ -7,6 +7,8 @@ import {
   Tr,
   Th,
   Td,
+  Image,
+  Text,
   useToast
 } from '@chakra-ui/react';
 import LoadingTransactions from '../LoadingTransactions';
@@ -78,7 +80,15 @@ const TransactionsTable = ({ getAccountById }) => {
                 textAlign="center"
                 color="gray.500"
               >
-                No transactions available
+                <Box display="flex" flexDirection="column" alignItems="center">
+                  <Image
+                    src={`${process.env.PUBLIC_URL}/assets/online_payments.svg`}
+                    alt="No transactions available"
+                    width="200px"
+                    height="200px"
+                  />
+                  <Text>No transactions available</Text>
+                </Box>
               </Td>
             </Tr>
           )}

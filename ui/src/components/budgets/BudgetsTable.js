@@ -12,6 +12,7 @@ import {
   IconButton,
   Tooltip,
   Text,
+  Image,
   Button,
   Menu,
   MenuButton,
@@ -21,7 +22,7 @@ import {
 } from '@chakra-ui/react';
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 import { GoKebabHorizontal } from 'react-icons/go';
-import Loading from '../Loading';
+import LoadingBudgets from '../LoadingBudgets';
 import { formatCurrency } from '../../utils/formatCurrency';
 
 const BudgetsTable = ({
@@ -45,7 +46,7 @@ const BudgetsTable = ({
   handleDeleteCategory,
   loading
 }) => {
-  if (loading) return <Loading />;
+  if (loading) return <LoadingBudgets />;
 
   return (
     <Box overflowX="auto">
@@ -73,7 +74,15 @@ const BudgetsTable = ({
                 textAlign="center"
                 color="gray.500"
               >
-                <Text>No budgets available</Text>
+                <Box display="flex" flexDirection="column" alignItems="center">
+                  <Image
+                    src={`${process.env.PUBLIC_URL}/assets/savings.svg`}
+                    alt="No budgets available"
+                    width="200px"
+                    height="200px"
+                  />
+                  <Text>No budgets available</Text>
+                </Box>
               </Td>
             </Tr>
           ) : (

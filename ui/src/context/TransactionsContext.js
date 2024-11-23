@@ -1,4 +1,10 @@
-import React, { createContext, useState, useCallback, useContext } from 'react';
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useCallback,
+  useContext
+} from 'react';
 import {
   fetchTransactions,
   addTransaction,
@@ -49,6 +55,12 @@ export const TransactionsProvider = ({ children }) => {
     [searchQuery, page, limit]
   );
 
+  useEffect(() => {
+    if (accountId) {
+      setPage(1);
+    }
+  }, [accountId]);
+
   const updateSearchQuery = query => {
     setSearchQuery(query);
     setPage(1);
@@ -83,18 +95,18 @@ export const TransactionsProvider = ({ children }) => {
     }
 
     try {
-      const importedTransactions = await uploadTransactions(accId, file);
+      const response = await uploadTransactions(accId, file);
+      const { data, status } = response;
 
-      if (Array.isArray(importedTransactions)) {
-        setTransactions([...transactions, ...importedTransactions]);
-      } else {
+      if (status === 200 && Array.isArray(data)) {
+        setTransactions([...transactions, ...data]);
+      } else if (status === 200) {
         setTransactions([...transactions]);
       }
 
       setError(null);
       // eslint-disable-next-line no-console
-      console.log('Imported Transactions:', importedTransactions);
-      return { success: true, transactions: importedTransactions };
+      return { success: true, status, transactions: data };
     } catch (err) {
       setError('Failed to import transactions');
       // eslint-disable-next-line no-console

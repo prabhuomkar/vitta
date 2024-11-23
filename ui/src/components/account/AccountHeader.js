@@ -18,6 +18,7 @@ import { AddIcon, ArrowDownIcon } from '@chakra-ui/icons';
 const AccountHeader = ({
   accountName,
   accountBalance,
+  accountCategory,
   formatCurrency,
   primaryColor,
   setModalOpen,
@@ -62,7 +63,7 @@ const AccountHeader = ({
                 <Skeleton height="26px" width="100px" my={2} />
               )}
             </StatNumber>
-            <StatHelpText>CASH/CHECK IN</StatHelpText>
+            <StatHelpText>{accountCategory}</StatHelpText>
           </Stat>
           <Input
             placeholder="Search Transactions"

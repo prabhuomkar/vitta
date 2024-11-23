@@ -39,7 +39,7 @@ export const uploadTransactions = async (accountId, file) => {
       throw new Error(`Unexpected status code: ${response.status}`);
     }
 
-    return response.data;
+    return response;
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log('Error importing transaction:', error);
