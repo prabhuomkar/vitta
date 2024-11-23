@@ -40,7 +40,7 @@ const (
 	queryGetAccount         = `SELECT a.*, COALESCE(SUM(t.credit)-SUM(t.debit), 0) as balance FROM accounts a LEFT JOIN` +
 		` transactions t ON a.id = t.account_id AND t.cleared_at IS NOT NULL WHERE a.id=$1 GROUP BY a.id`
 	queryGetAccounts = `SELECT a.*, COALESCE(SUM(t.credit)-SUM(t.debit), 0) as balance FROM accounts a LEFT JOIN` +
-		` transactions t ON a.id = t.account_id AND t.cleared_at IS NOT NULL GROUP BY a.id ORDER BY a.created_at DESC`
+		` transactions t ON a.id = t.account_id AND t.cleared_at IS NOT NULL GROUP BY a.id ORDER BY a.created_at ASC`
 )
 
 func (h *Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {

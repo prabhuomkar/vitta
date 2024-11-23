@@ -64,7 +64,7 @@ const (
 	queryGetTotalGroups = `SELECT COUNT(*) as total FROM groups WHERE (name ILIKE '%' ||` +
 		` COALESCE(NULLIF($1, ''), '') || '%')`
 	queryGetGroups = `SELECT * FROM groups WHERE (name ILIKE '%' || COALESCE(NULLIF($1, ''), '')` +
-		` || '%') ORDER BY created_at DESC`
+		` || '%') ORDER BY created_at ASC`
 	queryCreateCategory = `INSERT INTO categories (id, group_id, name, notes, created_at, updated_at)` +
 		` VALUES ($1, $2, $3, $4, $5, $6)`
 	queryUpdateCategory     = `UPDATE categories SET name=$1, notes=$2, group_id=$3, updated_at=$4 WHERE id=$5`
@@ -72,7 +72,7 @@ const (
 	queryGetTotalCategories = `SELECT COUNT(*) as total FROM categories WHERE (name ILIKE '%' ||` +
 		` COALESCE(NULLIF($1, ''), '') || '%')`
 	queryGetCategories = `SELECT * FROM categories WHERE (name ILIKE '%' || COALESCE(NULLIF($1, ''), '')` +
-		` || '%') ORDER BY created_at DESC`
+		` || '%') ORDER BY created_at ASC`
 	querySetBudget = `INSERT INTO budgets (id, category_id, year, month, budgeted, created_at,` +
 		` updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (year, month, category_id) DO UPDATE SET budgeted=$5`
 	queryGetBudget = `SELECT COALESCE(budgets.budgeted, 0) AS budgeted, COALESCE(t.spent, 0) AS spent,` +
@@ -81,9 +81,9 @@ const (
 		` g.notes as group_notes FROM groups AS g LEFT JOIN categories AS cg` +
 		` ON cg.group_id = g.id LEFT JOIN budgets ON budgets.category_id = cg.id AND budgets.year = $1 AND` +
 		` budgets.month = $2 LEFT JOIN(SELECT category_id, SUM(credit) AS total_credit, SUM(debit) AS total_debit,` +
-		` SUM(credit - debit) AS spent FROM transactions WHERE EXTRACT(YEAR FROM created_at) = $1 AND` +
-		` EXTRACT(MONTH FROM created_at) = $2 GROUP BY category_id) AS t ON cg.id = t.category_id` +
-		` ORDER BY g.created_at ASC`
+		` SUM(credit - debit) AS spent FROM transactions WHERE EXTRACT(YEAR FROM cleared_at) = $1 AND` +
+		` EXTRACT(MONTH FROM cleared_at) = $2 GROUP BY category_id) AS t ON cg.id = t.category_id` +
+		` ORDER BY g.created_at ASC, cg.created_at ASC`
 )
 
 func (h *Handler) CreateGroup(w http.ResponseWriter, r *http.Request) {
