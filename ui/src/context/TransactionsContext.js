@@ -96,17 +96,17 @@ export const TransactionsProvider = ({ children }) => {
 
     try {
       const response = await uploadTransactions(accId, file);
-      const { importedTransactions, status } = response;
+      const { data, status } = response;
 
-      if (status === 200 && Array.isArray(importedTransactions)) {
-        setTransactions([...transactions, ...importedTransactions]);
+      if (status === 200 && Array.isArray(data)) {
+        setTransactions([...transactions, ...data]);
       } else if (status === 200) {
         setTransactions([...transactions]);
       }
 
       setError(null);
       // eslint-disable-next-line no-console
-      return { success: true, status, transactions: importedTransactions };
+      return { success: true, status, transactions: data };
     } catch (err) {
       setError('Failed to import transactions');
       // eslint-disable-next-line no-console
