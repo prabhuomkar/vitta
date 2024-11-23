@@ -20,7 +20,6 @@ const TransactionsTable = ({ getAccountById }) => {
   const {
     transactions,
     page,
-    setPage,
     totalPages,
     goToPreviousPage,
     loading,
@@ -35,11 +34,6 @@ const TransactionsTable = ({ getAccountById }) => {
       goToPreviousPage();
     }
   }, [transactions.length, page, totalPages, goToPreviousPage]);
-
-  useEffect(() => {
-    setPage(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page]);
 
   if (loading) return <LoadingTransactions />;
 

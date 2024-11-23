@@ -4,12 +4,27 @@ import { usePayees } from '../context';
 import { PayeeTable, Loading, Error } from '../components';
 
 const Payees = () => {
-  const { payees, deletePayee, updatePayee, createPayee, loading, error } =
-    usePayees();
+  const {
+    payees,
+    getPayees,
+    deletePayee,
+    updatePayee,
+    createPayee,
+    loading,
+    error
+  } = usePayees();
   const [localPayees, setLocalPayees] = useState([]);
   const [newPayee, setNewPayee] = useState('');
   const [errors, setErrors] = useState({});
   const toast = useToast();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await getPayees();
+    };
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     setLocalPayees(prevPayees => {

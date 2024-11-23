@@ -1,4 +1,10 @@
-import React, { createContext, useState, useCallback, useContext } from 'react';
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useCallback,
+  useContext
+} from 'react';
 import {
   fetchTransactions,
   addTransaction,
@@ -48,6 +54,12 @@ export const TransactionsProvider = ({ children }) => {
     },
     [searchQuery, page, limit]
   );
+
+  useEffect(() => {
+    if (accountId) {
+      setPage(1);
+    }
+  }, [accountId]);
 
   const updateSearchQuery = query => {
     setSearchQuery(query);
@@ -160,7 +172,6 @@ export const TransactionsProvider = ({ children }) => {
         goToNextPage,
         goToPreviousPage,
         page,
-        setPage,
         hasNextPage
       }}
     >
