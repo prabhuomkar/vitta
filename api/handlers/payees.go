@@ -9,17 +9,30 @@ import (
 	uuid "github.com/google/uuid"
 )
 
-// Payee model.
-type Payee struct {
-	ID        uuid.UUID `json:"id"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
-}
+type (
+	// Rules model.
+	Rules struct {
+		Includes   []string `json:"includes"`
+		Excludes   []string `json:"excludes"`
+		StartsWith []string `json:"startsWith"`
+		EndsWith   []string `json:"endsWith"`
+	}
+
+	// Payee model.
+	Payee struct {
+		ID             uuid.UUID  `json:"id"`
+		Name           string     `json:"name"`
+		Rules          *Rules     `json:"rules,omitempty"`
+		AutoCategoryID *uuid.UUID `json:"autoCategoryId,omitempty"`
+		CreatedAt      time.Time  `json:"createdAt"`
+		UpdatedAt      time.Time  `json:"updatedAt"`
+	}
+)
 
 const (
-	queryCreatePayee    = `INSERT INTO payees (id, name, created_at, updated_at) VALUES ($1, $2, $3, $4)`
-	queryUpdatePayee    = `UPDATE payees SET name=$1, updated_at=$2 WHERE id=$3`
+	queryCreatePayee = `INSERT INTO payees (id, name, rules, auto_category_id, created_at, updated_at)` +
+		` VALUES ($1, $2, $3, $4, $5, $6)`
+	queryUpdatePayee    = `UPDATE payees SET name=$1, rules=$2, auto_category_id=$3, updated_at=$4 WHERE id=$5`
 	queryDeletePayee    = `DELETE FROM payees WHERE id=$1`
 	queryGetTotalPayees = `SELECT COUNT(*) as total FROM payees WHERE (name ILIKE '%' ||` +
 		` COALESCE(NULLIF($1, ''), '') || '%')`
@@ -50,7 +63,7 @@ func (h *Handler) CreatePayee(w http.ResponseWriter, r *http.Request) {
 	payee.UpdatedAt = payee.CreatedAt
 
 	_, err = h.db.Exec(r.Context(), queryCreatePayee,
-		payee.ID, payee.Name, payee.CreatedAt, payee.UpdatedAt)
+		payee.ID, payee.Name, payee.Rules, payee.AutoCategoryID, payee.CreatedAt, payee.UpdatedAt)
 	if err != nil {
 		slog.Error("error creating payee in database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
@@ -91,7 +104,7 @@ func (h *Handler) UpdatePayee(w http.ResponseWriter, r *http.Request) {
 	payee.UpdatedAt = time.Now()
 
 	_, err = h.db.Exec(r.Context(), queryUpdatePayee,
-		payee.Name, payee.UpdatedAt, payeeID)
+		payee.Name, payee.Rules, payee.AutoCategoryID, payee.UpdatedAt, payeeID)
 	if err != nil {
 		slog.Error("error updating payee in database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
@@ -164,7 +177,7 @@ func (h *Handler) GetPayees(w http.ResponseWriter, r *http.Request) { //nolint: 
 	for rows.Next() {
 		var payee Payee
 
-		err := rows.Scan(&payee.ID, &payee.Name, &payee.CreatedAt, &payee.UpdatedAt)
+		err := rows.Scan(&payee.ID, &payee.Name, &payee.Rules, &payee.AutoCategoryID, &payee.CreatedAt, &payee.UpdatedAt)
 		if err != nil {
 			slog.Error("error scanning payees row from database", "error", err)
 			buildErrorResponse(w, err.Error(), http.StatusInternalServerError)

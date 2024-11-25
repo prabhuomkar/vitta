@@ -30,8 +30,11 @@ CREATE TABLE categories (
 CREATE TABLE payees (
     id UUID PRIMARY KEY,
     name VARCHAR(255) UNIQUE NOT NULL,
+    rules JSONB,
+    auto_category_id UUID,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (auto_category_id) REFERENCES categories(id) ON DELETE SET NULL
 );
 
 CREATE TABLE transactions (

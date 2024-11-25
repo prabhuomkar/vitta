@@ -12,7 +12,8 @@ import (
 
 var (
 	testPayeeName = "Swiggy"
-	payeeRowCols  = []string{"id", "name", "created_at", "updated_at"}
+	testRules     = Rules{Includes: []string{"abc"}, Excludes: []string{"xyz"}, StartsWith: []string{"abc"}, EndsWith: []string{"xyz"}}
+	payeeRowCols  = []string{"id", "name", "rules", "auto_category_id", "created_at", "updated_at"}
 )
 
 func TestCreatePayee(t *testing.T) {
@@ -29,20 +30,24 @@ func TestCreatePayee(t *testing.T) {
 		},
 		{
 			"error inserting payee to database", http.MethodPost, "/v1/payees", true,
-			strings.NewReader(`{"name":"` + testPayeeName + `"}`),
+			strings.NewReader(`{"name":"` + testPayeeName + `","rules":{"includes":["abc"],"excludes":["xyz"],` +
+				`"startsWith":["abc"],"endsWith":["xyz"]},"autoCategoryId":"` + testCategoryID.String() + `"}`),
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectExec("INSERT INTO payees").WithArgs(pgxmock.AnyArg(), testPayeeName,
+					&testRules, &testCategoryID,
 					pgxmock.AnyArg(), pgxmock.AnyArg()).WillReturnError(pgx.ErrTxClosed)
 			},
 			http.StatusInternalServerError, "tx is closed",
 		},
 		{
 			"success creating payee", http.MethodPost, "/v1/payees", true,
-			strings.NewReader(`{"name":"` + testPayeeName + `"}`),
+			strings.NewReader(`{"name":"` + testPayeeName + `","rules":{"includes":["abc"],"excludes":["xyz"],` +
+				`"startsWith":["abc"],"endsWith":["xyz"]},"autoCategoryId":"` + testCategoryID.String() + `"}`),
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectExec("INSERT INTO payees").WithArgs(pgxmock.AnyArg(), testPayeeName,
+					&testRules, &testCategoryID,
 					pgxmock.AnyArg(), pgxmock.AnyArg()).WillReturnResult(pgxmock.NewResult("INSERT", 1))
 			},
 			http.StatusCreated, testPayeeName,
@@ -70,22 +75,26 @@ func TestUpdatePayee(t *testing.T) {
 		},
 		{
 			"error updating payee in database", http.MethodPatch, "/v1/payees/" + testPayeeID.String(), true,
-			strings.NewReader(`{"name":"` + testPayeeName + `"}`),
+			strings.NewReader(`{"name":"` + testPayeeName + `","rules":{"includes":["abc"],"excludes":["xyz"],` +
+				`"startsWith":["abc"],"endsWith":["xyz"]},"autoCategoryId":"` + testCategoryID.String() + `"}`),
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectExec("UPDATE payees").WithArgs(
-					testPayeeName, pgxmock.AnyArg(), testPayeeID,
+					testPayeeName, &Rules{Includes: []string{"abc"}, Excludes: []string{"xyz"}, StartsWith: []string{"abc"},
+						EndsWith: []string{"xyz"}}, &testCategoryID, pgxmock.AnyArg(), testPayeeID,
 				).WillReturnError(pgx.ErrTxClosed)
 			},
 			http.StatusInternalServerError, "tx is closed",
 		},
 		{
 			"success updating payee", http.MethodPatch, "/v1/payees/" + testPayeeID.String(), true,
-			strings.NewReader(`{"name":"` + testPayeeName + `"}`),
+			strings.NewReader(`{"name":"` + testPayeeName + `","rules":{"includes":["abc"],"excludes":["xyz"],` +
+				`"startsWith":["abc"],"endsWith":["xyz"]},"autoCategoryId":"` + testCategoryID.String() + `"}`),
 			nil,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectExec("UPDATE payees").WithArgs(
-					testPayeeName, pgxmock.AnyArg(), testPayeeID,
+					testPayeeName, &Rules{Includes: []string{"abc"}, Excludes: []string{"xyz"}, StartsWith: []string{"abc"},
+						EndsWith: []string{"xyz"}}, &testCategoryID, pgxmock.AnyArg(), testPayeeID,
 				).WillReturnResult(pgxmock.NewResult("UPDATE", 1))
 			},
 			http.StatusNoContent, "",
@@ -166,7 +175,7 @@ func TestGetPayees(t *testing.T) {
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows([]string{"total"}).AddRow(1))
 				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows(payeeRowCols).
-					AddRow("invalid", "ok", "bad-time", "bad-time"))
+					AddRow("invalid", "ok", "ok", "invalid", "bad-time", "bad-time"))
 			},
 			http.StatusInternalServerError, "Scanning value error",
 		},
@@ -186,7 +195,7 @@ func TestGetPayees(t *testing.T) {
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows([]string{"total"}).AddRow(1))
 				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnRows(pgxmock.NewRows(payeeRowCols).
-					AddRow(testPayeeID.String(), testPayeeName, testAccountTime, testAccountTime))
+					AddRow(testPayeeID.String(), testPayeeName, &testRules, &testCategoryID, testAccountTime, testAccountTime))
 			},
 			http.StatusOK, testPayeeID.String(),
 		},
