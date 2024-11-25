@@ -1,6 +1,6 @@
 name,category,dateName,dateFormats,remarks,credit,debit,transactionDiff
 ICICI,CASH/CHECK IN,Transaction Date,"02/01/2006",Transaction Remarks,Deposit Amount (INR ),Withdrawal Amount (INR ),
 ICICI,CC,Transaction Date,"02/01/2006;02,01,2006",Details,Amount (INR),Amount (INR),"cr.;dr."
-ICICI,PPF,Transaction Date,"02/01/2006;02,01,2006",Details,Amount (INR),Amount (INR),"cr.;dr."
-ICICI,CASH/CHECK IN,Transaction Date,"02/01/2006",Transaction Remarks,Deposit Amount (INR ),Withdrawal Amount (INR ),
-ICICI,PPF,Transaction Date,"02/01/2006;02,01,2006",Details,Amount (INR),Amount (INR),"cr.;dr."
+ICICI,PPF,Transaction Date,"02/01/2006",Transaction Remarks,Deposit Amount (INR ),Withdrawal Amount (INR ),
+HDFC,CASH/CHECK IN,Date,"02/01/06",Narration,Deposit Amt.,Withdrawal Amt.,
+HDFC,PPF,Date,"02/01/2006",Narration,Deposit Amt.,Withdrawal Amt.,
