@@ -1,9 +1,12 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 
 	uuid "github.com/google/uuid"
@@ -202,4 +205,85 @@ func (h *Handler) GetPayees(w http.ResponseWriter, r *http.Request) { //nolint: 
 	if err != nil {
 		slog.Error("error encoding payees response", "error", err)
 	}
+}
+
+func (h *Handler) assignPayeeAndCategory(ctx context.Context) ( //nolint: funlen,gocognit,cyclop
+	func(string) (*uuid.UUID, *uuid.UUID), error,
+) {
+	rows, err := h.db.Query(ctx, queryGetPayees, "")
+	if err != nil {
+		slog.Error("error getting payees from database", "error", err)
+
+		return nil, fmt.Errorf("error getting payees: %w", err)
+	}
+	defer rows.Close()
+
+	payees := []Payee{}
+
+	for rows.Next() {
+		var payee Payee
+
+		err := rows.Scan(&payee.ID, &payee.Name, &payee.Rules, &payee.AutoCategoryID, &payee.CreatedAt, &payee.UpdatedAt)
+		if err != nil {
+			slog.Error("error scanning payees row from database", "error", err)
+
+			return nil, fmt.Errorf("error scanning payees row: %w", err)
+		}
+
+		payees = append(payees, payee)
+	}
+
+	if err := rows.Err(); err != nil {
+		slog.Error("error reading payees rows from database", "error", err)
+
+		return nil, fmt.Errorf("error reading payees rows: %w", err)
+	}
+
+	return func(input string) (*uuid.UUID, *uuid.UUID) {
+		for _, payee := range payees {
+			if payee.Rules != nil { //nolint: nestif
+				ri, re, rsw, rew := false, false, false, false
+
+				input = strings.ToLower(input)
+
+				for _, includes := range payee.Rules.Includes {
+					if strings.Contains(input, includes) {
+						ri = true
+
+						break
+					}
+				}
+
+				for _, excludes := range payee.Rules.Excludes {
+					if !strings.Contains(input, excludes) {
+						re = true
+
+						break
+					}
+				}
+
+				for _, startsWith := range payee.Rules.StartsWith {
+					if strings.HasPrefix(input, startsWith) {
+						rsw = true
+
+						break
+					}
+				}
+
+				for _, endsWith := range payee.Rules.EndsWith {
+					if strings.HasSuffix(input, endsWith) {
+						rew = true
+
+						break
+					}
+				}
+
+				if (ri && re) || rsw || rew {
+					return &payee.ID, payee.AutoCategoryID
+				}
+			}
+		}
+
+		return nil, nil
+	}, nil
 }
