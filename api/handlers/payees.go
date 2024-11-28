@@ -1,25 +1,41 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 
 	uuid "github.com/google/uuid"
 )
 
-// Payee model.
-type Payee struct {
-	ID        uuid.UUID `json:"id"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
-}
+type (
+	// Rules model.
+	Rules struct {
+		Includes   []string `json:"includes"`
+		Excludes   []string `json:"excludes"`
+		StartsWith []string `json:"startsWith"`
+		EndsWith   []string `json:"endsWith"`
+	}
+
+	// Payee model.
+	Payee struct {
+		ID             uuid.UUID  `json:"id"`
+		Name           string     `json:"name"`
+		Rules          *Rules     `json:"rules,omitempty"`
+		AutoCategoryID *uuid.UUID `json:"autoCategoryId,omitempty"`
+		CreatedAt      time.Time  `json:"createdAt"`
+		UpdatedAt      time.Time  `json:"updatedAt"`
+	}
+)
 
 const (
-	queryCreatePayee    = `INSERT INTO payees (id, name, created_at, updated_at) VALUES ($1, $2, $3, $4)`
-	queryUpdatePayee    = `UPDATE payees SET name=$1, updated_at=$2 WHERE id=$3`
+	queryCreatePayee = `INSERT INTO payees (id, name, rules, auto_category_id, created_at, updated_at)` +
+		` VALUES ($1, $2, $3, $4, $5, $6)`
+	queryUpdatePayee    = `UPDATE payees SET name=$1, rules=$2, auto_category_id=$3, updated_at=$4 WHERE id=$5`
 	queryDeletePayee    = `DELETE FROM payees WHERE id=$1`
 	queryGetTotalPayees = `SELECT COUNT(*) as total FROM payees WHERE (name ILIKE '%' ||` +
 		` COALESCE(NULLIF($1, ''), '') || '%')`
@@ -50,7 +66,7 @@ func (h *Handler) CreatePayee(w http.ResponseWriter, r *http.Request) {
 	payee.UpdatedAt = payee.CreatedAt
 
 	_, err = h.db.Exec(r.Context(), queryCreatePayee,
-		payee.ID, payee.Name, payee.CreatedAt, payee.UpdatedAt)
+		payee.ID, payee.Name, payee.Rules, payee.AutoCategoryID, payee.CreatedAt, payee.UpdatedAt)
 	if err != nil {
 		slog.Error("error creating payee in database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
@@ -91,7 +107,7 @@ func (h *Handler) UpdatePayee(w http.ResponseWriter, r *http.Request) {
 	payee.UpdatedAt = time.Now()
 
 	_, err = h.db.Exec(r.Context(), queryUpdatePayee,
-		payee.Name, payee.UpdatedAt, payeeID)
+		payee.Name, payee.Rules, payee.AutoCategoryID, payee.UpdatedAt, payeeID)
 	if err != nil {
 		slog.Error("error updating payee in database", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
@@ -164,7 +180,7 @@ func (h *Handler) GetPayees(w http.ResponseWriter, r *http.Request) { //nolint: 
 	for rows.Next() {
 		var payee Payee
 
-		err := rows.Scan(&payee.ID, &payee.Name, &payee.CreatedAt, &payee.UpdatedAt)
+		err := rows.Scan(&payee.ID, &payee.Name, &payee.Rules, &payee.AutoCategoryID, &payee.CreatedAt, &payee.UpdatedAt)
 		if err != nil {
 			slog.Error("error scanning payees row from database", "error", err)
 			buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
@@ -189,4 +205,85 @@ func (h *Handler) GetPayees(w http.ResponseWriter, r *http.Request) { //nolint: 
 	if err != nil {
 		slog.Error("error encoding payees response", "error", err)
 	}
+}
+
+func (h *Handler) assignPayeeAndCategory(ctx context.Context) ( //nolint: funlen,gocognit,cyclop
+	func(string) (*uuid.UUID, *uuid.UUID), error,
+) {
+	rows, err := h.db.Query(ctx, queryGetPayees, "")
+	if err != nil {
+		slog.Error("error getting payees from database", "error", err)
+
+		return nil, fmt.Errorf("error getting payees: %w", err)
+	}
+	defer rows.Close()
+
+	payees := []Payee{}
+
+	for rows.Next() {
+		var payee Payee
+
+		err := rows.Scan(&payee.ID, &payee.Name, &payee.Rules, &payee.AutoCategoryID, &payee.CreatedAt, &payee.UpdatedAt)
+		if err != nil {
+			slog.Error("error scanning payees row from database", "error", err)
+
+			return nil, fmt.Errorf("error scanning payees row: %w", err)
+		}
+
+		payees = append(payees, payee)
+	}
+
+	if err := rows.Err(); err != nil {
+		slog.Error("error reading payees rows from database", "error", err)
+
+		return nil, fmt.Errorf("error reading payees rows: %w", err)
+	}
+
+	return func(input string) (*uuid.UUID, *uuid.UUID) {
+		for _, payee := range payees {
+			if payee.Rules != nil { //nolint: nestif
+				ri, re, rsw, rew := false, false, false, false
+
+				input = strings.ToLower(input)
+
+				for _, includes := range payee.Rules.Includes {
+					if strings.Contains(input, includes) {
+						ri = true
+
+						break
+					}
+				}
+
+				for _, excludes := range payee.Rules.Excludes {
+					if !strings.Contains(input, excludes) {
+						re = true
+
+						break
+					}
+				}
+
+				for _, startsWith := range payee.Rules.StartsWith {
+					if strings.HasPrefix(input, startsWith) {
+						rsw = true
+
+						break
+					}
+				}
+
+				for _, endsWith := range payee.Rules.EndsWith {
+					if strings.HasSuffix(input, endsWith) {
+						rew = true
+
+						break
+					}
+				}
+
+				if (ri && re) || rsw || rew {
+					return &payee.ID, payee.AutoCategoryID
+				}
+			}
+		}
+
+		return nil, nil
+	}, nil
 }
