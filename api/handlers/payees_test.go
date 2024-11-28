@@ -1,13 +1,17 @@
 package handlers
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"strings"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/pashagolub/pgxmock/v4"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -201,4 +205,103 @@ func TestGetPayees(t *testing.T) {
 		},
 	}
 	executeTests(t, tests)
+}
+
+func TestAssignPayeeAndCategory(t *testing.T) {
+	tests := []struct {
+		name             string
+		mockDBFunc       func(pgxmock.PgxPoolIface)
+		errContains      string
+		input            string
+		expectedPayee    *uuid.UUID
+		expectedCategory *uuid.UUID
+	}{
+		{
+			"error getting payees",
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WithArgs("some").WillReturnError(pgx.ErrNoRows)
+			},
+			"error getting payees", "", nil, nil,
+		},
+		{
+			"error scanning payees row",
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WithArgs("").WillReturnRows(pgxmock.NewRows(payeeRowCols).
+					AddRow("invalid", "ok", "ok", "invalid", "bad-time", "bad-time"))
+			},
+			"error scanning payees row", "", nil, nil,
+		},
+		{
+			"error reading payees rows",
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WithArgs("").WillReturnRows(pgxmock.NewRows(payeeRowCols).
+					RowError(0, errors.New("some error in db")))
+			},
+			"error reading payees rows", "", nil, nil,
+		},
+		{
+			"match includes and excludes",
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WithArgs("").WillReturnRows(pgxmock.NewRows(payeeRowCols).
+					AddRow(testPayeeID.String(), testPayeeName, &Rules{Includes: []string{"ato"}, Excludes: []string{"swiggy"}}, &testCategoryID, testAccountTime, testAccountTime))
+			},
+			"", "ZOMATO", &testPayeeID, &testCategoryID,
+		},
+		{
+			"match starts with",
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WithArgs("").WillReturnRows(pgxmock.NewRows(payeeRowCols).
+					AddRow(testPayeeID.String(), testPayeeName, &Rules{StartsWith: []string{"zoma"}}, &testCategoryID, testAccountTime, testAccountTime))
+			},
+			"", "ZOMATO", &testPayeeID, &testCategoryID,
+		},
+		{
+			"match ends with",
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WithArgs("").WillReturnRows(pgxmock.NewRows(payeeRowCols).
+					AddRow(testPayeeID.String(), testPayeeName, &Rules{EndsWith: []string{"ato"}}, &testCategoryID, testAccountTime, testAccountTime))
+			},
+			"", "ZOMATO", &testPayeeID, &testCategoryID,
+		},
+		{
+			"match with nothing and empty rules",
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WithArgs("").WillReturnRows(pgxmock.NewRows(payeeRowCols).
+					AddRow(testPayeeID.String(), testPayeeName, &Rules{}, &testCategoryID, testAccountTime, testAccountTime))
+			},
+			"", "ZOMATO", nil, nil,
+		},
+		{
+			"match with nothing and single rule",
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WithArgs("").WillReturnRows(pgxmock.NewRows(payeeRowCols).
+					AddRow(testPayeeID.String(), testPayeeName, &Rules{Includes: []string{"wig"}, Excludes: []string{"zomato"}, StartsWith: []string{"swi"},
+						EndsWith: []string{"gy"}}, &testCategoryID, testAccountTime, testAccountTime))
+			},
+			"", "ZOMATO", nil, nil,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			mockDB, err := pgxmock.NewPool()
+			require.NoError(t, err)
+			defer mockDB.Close()
+
+			if tc.mockDBFunc != nil {
+				tc.mockDBFunc(mockDB)
+			}
+
+			h := &Handler{cfg: nil, db: mockDB, adapters: nil}
+			actFn, err := h.assignPayeeAndCategory(context.TODO())
+			if len(tc.errContains) > 0 {
+				assert.Error(t, err)
+				assert.ErrorContains(t, err, tc.errContains)
+			} else {
+				assert.NoError(t, err)
+				gotPayee, gotCategory := actFn(tc.input)
+				assert.Equal(t, tc.expectedPayee, gotPayee)
+				assert.Equal(t, tc.expectedCategory, gotCategory)
+			}
+		})
+	}
 }
