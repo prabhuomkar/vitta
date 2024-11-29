@@ -329,6 +329,14 @@ func (h *Handler) ImportTransactions(w http.ResponseWriter, r *http.Request) { /
 	adapterTransactions := adapters.GetTransactions(h.adapters[account.Adapter+"-"+account.Category], rows)
 	importedTransactions := 0
 
+	getPayeeCategory, err := h.assignPayeeAndCategory(r.Context())
+	if err != nil {
+		slog.Error("error creating payee category assigner", "error", err)
+		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
+
+		return
+	}
+
 	tx, err := h.db.Begin(r.Context())
 	if err != nil {
 		slog.Error("error creating database txn", "error", err)
@@ -356,7 +364,9 @@ func (h *Handler) ImportTransactions(w http.ResponseWriter, r *http.Request) { /
 			return
 		}
 
-		_, err = tx.Exec(r.Context(), queryCreateTransaction, transactionID, accountID, nil, nil,
+		payeeID, categoryID := getPayeeCategory(adapterTransaction.Remarks)
+
+		_, err = tx.Exec(r.Context(), queryCreateTransaction, transactionID, accountID, categoryID, payeeID,
 			adapterTransaction.Credit, adapterTransaction.Debit, "imported transaction", adapterTransaction.Remarks,
 			adapterTransaction.Date, transactionTime, transactionTime)
 

@@ -17,12 +17,13 @@ import (
 )
 
 var (
-	testTransactionName = "House Party Food"
-	testCategoryID      = uuid.MustParse("01927f3e-11b6-7a79-bbc7-affae59272ae")
-	testPayeeID         = uuid.MustParse("01927f3e-5609-703b-b067-f9b9dd9d8ee2")
-	testAccountID       = uuid.MustParse("01927f3e-6ecf-7091-987f-8aa23adcda09")
-	testTransactionID   = uuid.MustParse("01927f3e-6ecf-7091-987f-8aa23addda09")
-	transactionRowCols  = []string{"id", "account_id", "category_id", "payee_id", "name", "credit",
+	testTransactionName            = "House Party Food"
+	testCategoryID                 = uuid.MustParse("01927f3e-11b6-7a79-bbc7-affae59272ae")
+	testPayeeID                    = uuid.MustParse("01927f3e-5609-703b-b067-f9b9dd9d8ee2")
+	testAccountID                  = uuid.MustParse("01927f3e-6ecf-7091-987f-8aa23adcda09")
+	testTransactionID              = uuid.MustParse("01927f3e-6ecf-7091-987f-8aa23addda09")
+	testNullID          *uuid.UUID = nil
+	transactionRowCols             = []string{"id", "account_id", "category_id", "payee_id", "name", "credit",
 		"debit", "notes", "cleared_at", "created_at", "updated_at", "category_name", "payee_name"}
 )
 
@@ -232,6 +233,7 @@ func TestImportTransactions(t *testing.T) {
 	sampleBytes1, ctype1 := getMockCSV(t, true)
 	sampleBytes2, ctype2 := getMockCSV(t, false)
 	sampleBytes3, ctype3 := getMockCSV(t, false)
+	sampleBytes4, ctype4 := getMockCSV(t, false)
 	tests := []testCase{
 		{
 			"error due to auth", http.MethodPut, "/v1/accounts/" + testAccountID.String() + "/transactions", false, nil,
@@ -265,15 +267,28 @@ func TestImportTransactions(t *testing.T) {
 			http.StatusInternalServerError, "error opening file",
 		},
 		{
-			"error inserting transaction to database", http.MethodPut, "/v1/accounts/" + testAccountID.String() + "/transactions", true,
+			"error creating payee category assigner", http.MethodPut, "/v1/accounts/" + testAccountID.String() + "/transactions", true,
 			sampleBytes2, ctype2,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectQuery("SELECT *").WithArgs(testAccountID).WillReturnRows(pgxmock.NewRows(accountRowCols).AddRow(testAccountID.String(), testAccountName, &testOffBudget, testCategory,
 					testAdapter, testAccountTime, testAccountTime))
+				mock.ExpectQuery("SELECT *").WithArgs("").WillReturnRows(pgxmock.NewRows(payeeRowCols).
+					RowError(0, errors.New("some error in db")))
+			},
+			http.StatusInternalServerError, "some error in db",
+		},
+		{
+			"error inserting transaction to database", http.MethodPut, "/v1/accounts/" + testAccountID.String() + "/transactions", true,
+			sampleBytes3, ctype3,
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WithArgs(testAccountID).WillReturnRows(pgxmock.NewRows(accountRowCols).AddRow(testAccountID.String(), testAccountName, &testOffBudget, testCategory,
+					testAdapter, testAccountTime, testAccountTime))
+				mock.ExpectQuery("SELECT *").WithArgs("").WillReturnRows(pgxmock.NewRows(payeeRowCols).
+					AddRow(testPayeeID.String(), testPayeeName, &testRules, &testCategoryID, testAccountTime, testAccountTime))
 				mock.ExpectBeginTx(pgx.TxOptions{})
 				mock.ExpectExec("SAVEPOINT sp1").WillReturnResult(pgxmock.NewResult("SAVEPOINT", 1))
 				mock.ExpectExec("INSERT INTO transactions").WithArgs(pgxmock.AnyArg(),
-					testAccountID, nil, nil, 0.0, 4.20, "imported transaction", "John Doe",
+					testAccountID, testNullID, testNullID, 0.0, 4.20, "imported transaction", "John Doe",
 					pgxmock.AnyArg(), pgxmock.AnyArg(), pgxmock.AnyArg()).WillReturnError(pgx.ErrTxClosed)
 				mock.ExpectExec("ROLLBACK TO SAVEPOINT sp1").WillReturnResult(pgxmock.NewResult("SAVEPOINT", 1))
 			},
@@ -281,14 +296,16 @@ func TestImportTransactions(t *testing.T) {
 		},
 		{
 			"success", http.MethodPut, "/v1/accounts/" + testAccountID.String() + "/transactions", true,
-			sampleBytes3, ctype3,
+			sampleBytes4, ctype4,
 			func(mock pgxmock.PgxPoolIface) {
 				mock.ExpectQuery("SELECT *").WithArgs(testAccountID).WillReturnRows(pgxmock.NewRows(accountRowCols).AddRow(testAccountID.String(), testAccountName, &testOffBudget, testCategory,
 					testAdapter, testAccountTime, testAccountTime))
+				mock.ExpectQuery("SELECT *").WithArgs("").WillReturnRows(pgxmock.NewRows(payeeRowCols).
+					AddRow(testPayeeID.String(), testPayeeName, &testRules, &testCategoryID, testAccountTime, testAccountTime))
 				mock.ExpectBeginTx(pgx.TxOptions{})
 				mock.ExpectExec("SAVEPOINT sp1").WillReturnResult(pgxmock.NewResult("SAVEPOINT", 1))
 				mock.ExpectExec("INSERT INTO transactions").WithArgs(pgxmock.AnyArg(),
-					testAccountID, nil, nil, 0.0, 4.20, "imported transaction", "John Doe",
+					testAccountID, testNullID, testNullID, 0.0, 4.20, "imported transaction", "John Doe",
 					pgxmock.AnyArg(), pgxmock.AnyArg(), pgxmock.AnyArg()).WillReturnResult(pgxmock.NewResult("INSERT", 1))
 				mock.ExpectCommit()
 			},
