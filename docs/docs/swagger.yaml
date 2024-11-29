@@ -482,12 +482,6 @@ paths:
       operationId: getAccount
       security:
         - basicAuth: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Account'
-        required: true
       responses:
         '200':
           description: Success
@@ -871,6 +865,33 @@ components:
         name:
           type: string
           example: Swiggy
+        autoCategoryId:
+          type: string
+          format: uuid
+          example: 01926b84-93cb-75b9-b445-a5a744f7a59f
+        rules:
+          type: object
+          properties:
+            includes:
+              type: array
+              items:
+                type: string
+              example: ["ig"]
+            excludes:
+              type: array
+              items:
+                type: string
+              example: ["ato"]
+            startsWith:
+              type: array
+              items:
+                type: string
+              example: ["swi"]
+            endsWith:
+              type: array
+              items:
+                type: string
+              example: ["ggy"]
         createdAt:
           type: string
           format: date-time
