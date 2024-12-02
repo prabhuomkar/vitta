@@ -292,7 +292,7 @@ func TestAssignPayeeAndCategory(t *testing.T) {
 			}
 
 			h := &Handler{cfg: nil, db: mockDB, adapters: nil}
-			actFn, err := h.assignPayeeAndCategory(context.TODO())
+			actFn, err := h.assignPayeeAndCategory(context.TODO(), []Payee{})
 			if len(tc.errContains) > 0 {
 				assert.Error(t, err)
 				assert.ErrorContains(t, err, tc.errContains)

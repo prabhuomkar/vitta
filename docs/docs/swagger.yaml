@@ -330,6 +330,12 @@ paths:
           schema:
             type: string
           description: Search query for payees
+        - name: updateTransactions
+          in: query
+          schema:
+            type: boolean
+            example: true
+          description: Update transactions which matches payee rules
       summary: Get all existing payees
       operationId: getPayees
       security:

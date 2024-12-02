@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -43,10 +44,17 @@ const (
 		` || '%') ORDER BY created_at DESC`
 )
 
-func (h *Handler) CreatePayee(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) CreatePayee(w http.ResponseWriter, r *http.Request) { //nolint: cyclop
+	updateTransactionsQuery := r.URL.Query().Get("updateTransactions")
+
+	updateTransactions, err := strconv.ParseBool(updateTransactionsQuery)
+	if err != nil {
+		updateTransactions = false
+	}
+
 	var payee Payee
 
-	err := json.NewDecoder(r.Body).Decode(&payee)
+	err = json.NewDecoder(r.Body).Decode(&payee)
 	if err != nil {
 		slog.Error("error decoding create payee request", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusBadRequest)
@@ -74,6 +82,22 @@ func (h *Handler) CreatePayee(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if updateTransactions && (payee.Rules != nil || payee.AutoCategoryID != nil) {
+		getPayeeCategory, err := h.assignPayeeAndCategory(r.Context(), []Payee{payee})
+		if err != nil {
+			slog.Error("error creating payee category assigner", "error", err)
+			buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
+
+			return
+		}
+
+		err = h.updateTransactions(r.Context(), getPayeeCategory)
+		if err != nil {
+			slog.Error("error updating transactions", "error", err)
+			buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 
@@ -84,6 +108,13 @@ func (h *Handler) CreatePayee(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) UpdatePayee(w http.ResponseWriter, r *http.Request) {
+	updateTransactionsQuery := r.URL.Query().Get("updateTransactions")
+
+	updateTransactions, err := strconv.ParseBool(updateTransactionsQuery)
+	if err != nil {
+		updateTransactions = false
+	}
+
 	id := r.PathValue("id")
 
 	payeeID, err := uuid.Parse(id)
@@ -113,6 +144,22 @@ func (h *Handler) UpdatePayee(w http.ResponseWriter, r *http.Request) {
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
 
 		return
+	}
+
+	if updateTransactions && (payee.Rules != nil || payee.AutoCategoryID != nil) {
+		getPayeeCategory, err := h.assignPayeeAndCategory(r.Context(), []Payee{payee})
+		if err != nil {
+			slog.Error("error creating payee category assigner", "error", err)
+			buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
+
+			return
+		}
+
+		err = h.updateTransactions(r.Context(), getPayeeCategory)
+		if err != nil {
+			slog.Error("error updating transactions", "error", err)
+			buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -207,36 +254,36 @@ func (h *Handler) GetPayees(w http.ResponseWriter, r *http.Request) { //nolint: 
 	}
 }
 
-func (h *Handler) assignPayeeAndCategory(ctx context.Context) ( //nolint: funlen,gocognit,cyclop
+func (h *Handler) assignPayeeAndCategory(ctx context.Context, payees []Payee) ( //nolint: funlen,gocognit,cyclop
 	func(string) (*uuid.UUID, *uuid.UUID), error,
 ) {
-	rows, err := h.db.Query(ctx, queryGetPayees, "")
-	if err != nil {
-		slog.Error("error getting payees from database", "error", err)
-
-		return nil, fmt.Errorf("error getting payees: %w", err)
-	}
-	defer rows.Close()
-
-	payees := []Payee{}
-
-	for rows.Next() {
-		var payee Payee
-
-		err := rows.Scan(&payee.ID, &payee.Name, &payee.Rules, &payee.AutoCategoryID, &payee.CreatedAt, &payee.UpdatedAt)
+	if len(payees) == 0 {
+		rows, err := h.db.Query(ctx, queryGetPayees, "")
 		if err != nil {
-			slog.Error("error scanning payees row from database", "error", err)
+			slog.Error("error getting payees from database", "error", err)
 
-			return nil, fmt.Errorf("error scanning payees row: %w", err)
+			return nil, fmt.Errorf("error getting payees: %w", err)
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var payee Payee
+
+			err := rows.Scan(&payee.ID, &payee.Name, &payee.Rules, &payee.AutoCategoryID, &payee.CreatedAt, &payee.UpdatedAt)
+			if err != nil {
+				slog.Error("error scanning payees row from database", "error", err)
+
+				return nil, fmt.Errorf("error scanning payees row: %w", err)
+			}
+
+			payees = append(payees, payee)
 		}
 
-		payees = append(payees, payee)
-	}
+		if err := rows.Err(); err != nil {
+			slog.Error("error reading payees rows from database", "error", err)
 
-	if err := rows.Err(); err != nil {
-		slog.Error("error reading payees rows from database", "error", err)
-
-		return nil, fmt.Errorf("error reading payees rows: %w", err)
+			return nil, fmt.Errorf("error reading payees rows: %w", err)
+		}
 	}
 
 	return func(input string) (*uuid.UUID, *uuid.UUID) {
