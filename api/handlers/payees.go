@@ -16,10 +16,10 @@ import (
 type (
 	// Rules model.
 	Rules struct {
-		Includes   []string `json:"includes"`
-		Excludes   []string `json:"excludes"`
-		StartsWith []string `json:"startsWith"`
-		EndsWith   []string `json:"endsWith"`
+		Includes   []string `json:"includes,omitempty"`
+		Excludes   []string `json:"excludes,omitempty"`
+		StartsWith []string `json:"startsWith,omitempty"`
+		EndsWith   []string `json:"endsWith,omitempty"`
 	}
 
 	// Payee model.
@@ -294,23 +294,27 @@ func (h *Handler) assignPayeeAndCategory(ctx context.Context, payees []Payee) ( 
 				input = strings.ToLower(input)
 
 				for _, includes := range payee.Rules.Includes {
-					if strings.Contains(input, includes) {
+					if strings.Contains(input, strings.ToLower(includes)) {
 						ri = true
 
 						break
 					}
 				}
 
-				for _, excludes := range payee.Rules.Excludes {
-					if !strings.Contains(input, excludes) {
-						re = true
+				if len(payee.Rules.Excludes) > 0 {
+					for _, excludes := range payee.Rules.Excludes {
+						if !strings.Contains(input, strings.ToLower(excludes)) {
+							re = true
 
-						break
+							break
+						}
 					}
+				} else {
+					re = true
 				}
 
 				for _, startsWith := range payee.Rules.StartsWith {
-					if strings.HasPrefix(input, startsWith) {
+					if strings.HasPrefix(input, strings.ToLower(startsWith)) {
 						rsw = true
 
 						break
@@ -318,7 +322,7 @@ func (h *Handler) assignPayeeAndCategory(ctx context.Context, payees []Payee) ( 
 				}
 
 				for _, endsWith := range payee.Rules.EndsWith {
-					if strings.HasSuffix(input, endsWith) {
+					if strings.HasSuffix(input, strings.ToLower(endsWith)) {
 						rew = true
 
 						break
