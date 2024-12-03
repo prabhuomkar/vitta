@@ -35,9 +35,10 @@ const (
 		` VALUES ($1, $2, $3, $4, $5, $6, $7)`
 	queryUpdateAccount = `UPDATE accounts SET name=$1, off_budget=$2, category=$3, adapter=$4, updated_at=$5` +
 		` WHERE id=$6`
-	queryDeleteAccount      = `DELETE FROM accounts WHERE id=$1`
-	queryGetAccountForUsage = `SELECT * FROM accounts WHERE id=$1`
-	queryGetAccount         = `SELECT a.*, COALESCE(SUM(t.credit)-SUM(t.debit), 0) as balance FROM accounts a LEFT JOIN` +
+	queryDeleteAccount       = `DELETE FROM accounts WHERE id=$1`
+	queryGetAccountForUsage  = `SELECT * FROM accounts WHERE id=$1`
+	queryGetAccountsForUsage = `SELECT * FROM accounts`
+	queryGetAccount          = `SELECT a.*, COALESCE(SUM(t.credit)-SUM(t.debit), 0) as balance FROM accounts a LEFT JOIN` +
 		` transactions t ON a.id = t.account_id AND t.cleared_at IS NOT NULL WHERE a.id=$1 GROUP BY a.id`
 	queryGetAccounts = `SELECT a.*, COALESCE(SUM(t.credit)-SUM(t.debit), 0) as balance FROM accounts a LEFT JOIN` +
 		` transactions t ON a.id = t.account_id AND t.cleared_at IS NOT NULL GROUP BY a.id ORDER BY a.created_at ASC`

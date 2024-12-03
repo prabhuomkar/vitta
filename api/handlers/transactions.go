@@ -51,7 +51,8 @@ const (
 	queryDeleteTransaction    = `DELETE FROM transactions WHERE account_id=$1 AND id=$2`
 	queryGetTotalTransactions = `SELECT COUNT(*) as total FROM transactions WHERE account_id=$1 AND (name ILIKE '%' ||` +
 		` COALESCE(NULLIF($2, ''), '') || '%')`
-	queryGetTransactions = `SELECT t.*, c.name as category_name, p.name as payee_name FROM transactions AS t` +
+	queryGetTransactionsForUsage = `SELECT * FROM transactions`
+	queryGetTransactions         = `SELECT t.*, c.name as category_name, p.name as payee_name FROM transactions AS t` +
 		` LEFT JOIN categories AS c ON t.category_id = c.id LEFT JOIN payees AS p ON t.payee_id = p.id` +
 		` WHERE t.account_id=$1 AND ((t.name ILIKE '%' || COALESCE(NULLIF($2, ''), '') || '%') OR (t.notes ILIKE` +
 		` '%' || COALESCE(NULLIF($2, ''), '') || '%')) ORDER BY t.created_at DESC OFFSET $3 LIMIT $4`
@@ -329,7 +330,7 @@ func (h *Handler) ImportTransactions(w http.ResponseWriter, r *http.Request) { /
 	adapterTransactions := adapters.GetTransactions(h.adapters[account.Adapter+"-"+account.Category], rows)
 	importedTransactions := 0
 
-	getPayeeCategory, err := h.assignPayeeAndCategory(r.Context())
+	getPayeeCategory, err := h.assignPayeeAndCategory(r.Context(), []Payee{})
 	if err != nil {
 		slog.Error("error creating payee category assigner", "error", err)
 		buildErrorResponse(w, err.Error(), http.StatusInternalServerError)
@@ -467,4 +468,96 @@ func (h *Handler) getDataRows(fileName string, file multipart.File) ([][]string,
 	}
 
 	return rows, nil
+}
+
+func (h *Handler) updateTransactions(ctx context.Context, getPayeeCategory func(string) (*uuid.UUID, *uuid.UUID)) error { //nolint: funlen,lll,cyclop
+	rows, err := h.db.Query(ctx, queryGetTransactionsForUsage)
+	if err != nil {
+		slog.Error("error getting transactions from database", "error", err)
+
+		return fmt.Errorf("error getting transactions: %w", err)
+	}
+	defer rows.Close()
+
+	transactions := []Transaction{}
+
+	for rows.Next() {
+		var transaction Transaction
+
+		err := rows.Scan(&transaction.ID, &transaction.AccountID, &transaction.CategoryID, &transaction.PayeeID,
+			&transaction.Name, &transaction.Credit, &transaction.Debit, &transaction.Notes, &transaction.ClearedAt,
+			&transaction.CreatedAt, &transaction.UpdatedAt)
+		if err != nil {
+			slog.Error("error scanning transactions row from database", "error", err)
+
+			return fmt.Errorf("error scanning transactions row: %w", err)
+		}
+
+		transactions = append(transactions, transaction)
+	}
+
+	if err := rows.Err(); err != nil {
+		slog.Error("error reading transactions rows from database", "error", err)
+
+		return fmt.Errorf("error reading transactions rows: %w", err)
+	}
+
+	tx, err := h.db.Begin(ctx)
+	if err != nil {
+		slog.Error("error creating database txn", "error", err)
+
+		return fmt.Errorf("error creating database txn: %w", err)
+	}
+
+	for _, transaction := range transactions {
+		_, err = tx.Exec(ctx, "SAVEPOINT sp1")
+		if err != nil {
+			slog.Error("error storing savepoint", "error", err)
+
+			return fmt.Errorf("error storing savepoint: %w", err)
+		}
+
+		payeeID, categoryID := getPayeeCategory(transaction.Notes)
+
+		if transaction.PayeeID == nil {
+			transaction.PayeeID = payeeID
+		}
+
+		if transaction.CategoryID == nil {
+			transaction.CategoryID = categoryID
+		}
+
+		transaction.UpdatedAt = time.Now()
+
+		_, err = h.db.Exec(ctx, queryUpdateTransaction, transaction.AccountID, transaction.CategoryID,
+			transaction.PayeeID, transaction.Credit, transaction.Debit, transaction.Name, transaction.Notes,
+			transaction.ClearedAt, transaction.UpdatedAt, transaction.ID)
+		if err != nil {
+			slog.Error("error updating transaction", "error", err, "transaction", transaction)
+
+			_, rollbackErr := tx.Exec(ctx, "ROLLBACK TO SAVEPOINT sp1")
+			if rollbackErr != nil {
+				slog.Error("error rolling back savepoint", "error", rollbackErr)
+			}
+
+			return fmt.Errorf("error updating transaction: %w", err)
+		}
+	}
+
+	defer func(ctx context.Context) {
+		if err != nil {
+			rollBackErr := tx.Rollback(ctx)
+			if rollBackErr != nil {
+				slog.Error("error rolling back database txn", "error", rollBackErr)
+			}
+		}
+	}(ctx)
+
+	if err := tx.Commit(ctx); err != nil {
+		slog.Error("error committing database txn", "error", err)
+
+		return fmt.Errorf("error committing database txn: %w", err)
+	}
+
+	return nil
 }

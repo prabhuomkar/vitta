@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"bytes"
+	"context"
 	"encoding/csv"
 	"errors"
 	"io"
@@ -13,6 +14,7 @@ import (
 	uuid "github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/pashagolub/pgxmock/v4"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -25,6 +27,8 @@ var (
 	testNullID          *uuid.UUID = nil
 	transactionRowCols             = []string{"id", "account_id", "category_id", "payee_id", "name", "credit",
 		"debit", "notes", "cleared_at", "created_at", "updated_at", "category_name", "payee_name"}
+	transactionsRowCols = []string{"id", "account_id", "category_id", "payee_id", "name", "credit",
+		"debit", "notes", "cleared_at", "created_at", "updated_at"}
 )
 
 func TestCreateTransaction(t *testing.T) {
@@ -345,4 +349,149 @@ func getMockCSV(t *testing.T, fail bool) (io.Reader, http.Header) {
 	require.NoError(t, err)
 
 	return body, http.Header{"Content-Type": []string{writer.FormDataContentType()}}
+}
+
+func TestUpdateTransactions(t *testing.T) {
+	tests := []struct {
+		name                 string
+		mockDBFunc           func(pgxmock.PgxPoolIface)
+		mockGetPayeeCategory func(string) (*uuid.UUID, *uuid.UUID)
+		errContains          string
+	}{
+		{
+			"error getting transactions",
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnError(pgx.ErrNoRows)
+			},
+			func(_ string) (*uuid.UUID, *uuid.UUID) {
+				return nil, nil
+			},
+			"error getting transactions",
+		},
+		{
+			"error scanning transactions row",
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(transactionsRowCols).AddRow("invalid", "invalid", "invalid",
+					"invalid", "invalid", "invalid", "invalid", "invalid", "invalid", "invalid", "invalid"))
+			},
+			func(_ string) (*uuid.UUID, *uuid.UUID) {
+				return nil, nil
+			},
+			"error scanning transactions row",
+		},
+		{
+			"error reading transactions rows",
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(transactionsRowCols).RowError(0, errors.New("some error in db")))
+			},
+			func(_ string) (*uuid.UUID, *uuid.UUID) {
+				return nil, nil
+			},
+			"error reading transactions rows",
+		},
+		{
+			"error creating database txn",
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(transactionsRowCols).AddRow(testTransactionID,
+					testAccountID, &testCategoryID, &testPayeeID, "Some transaction", 4.20, 4.20, "Some notes",
+					&testAccountTime, testAccountTime, testAccountTime))
+				mock.ExpectBeginTx(pgx.TxOptions{}).WillReturnError(errors.New("some db error"))
+			},
+			func(_ string) (*uuid.UUID, *uuid.UUID) {
+				return nil, nil
+			},
+			"error creating database txn",
+		},
+		{
+			"error storing savepoint",
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(transactionsRowCols).AddRow(testTransactionID,
+					testAccountID, &testCategoryID, &testPayeeID, "Some transaction", 4.20, 4.20, "Some notes",
+					&testAccountTime, testAccountTime, testAccountTime))
+				mock.ExpectBeginTx(pgx.TxOptions{})
+				mock.ExpectExec("SAVEPOINT sp1").WillReturnError(errors.New("some db error"))
+			},
+			func(_ string) (*uuid.UUID, *uuid.UUID) {
+				return nil, nil
+			},
+			"error storing savepoint",
+		},
+		{
+			"error updating transaction",
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(transactionsRowCols).AddRow(testTransactionID,
+					testAccountID, &testCategoryID, &testPayeeID, "Some transaction", 4.20, 4.20, "Some notes",
+					&testAccountTime, testAccountTime, testAccountTime))
+				mock.ExpectBeginTx(pgx.TxOptions{})
+				mock.ExpectExec("SAVEPOINT sp1").WillReturnResult(pgxmock.NewResult("SAVEPOINT", 1))
+				mock.ExpectExec("UPDATE transactions").WithArgs(
+					testAccountID, &testCategoryID, &testPayeeID, 4.20, 4.20, "Some name",
+					"Some notes", pgxmock.AnyArg(), pgxmock.AnyArg(), testTransactionID,
+				).WillReturnError(pgx.ErrTxClosed)
+				mock.ExpectRollback()
+			},
+			func(_ string) (*uuid.UUID, *uuid.UUID) {
+				return &testPayeeID, &testCategoryID
+			},
+			"error updating transaction",
+		},
+		{
+			"error committing database txn",
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(transactionsRowCols).AddRow(testTransactionID,
+					testAccountID, &testCategoryID, &testPayeeID, "Some transaction", 4.20, 4.20, "Some notes",
+					&testAccountTime, testAccountTime, testAccountTime))
+				mock.ExpectBeginTx(pgx.TxOptions{})
+				mock.ExpectExec("SAVEPOINT sp1").WillReturnResult(pgxmock.NewResult("SAVEPOINT", 1))
+				mock.ExpectExec("UPDATE transactions").WithArgs(
+					testAccountID, &testCategoryID, &testPayeeID, 4.20, 4.20, "Some transaction",
+					"Some notes", pgxmock.AnyArg(), pgxmock.AnyArg(), testTransactionID,
+				).WillReturnResult(pgxmock.NewResult("UPDATE", 1))
+				mock.ExpectCommit().WillReturnError(errors.New("some db error"))
+			},
+			func(_ string) (*uuid.UUID, *uuid.UUID) {
+				return &testPayeeID, &testCategoryID
+			},
+			"error committing database txn",
+		},
+		{
+			"success updating transaction",
+			func(mock pgxmock.PgxPoolIface) {
+				mock.ExpectQuery("SELECT *").WillReturnRows(pgxmock.NewRows(transactionsRowCols).AddRow(testTransactionID,
+					testAccountID, &testCategoryID, &testPayeeID, "Some transaction", 4.20, 4.20, "Some notes",
+					&testAccountTime, testAccountTime, testAccountTime))
+				mock.ExpectBeginTx(pgx.TxOptions{})
+				mock.ExpectExec("SAVEPOINT sp1").WillReturnResult(pgxmock.NewResult("SAVEPOINT", 1))
+				mock.ExpectExec("UPDATE transactions").WithArgs(
+					testAccountID, &testCategoryID, &testPayeeID, 4.20, 4.20, "Some transaction",
+					"Some notes", pgxmock.AnyArg(), pgxmock.AnyArg(), testTransactionID,
+				).WillReturnResult(pgxmock.NewResult("UPDATE", 1))
+				mock.ExpectCommit()
+			},
+			func(_ string) (*uuid.UUID, *uuid.UUID) {
+				return &testPayeeID, &testCategoryID
+			},
+			"",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			mockDB, err := pgxmock.NewPool()
+			require.NoError(t, err)
+			defer mockDB.Close()
+
+			if tc.mockDBFunc != nil {
+				tc.mockDBFunc(mockDB)
+			}
+
+			h := &Handler{cfg: nil, db: mockDB, adapters: nil}
+			err = h.updateTransactions(context.TODO(), tc.mockGetPayeeCategory)
+			if len(tc.errContains) > 0 {
+				assert.Error(t, err)
+				assert.ErrorContains(t, err, tc.errContains)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
 }
