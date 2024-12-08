@@ -5,6 +5,7 @@ import NewPayeeRow from './NewPayeeRow';
 
 const PayeeTable = ({
   payees,
+  categories,
   newPayee,
   setNewPayee,
   handleAddPayee,
@@ -24,12 +25,16 @@ const PayeeTable = ({
       <Thead>
         <Tr>
           <Th padding="0.6rem">Payee Name</Th>
-          <Th padding="0.6rem">Actions</Th>
+          <Th padding="0.6rem">Category</Th>
+          <Th padding="0.6rem">Rules</Th>
+          <Th padding="0.6rem">Add / Delete</Th>
         </Tr>
       </Thead>
       <Tbody>
         <NewPayeeRow
+          payees={payees}
           newPayee={newPayee}
+          categories={categories}
           setNewPayee={setNewPayee}
           handleAddPayee={handleAddPayee}
         />
@@ -38,6 +43,7 @@ const PayeeTable = ({
             <PayeeRow
               key={payee.id}
               payee={payee}
+              categories={categories}
               handleDelete={handleDelete}
               handleFieldChange={handleFieldChange}
               handleSaveChanges={handleSaveChanges}
@@ -48,7 +54,7 @@ const PayeeTable = ({
           <Tr>
             <Td
               padding="0.6rem"
-              colSpan={2}
+              colSpan={4}
               textAlign="center"
               color="gray.500"
             >

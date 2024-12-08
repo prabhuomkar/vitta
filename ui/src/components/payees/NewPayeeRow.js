@@ -1,12 +1,35 @@
-import React from 'react';
-import { Tr, Td, Input, IconButton } from '@chakra-ui/react';
-import { AddIcon } from '@chakra-ui/icons';
+import React, { useState } from 'react';
+import {
+  Tr,
+  Td,
+  Text,
+  Input,
+  Select,
+  Button,
+  useTheme
+} from '@chakra-ui/react';
 
-const NewPayeeRow = ({ newPayee, setNewPayee, handleAddPayee }) => {
+const NewPayeeRow = ({
+  payees,
+  newPayee,
+  categories,
+  setNewPayee,
+  handleAddPayee
+}) => {
+  const theme = useTheme();
+  const primaryColor = theme.colors.primary;
+  const [selectedCategory, setSelectedCategory] = useState('');
+
   const handleKeyDown = e => {
     if (e.key === 'Enter') {
-      handleAddPayee();
+      handleAddPayee(newPayee, selectedCategory || null);
+      setSelectedCategory('');
     }
+  };
+
+  const handleAdd = () => {
+    handleAddPayee(newPayee, selectedCategory || null);
+    setSelectedCategory('');
   };
 
   return (
@@ -22,13 +45,36 @@ const NewPayeeRow = ({ newPayee, setNewPayee, handleAddPayee }) => {
         />
       </Td>
       <Td padding="0.6rem">
-        <IconButton
-          aria-label="Add payee"
-          icon={<AddIcon />}
-          variant="outline"
-          onClick={handleAddPayee}
+        <Select
+          placeholder="Select Category"
+          value={selectedCategory}
+          onChange={e => setSelectedCategory(e.target.value)}
           size="sm"
-        />
+        >
+          {categories.map(category => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </Select>
+      </Td>
+      <Td padding="0.6rem">
+        {payees.length === 0 && (
+          <Text fontSize="xs" color="gray.500">
+            You can add rules <br /> after adding a payee
+          </Text>
+        )}
+      </Td>
+      <Td padding="0.6rem">
+        <Button
+          aria-label="Add payee"
+          onClick={handleAdd}
+          size="sm"
+          colorScheme={primaryColor}
+          bg={primaryColor}
+        >
+          Add Payee
+        </Button>
       </Td>
     </Tr>
   );

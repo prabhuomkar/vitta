@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, useToast } from '@chakra-ui/react';
-import { usePayees } from '../context';
+import { useCategories, usePayees } from '../context';
 import { PayeeTable, Loading, Error } from '../components';
 
 const Payees = () => {
@@ -13,6 +13,7 @@ const Payees = () => {
     loading,
     error
   } = usePayees();
+  const { categories } = useCategories();
   const [localPayees, setLocalPayees] = useState([]);
   const [newPayee, setNewPayee] = useState('');
   const [errors, setErrors] = useState({});
@@ -42,7 +43,7 @@ const Payees = () => {
     );
   };
 
-  const handleAddPayee = async () => {
+  const handleAddPayee = async (name, autoCategoryId = null) => {
     if (newPayee.trim()) {
       if (isDuplicatePayee(newPayee)) {
         toast({
@@ -57,7 +58,7 @@ const Payees = () => {
       }
 
       try {
-        const newPayeeObj = { name: newPayee.trim() };
+        const newPayeeObj = { name: newPayee.trim(), autoCategoryId };
         await createPayee(newPayeeObj);
         setNewPayee('');
         toast({
@@ -109,14 +110,21 @@ const Payees = () => {
       ...prevErrors,
       [id]: {
         ...prevErrors[id],
-        [field]: !value
+        [field]: field === 'name' ? !value : false
       }
     }));
   };
 
   const handleSaveChanges = async (id, updatedPayee) => {
     const originalPayee = payees.find(payee => payee.id === id);
-    if (!originalPayee || originalPayee.name === updatedPayee.name.trim()) {
+
+    if (
+      !originalPayee ||
+      (originalPayee.name === updatedPayee.name.trim() &&
+        originalPayee.autoCategoryId === updatedPayee.autoCategoryId &&
+        JSON.stringify(originalPayee.rules) ===
+          JSON.stringify(updatedPayee.rules))
+    ) {
       return;
     }
 
@@ -135,6 +143,13 @@ const Payees = () => {
 
     try {
       await updatePayee(id, updatedPayee);
+      toast({
+        title: 'Payee updated.',
+        description: `Payee has been successfully updated.`,
+        status: 'success',
+        duration: 1500,
+        isClosable: true
+      });
     } catch (err) {
       toast({
         title: 'Error updating payee.',
@@ -153,6 +168,7 @@ const Payees = () => {
     <Box overflowX="auto" borderRadius="md">
       <PayeeTable
         payees={localPayees}
+        categories={categories}
         newPayee={newPayee}
         setNewPayee={setNewPayee}
         handleAddPayee={handleAddPayee}
