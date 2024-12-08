@@ -121,7 +121,9 @@ const Payees = () => {
     if (
       !originalPayee ||
       (originalPayee.name === updatedPayee.name.trim() &&
-        originalPayee.autoCategoryId === updatedPayee.autoCategoryId)
+        originalPayee.autoCategoryId === updatedPayee.autoCategoryId &&
+        JSON.stringify(originalPayee.rules) ===
+          JSON.stringify(updatedPayee.rules))
     ) {
       return;
     }
@@ -142,7 +144,8 @@ const Payees = () => {
     try {
       await updatePayee(id, updatedPayee);
       toast({
-        title: 'Payee updated successfully.',
+        title: 'Payee updated.',
+        description: `Payee has been successfully updated.`,
         status: 'success',
         duration: 1500,
         isClosable: true

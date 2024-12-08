@@ -1,9 +1,23 @@
 import React, { useState } from 'react';
-import { Tr, Td, Input, Select, Tooltip, IconButton } from '@chakra-ui/react';
-import { AddIcon } from '@chakra-ui/icons';
-import { FaListUl } from 'react-icons/fa';
+import {
+  Tr,
+  Td,
+  Text,
+  Input,
+  Select,
+  Button,
+  useTheme
+} from '@chakra-ui/react';
 
-const NewPayeeRow = ({ newPayee, categories, setNewPayee, handleAddPayee }) => {
+const NewPayeeRow = ({
+  payees,
+  newPayee,
+  categories,
+  setNewPayee,
+  handleAddPayee
+}) => {
+  const theme = useTheme();
+  const primaryColor = theme.colors.primary;
   const [selectedCategory, setSelectedCategory] = useState('');
 
   const handleKeyDown = e => {
@@ -45,20 +59,22 @@ const NewPayeeRow = ({ newPayee, categories, setNewPayee, handleAddPayee }) => {
         </Select>
       </Td>
       <Td padding="0.6rem">
-        <Tooltip label="Set Rules" hasArrow openDelay={500}>
-          <IconButton icon={<FaListUl />} variant="outline" size="sm" />
-        </Tooltip>
+        {payees.length === 0 && (
+          <Text fontSize="xs" color="gray.500">
+            You can add rules <br /> after adding a payee
+          </Text>
+        )}
       </Td>
       <Td padding="0.6rem">
-        <Tooltip label="Add Payee" hasArrow openDelay={500}>
-          <IconButton
-            aria-label="Add payee"
-            icon={<AddIcon />}
-            variant="outline"
-            onClick={handleAdd}
-            size="sm"
-          />
-        </Tooltip>
+        <Button
+          aria-label="Add payee"
+          onClick={handleAdd}
+          size="sm"
+          colorScheme={primaryColor}
+          bg={primaryColor}
+        >
+          Add Payee
+        </Button>
       </Td>
     </Tr>
   );

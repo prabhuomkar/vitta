@@ -32,6 +32,7 @@ const PayeeTable = ({
       </Thead>
       <Tbody>
         <NewPayeeRow
+          payees={payees}
           newPayee={newPayee}
           categories={categories}
           setNewPayee={setNewPayee}
@@ -53,7 +54,7 @@ const PayeeTable = ({
           <Tr>
             <Td
               padding="0.6rem"
-              colSpan={2}
+              colSpan={4}
               textAlign="center"
               color="gray.500"
             >
